@@ -22,10 +22,10 @@ class wc_sale extends CModule
             $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
         }
 
-        $this->MODULE_NAME = Loc::getMessage('WC_MODULE_NAME');
-        $this->MODULE_DESCRIPTION = Loc::getMessage('WC_MODULE_DESCRIPTION');
-        $this->PARTNER_NAME = Loc::getMessage('WC_PARTNER_NAME');
-        $this->PARTNER_URI = Loc::getMessage('WC_PARTNER_URI');
+        $this->MODULE_NAME = Loc::getMessage('WC_SALE_MODULE_NAME');
+        $this->MODULE_DESCRIPTION = Loc::getMessage('WC_SALE_MODULE_DESCRIPTION');
+        $this->PARTNER_NAME = Loc::getMessage('WC_SALE_PARTNER_NAME');
+        $this->PARTNER_URI = Loc::getMessage('WC_SALE_PARTNER_URI');
     }
 
     public function DoInstall()
@@ -37,7 +37,7 @@ class wc_sale extends CModule
             $this->checkRequirements();
             Main\ModuleManager::registerModule($this->MODULE_ID);
             if (!Main\Loader::includeModule($this->MODULE_ID)) {
-                throw new Main\SystemException(Loc::getMessage('WC_MODULE_NOT_REGISTERED'));
+                throw new Main\SystemException(Loc::getMessage('WC_SALE_MODULE_NOT_REGISTERED'));
             }
         } catch (Exception $exception) {
             $result = false;
@@ -56,7 +56,7 @@ class wc_sale extends CModule
     {
         $requirePhp = '7.1';
         if (CheckVersion(PHP_VERSION, $requirePhp) === false) {
-            throw new \RuntimeException(Loc::getMessage('WC_INSTALL_REQUIRE_PHP', ['#VERSION#' => $requirePhp]));
+            throw new \RuntimeException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_PHP', ['#VERSION#' => $requirePhp]));
         }
 
         $requireModules = [
@@ -70,7 +70,7 @@ class wc_sale extends CModule
             foreach ($requireModules as $moduleName => $moduleVersion) {
                 $currentVersion = Main\ModuleManager::getVersion($moduleName);
                 if (CheckVersion($currentVersion, $moduleVersion) === false) {
-                    throw new \RuntimeException(Loc::getMessage('WC_INSTALL_REQUIRE_MODULE', [
+                    throw new \RuntimeException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_MODULE', [
                         '#MODULE#' => $moduleName,
                         '#VERSION#' => $moduleVersion,
                     ]));
