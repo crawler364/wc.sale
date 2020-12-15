@@ -4,8 +4,6 @@
 namespace WC\Sale;
 
 
-use Bitrix\Main\Loader;
-
 class BasketHandler
 {
     /**
