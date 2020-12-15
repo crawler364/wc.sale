@@ -4,7 +4,6 @@
 namespace WC\Sale;
 
 
-
 class ProductProvider implements \IBXSaleProductProvider
 {
     public static function GetProductData($arFields)

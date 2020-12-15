@@ -23,10 +23,6 @@ class BasketHandler
      */
     public function __construct($param, \Bitrix\Sale\Basket $basket = null)
     {
-        Loader::includeModule('sale');
-        Loader::includeModule('iblock');
-        Loader::includeModule('catalog');
-
         $this->result = new \WC\Main\Result();
         $this->mess = new \WC\Main\Messages(__FILE__);
 
