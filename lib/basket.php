@@ -16,12 +16,7 @@ class Basket extends \Bitrix\Sale\Basket
         }
 
         // $removedItems
-        global $USER;
-        $removedItems = array_values($USER->GetParam('REMOVED_BASKET_ITEMS'));
-        foreach ($removedItems as $key => &$item) {
-            $item['ELEMENT'] = $basketHandler::getIblockElementInfo($item['ID']);
-        }
-        unset($item);
+        $removedItems = [];
 
         // $info
         $info['WEIGHT'] = (string)$this->getWeight();
