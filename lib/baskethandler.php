@@ -16,7 +16,7 @@ class BasketHandler
     protected $productProviderClass = ProductProvider::class;
 
     /**
-     * @param $param = int | \Bitrix\Sale\BasketItemBase
+     * @param $param = int | \Bitrix\Sale\BasketItem
      * @param \Bitrix\Sale\Basket|null $basket
      */
     public function __construct($param, \Bitrix\Sale\Basket $basket = null)
@@ -24,7 +24,7 @@ class BasketHandler
         $this->result = new \WC\Main\Result();
         $this->mess = new \WC\Main\Messages(__FILE__);
 
-        $this->basket = $basket ?: \WC\Sale\Basket::getCurrentUserBasket();
+        $this->basket = $basket ?: Basket::getCurrentUserBasket();
 
         if ($param instanceof \Bitrix\Sale\BasketItem) {
             $this->productId = $param->getProductId();
