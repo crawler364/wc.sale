@@ -4,6 +4,8 @@
 namespace WC\Sale;
 
 
+use Bitrix\Main\Localization\Loc;
+
 class BasketHandler
 {
     /**
@@ -57,7 +59,7 @@ class BasketHandler
 
         $this->setBasketItemPriceName();
 
-        $this->basketItem->setProperty('Артикул', 'ARTICLE', $notes['ARTICLE']);
+        $this->basketItem->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
 
         $r = $this->basket->save();
 
