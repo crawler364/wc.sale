@@ -13,7 +13,7 @@ class BasketHandler
     public $basketItem;
     protected $basket;
     public $quantity;
-    protected $productProviderClass = ProductProvider::class;
+    protected $productProviderClass = \CCatalogProductProvider::class;
 
     /**
      * @param $param = int | \Bitrix\Sale\BasketItem
