@@ -55,6 +55,8 @@ class BasketHandler
 
         $this->basketItem->setFields($fields);
 
+        $this->setBasketItemPriceName();
+
         $this->basketItem->setProperty('Артикул', 'ARTICLE', $notes['ARTICLE']);
 
         $r = $this->basket->save();
@@ -81,6 +83,8 @@ class BasketHandler
         ];
 
         $this->basketItem->setFields($fields);
+
+        $this->setBasketItemPriceName();
 
         $r = $this->basket->save();
 
@@ -151,6 +155,15 @@ class BasketHandler
         }
 
         $this->quantity = $quantity;
+    }
+
+    private function setBasketItemPriceName()
+    {
+        $notes = unserialize($this->basketItem->getField('NOTES'), ['allowed_classes' => true]);
+        $price = \Bitrix\Catalog\GroupTable::getById($this->basketItem->getField('PRICE_TYPE_ID'))->fetch();
+        $notes['PRICE_NAME'] = $price['NAME'];
+
+        $this->basketItem->setField('NOTES', serialize($notes));
     }
 
     public function prepareBasketItemFields()
