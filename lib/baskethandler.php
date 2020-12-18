@@ -16,9 +16,10 @@ class BasketHandler
     protected $basket;
     public $quantity;
     protected $productProviderClass = \CCatalogProductProvider::class;
+    public $productId;
 
     /**
-     * @param $param = int | \Bitrix\Sale\BasketItem
+     * @param $param = PRODUCT_ID | \Bitrix\Sale\BasketItem
      * @param \Bitrix\Sale\Basket|null $basket
      */
     public function __construct($param, \Bitrix\Sale\Basket $basket = null)
@@ -33,44 +34,13 @@ class BasketHandler
             $this->basketItem = $param;
         } else {
             $this->productId = $param;
-            if (!\Bitrix\Catalog\ProductTable::getById($this->productId)->fetch()) {
+            if (\Bitrix\Catalog\ProductTable::getById($this->productId)->fetch()) {
+                $this->basketItem = $this->basket->getItemBy(['PRODUCT_ID' => $this->productId]) ?:
+                    $this->basket->createItem('catalog', $this->productId);
+            } else {
                 $this->result->addError($this->mess->get('WC_INCORRECT_PRODUCT_ID'));
             }
-            if ($this->result->isSuccess()) {
-                $this->basketItem = $this->basket->getItemBy(['PRODUCT_ID' => $param]);
-            }
         }
-    }
-
-    public function basketItemAdd()
-    {
-        if (!$this->result->isSuccess()) {
-            return $this->result;
-        }
-
-        $this->basketItem = $this->basket->createItem('catalog', $this->productId);
-
-        $fields = $this->prepareBasketItemFields();
-        $fields['QUANTITY'] = $this->quantity;
-        $fields['PRODUCT_PROVIDER_CLASS'] = $this->productProviderClass;
-        $notes = unserialize($fields['NOTES'], ['allowed_classes' => true]);
-
-        $this->basketItem->setFields($fields);
-
-        $this->setBasketItemPriceName();
-
-        $this->basketItem->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
-
-        $r = $this->basket->save();
-
-        $this->result->mergeResult($r);
-
-        if ($this->result->isSuccess()) {
-            $basketItemInfo = $this->basketItem->getInfo();
-            $this->result->setData($basketItemInfo);
-        }
-
-        return $this->result;
     }
 
     public function basketItemUpdate()
@@ -79,14 +49,19 @@ class BasketHandler
             return $this->result;
         }
 
-        $fields = [
-            'QUANTITY' => $this->quantity,
-            'PRODUCT_PROVIDER_CLASS' => $this->productProviderClass,
-        ];
+        // Собрать поля для нового basketItem
+        if ($this->basketItem->getId() == null) {
+            $fields = $this->prepareBasketItemFields();
+        }
+
+        $fields['QUANTITY'] = $this->quantity;
+        $fields['PRODUCT_PROVIDER_CLASS'] = $this->productProviderClass;
 
         $this->basketItem->setFields($fields);
 
         $this->setBasketItemPriceName();
+
+        $this->setBasketItemPropertyArticle();
 
         $r = $this->basket->save();
 
@@ -102,6 +77,10 @@ class BasketHandler
 
     public function basketItemDelete()
     {
+        if (!$this->result->isSuccess()) {
+            return $this->result;
+        }
+
         $this->basketItem->delete();
 
         $r = $this->basket->save();
@@ -159,7 +138,7 @@ class BasketHandler
         $this->quantity = $quantity;
     }
 
-    private function setBasketItemPriceName()
+    protected function setBasketItemPriceName()
     {
         $notes = unserialize($this->basketItem->getField('NOTES'), ['allowed_classes' => true]);
         $price = \Bitrix\Catalog\GroupTable::getById($this->basketItem->getField('PRICE_TYPE_ID'))->fetch();
@@ -172,6 +151,12 @@ class BasketHandler
     {
         // todo универсальный вариант под торговые предложения и товары
         return [];
+    }
+
+    protected function setBasketItemPropertyArticle()
+    {
+        $notes = unserialize($this->basketItem->getField('NOTES'), ['allowed_classes' => true]);
+        $this->basketItem->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
     }
 
     public static function getIblockElementInfo($productId)
