@@ -39,7 +39,7 @@ class wc_sale extends CModule
             if (!Main\Loader::includeModule($this->MODULE_ID)) {
                 throw new Main\SystemException(Loc::getMessage('WC_SALE_MODULE_NOT_REGISTERED'));
             }
-        } catch (Exception $exception) {
+        } catch (Main\SystemException $exception) {
             $result = false;
             $APPLICATION->ThrowException($exception->getMessage());
         }
@@ -56,7 +56,7 @@ class wc_sale extends CModule
     {
         $requirePhp = '7.1';
         if (CheckVersion(PHP_VERSION, $requirePhp) === false) {
-            throw new \RuntimeException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_PHP', ['#VERSION#' => $requirePhp]));
+            throw new Main\SystemException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_PHP', ['#VERSION#' => $requirePhp]));
         }
 
         $requireModules = [
@@ -70,7 +70,7 @@ class wc_sale extends CModule
             foreach ($requireModules as $moduleName => $moduleVersion) {
                 $currentVersion = Main\ModuleManager::getVersion($moduleName);
                 if (CheckVersion($currentVersion, $moduleVersion) === false) {
-                    throw new \RuntimeException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_MODULE', [
+                    throw new Main\SystemException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_MODULE', [
                         '#MODULE#' => $moduleName,
                         '#VERSION#' => $moduleVersion,
                     ]));
