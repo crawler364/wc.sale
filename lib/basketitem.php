@@ -66,7 +66,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
      */
     public static function getBasketItem($productId, \Bitrix\Sale\Basket $basket = null)
     {
-        $basket = $basket ?: \WC\Sale\BasketHandler::getCurrentUserBasket();
+        $basket = $basket ?: \WC\Sale\Basket::getCurrentUserBasket();
         if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
             return $basket->getItemBy(['PRODUCT_ID' => $productId]) ?: $basket->createItem('catalog', $productId);
         }

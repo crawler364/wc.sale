@@ -164,14 +164,4 @@ class BasketHandler
         // todo
         return [];
     }
-
-    /**
-     * @return \Bitrix\Sale\Basket
-     */
-    public static function getCurrentUserBasket()
-    {
-        $siteId = \WC\Main\Tools::getSiteId();
-        $fUserId = \Bitrix\Sale\Fuser::getId();
-        return \Bitrix\Sale\Basket::loadItemsForFUser($fUserId, $siteId);
-    }
 }
