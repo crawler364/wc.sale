@@ -165,6 +165,9 @@ class BasketHandler
         return [];
     }
 
+    /**
+     * @return \Bitrix\Sale\Basket
+     */
     public static function getCurrentUserBasket()
     {
         $siteId = \WC\Main\Tools::getSiteId();
