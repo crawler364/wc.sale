@@ -3,6 +3,7 @@
 use Bitrix\Main\ModuleManager;
 use Bitrix\Main;
 use Bitrix\Main\Localization\Loc;
+use \Bitrix\Main\IO\Directory;
 
 class wc_sale extends CModule
 {
@@ -28,7 +29,7 @@ class wc_sale extends CModule
         $this->PARTNER_URI = Loc::getMessage('WC_SALE_PARTNER_URI');
     }
 
-    public function DoInstall()
+    function DoInstall()
     {
         global $APPLICATION;
         $result = true;
@@ -36,8 +37,11 @@ class wc_sale extends CModule
         try {
             $this->checkRequirements();
             Main\ModuleManager::registerModule($this->MODULE_ID);
-            if (!Main\Loader::includeModule($this->MODULE_ID)) {
-                throw new Main\SystemException(Loc::getMessage('WC_SALE_MODULE_NOT_REGISTERED'));
+            if (Main\Loader::includeModule($this->MODULE_ID)) {
+                $this->InstallEvents();
+                $this->InstallFiles();
+            } else {
+                throw new Main\SystemException(Loc::getMessage('WC_MAIN_MODULE_NOT_REGISTERED'));
             }
         } catch (Main\SystemException $exception) {
             $result = false;
@@ -47,9 +51,34 @@ class wc_sale extends CModule
         return $result;
     }
 
-    public function DoUninstall()
+    function DoUninstall()
     {
+        if (Main\Loader::includeModule($this->MODULE_ID)) {
+            $this->UnInstallEvents();
+            $this->UnInstallFiles();
+        }
+
         Main\ModuleManager::unRegisterModule($this->MODULE_ID);
+    }
+
+    function InstallEvents()
+    {
+        // todo \WC\IBlock\UniqueSymbolCode
+    }
+
+    function UnInstallEvents()
+    {
+        // todo \WC\IBlock\UniqueSymbolCode
+    }
+
+    function InstallFiles()
+    {
+        CopyDirFiles(__DIR__ . '/components', $this->getKernelDir() . "/components", true, true);
+    }
+
+    function UnInstallFiles()
+    {
+        //Directory::deleteDirectory($this->getKernelDir() . '/components/wc/order');
     }
 
     private function checkRequirements()
@@ -77,5 +106,12 @@ class wc_sale extends CModule
                 }
             }
         }
+    }
+
+    private function getKernelDir()
+    {
+        $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
+
+        return $_SERVER['DOCUMENT_ROOT'] . $kernelDir;
     }
 }
