@@ -27,7 +27,7 @@ class BasketHandler
         $this->result = new \WC\Main\Result();
         $this->mess = new \WC\Main\Messages(__FILE__);
 
-        $this->basket = $basket ?: Basket::getCurrentUserBasket();
+        $this->basket = $basket ?: self::getCurrentUserBasket();
 
         if ($param instanceof \Bitrix\Sale\BasketItem) {
             $this->productId = $param->getProductId();
@@ -163,5 +163,12 @@ class BasketHandler
     {
         // todo
         return [];
+    }
+
+    public static function getCurrentUserBasket()
+    {
+        $siteId = \WC\Main\Tools::getSiteId();
+        $fUserId = \Bitrix\Sale\Fuser::getId();
+        return \Bitrix\Sale\Basket::loadItemsForFUser($fUserId, $siteId);
     }
 }

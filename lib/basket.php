@@ -61,11 +61,4 @@ class Basket extends \Bitrix\Sale\Basket
 
         return null;
     }
-
-    public static function getCurrentUserBasket()
-    {
-        $siteId = \WC\Main\Tools::getSiteId();
-        $fUserId = \Bitrix\Sale\Fuser::getId();
-        return \Bitrix\Sale\Basket::loadItemsForFUser($fUserId, $siteId);
-    }
 }
