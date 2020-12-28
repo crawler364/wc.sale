@@ -6,8 +6,6 @@ namespace WC\Sale;
 
 class Basket extends \Bitrix\Sale\Basket
 {
-    public $basketHandler = basketHandler::class;
-
     public function getInfo()
     {
         // $items
@@ -34,7 +32,7 @@ class Basket extends \Bitrix\Sale\Basket
 
     /**
      * @param array $param = ['PRODUCT_ID'|'PRODUCT_XML_ID'|'SORT']
-     * @return \Bitrix\Sale\BasketItemBase|null
+     * @return BasketItem|null
      */
     public function getItemBy(array $param): ?BasketItem
     {

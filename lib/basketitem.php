@@ -88,7 +88,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     /**
      * @param string $math = 'plus' | 'minus'
      */
-    public function mathBasketItemQuantity(string $math)
+    public function mathQuantity(string $math)
     {
         $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
 
@@ -105,10 +105,10 @@ class BasketItem extends \Bitrix\Sale\BasketItem
                 break;
         }
 
-        $this->setBasketItemQuantity($quantity);
+        $this->setQuantity($quantity);
     }
 
-    public function setBasketItemQuantity($quantity = 0.0)
+    public function setQuantity($quantity = 0.0)
     {
         $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
 

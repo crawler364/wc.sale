@@ -52,7 +52,7 @@ class BasketItemHandler
         return $this->result;
     }
 
-    public function basketItemDelete()
+    public function delete()
     {
         if (!$this->result->isSuccess()) {
             return $this->result;
@@ -69,10 +69,10 @@ class BasketItemHandler
 
     /**
      * @param $productId
-     * @param \Bitrix\Sale\Basket|null $basket
-     * @return \Bitrix\Sale\BasketItem
+     * @param Basket|null $basket
+     * @return BasketItem|null
      */
-    public static function getBasketItem($productId, \Bitrix\Sale\Basket $basket = null)
+    public static function getBasketItem($productId, Basket $basket = null)
     {
         $basket = $basket ?: BasketHandler::getCurrentUserBasket();
         if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {

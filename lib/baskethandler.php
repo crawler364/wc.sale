@@ -15,7 +15,7 @@ class BasketHandler
     }
 
     /**
-     * @return \Bitrix\Sale\Basket
+     * @return Basket
      */
     public static function getCurrentUserBasket()
     {
