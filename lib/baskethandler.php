@@ -6,7 +6,7 @@ namespace WC\Sale;
 
 class BasketHandler
 {
-    public function __construct(\Bitrix\Sale\Basket $basket)
+    public function __construct(Basket $basket)
     {
         $this->result = new \WC\Main\Result();
         $this->mess = new \WC\Main\Messages(__FILE__);
@@ -14,13 +14,10 @@ class BasketHandler
         $this->basket = $basket;
     }
 
-    /**
-     * @return Basket
-     */
-    public static function getCurrentUserBasket()
+    public static function getCurrentUserBasket(): Basket
     {
         $siteId = \WC\Main\Tools::getSiteId();
         $fUserId = \Bitrix\Sale\Fuser::getId();
-        return \Bitrix\Sale\Basket::loadItemsForFUser($fUserId, $siteId);
+        return Basket::loadItemsForFUser($fUserId, $siteId);
     }
 }
