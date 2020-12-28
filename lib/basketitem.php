@@ -4,15 +4,16 @@
 namespace WC\Sale;
 
 
+use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 
 class BasketItem extends \Bitrix\Sale\BasketItem
 {
-    public $basketHandler = basketHandler::class;
+    protected $productProviderClass = \CCatalogProductProvider::class;
 
     public function getInfo()
     {
-        \Bitrix\Main\Loader::includeModule('iblock');
+        Loader::includeModule('iblock');
 
         $productId = $this->getProductId();
 
@@ -58,7 +59,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         }
     }
 
-    public function setBasketItemPriceName()
+    public function setPriceName()
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
         $price = \Bitrix\Catalog\GroupTable::getById($this->getField('PRICE_TYPE_ID'))->fetch();
@@ -67,7 +68,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $this->setField('NOTES', serialize($notes));
     }
 
-    public function setBasketItemPropertyArticle()
+    public function setPropertyArticle()
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
         $this->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
@@ -76,7 +77,9 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     public function prepareBasketItemFields()
     {
         // todo универсальный вариант под торговые предложения и товары
-        return [];
+        return [
+            'PRODUCT_PROVIDER_CLASS' => $this->productProviderClass,
+        ];
     }
 
     public static function getIblockElementInfo($productId)

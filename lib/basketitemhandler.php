@@ -36,9 +36,9 @@ class BasketItemHandler
 
         $this->basketItem->setFields($fields);
 
-        $this->basketItem->setBasketItemPriceName();
+        $this->basketItem->setPriceName();
 
-        $this->basketItem->setBasketItemPropertyArticle();
+        $this->basketItem->setPropertyArticle();
 
         $r = $this->basket->save();
 
