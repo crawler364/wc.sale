@@ -4,11 +4,10 @@
 namespace WC\Sale;
 
 
+use Bitrix\Main\Localization\Loc;
+
 class BasketItem extends \Bitrix\Sale\BasketItem
 {
-    /**
-     * @var basketHandler $basketHandler
-     */
     public $basketHandler = basketHandler::class;
 
     public function getInfo()
@@ -17,7 +16,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 
         $productId = $this->getProductId();
 
-        $info['ELEMENT'] = $this->basketHandler::getIblockElementInfo($productId);
+        $info['ELEMENT'] = static::getIblockElementInfo($productId);
 
         $info['MAIN_SECTION'] = \Bitrix\Iblock\SectionTable::getList([
             'filter' => ['=ID' => $info['ELEMENT']['IBLOCK_SECTION_ID']],
@@ -59,17 +58,73 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         }
     }
 
-    /**
-     * @param $productId
-     * @param \Bitrix\Sale\Basket|null $basket
-     * @return \Bitrix\Sale\BasketItem
-     */
-    public static function getBasketItem($productId, \Bitrix\Sale\Basket $basket = null)
+    public function setBasketItemPriceName()
     {
-        $basket = $basket ?: \WC\Sale\Basket::getCurrentUserBasket();
-        if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
-            return $basket->getItemBy(['PRODUCT_ID' => $productId]) ?: $basket->createItem('catalog', $productId);
+        $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
+        $price = \Bitrix\Catalog\GroupTable::getById($this->getField('PRICE_TYPE_ID'))->fetch();
+        $notes['PRICE_NAME'] = $price['NAME'];
+
+        $this->setField('NOTES', serialize($notes));
+    }
+
+    public function setBasketItemPropertyArticle()
+    {
+        $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
+        $this->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
+    }
+
+    public function prepareBasketItemFields()
+    {
+        // todo универсальный вариант под торговые предложения и товары
+        return [];
+    }
+
+    public static function getIblockElementInfo($productId)
+    {
+        // todo
+        return [];
+    }
+
+    /**
+     * @param string $math = 'plus' | 'minus'
+     */
+    public function mathBasketItemQuantity(string $math)
+    {
+        $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
+
+        if (!$quantity = $this->getQuantity()) {
+            $quantity = 0.0;
         }
-        return null;
+
+        switch ($math) {
+            case 'plus':
+                $quantity += $ratio;
+                break;
+            case 'minus':
+                $quantity -= $ratio;
+                break;
+        }
+
+        $this->setBasketItemQuantity($quantity);
+    }
+
+    public function setBasketItemQuantity($quantity = 0.0)
+    {
+        $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
+
+        // todo Проверить остатки, установить количество по остаткам
+
+        // Проверить количество по коэффициенту
+        if (is_numeric($quantity) && $quantity > $ratio && $quantity > 0) {
+            $multiply = round($quantity / $ratio, 2);
+            if (round($multiply, 0) !== $multiply) {
+                $multiply = floor($multiply);
+                $quantity = $multiply * $ratio;
+            }
+        } else {
+            $quantity = 0.0;
+        }
+
+        $this->setField('QUANTITY', $quantity);
     }
 }

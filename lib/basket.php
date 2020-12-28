@@ -15,7 +15,7 @@ class Basket extends \Bitrix\Sale\Basket
             $items[] = $basketItem->getInfo();
         }
 
-        // $removedItems
+        // todo $removedItems
         $removedItems = [];
 
         // $info
@@ -60,15 +60,5 @@ class Basket extends \Bitrix\Sale\Basket
         }
 
         return null;
-    }
-
-    /**
-     * @return \Bitrix\Sale\Basket
-     */
-    public static function getCurrentUserBasket()
-    {
-        $siteId = \WC\Main\Tools::getSiteId();
-        $fUserId = \Bitrix\Sale\Fuser::getId();
-        return \Bitrix\Sale\Basket::loadItemsForFUser($fUserId, $siteId);
     }
 }
