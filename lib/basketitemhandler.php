@@ -4,6 +4,7 @@
 namespace WC\Sale;
 
 
+use Bitrix\Main\Loader;
 use WC\Main\Messages;
 use WC\Main\Result;
 
@@ -15,8 +16,6 @@ class BasketItemHandler
      */
     public $basketItem;
     public $basket;
-    public $quantity;
-    public $productId;
 
     public function __construct(BasketItem $basketItem)
     {
@@ -29,20 +28,19 @@ class BasketItemHandler
 
     public function update()
     {
+        // todo добавить сюда проверку количества?
+
         // Собрать поля для нового basketItem
         if ($this->basketItem->getId() == null) {
             $fields = $this->basketItem->prepareBasketItemFields();
+            $this->basketItem->setFields($fields);
         }
-
-        $this->basketItem->setFields($fields);
 
         $this->basketItem->setPriceName();
 
         $this->basketItem->setPropertyArticle();
 
-        $r = $this->basket->save();
-
-        $this->result->mergeResult($r);
+        $this->result = $this->basket->save();
 
         if ($this->result->isSuccess()) {
             $basketItemInfo = $this->basketItem->getInfo();
@@ -54,15 +52,9 @@ class BasketItemHandler
 
     public function delete()
     {
-        if (!$this->result->isSuccess()) {
-            return $this->result;
-        }
-
         $this->basketItem->delete();
 
-        $r = $this->basket->save();
-
-        $this->result->mergeResult($r);
+        $this->result = $this->basket->save();
 
         return $this->result;
     }
@@ -72,12 +64,14 @@ class BasketItemHandler
      * @param Basket|null $basket
      * @return BasketItem|null
      */
-    public static function getBasketItem($productId, Basket $basket = null)
+    public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
     {
+        Loader::includeModule('catalog');
         $basket = $basket ?: BasketHandler::getCurrentUserBasket();
         if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
             return $basket->getItemBy(['PRODUCT_ID' => $productId]) ?: $basket->createItem('catalog', $productId);
         }
+
         return null;
     }
 }
