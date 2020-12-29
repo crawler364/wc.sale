@@ -133,11 +133,4 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 
         return $quantity;
     }
-
-    public function setQuantity($quantity)
-    {
-        if ($quantity > 0) {
-            $this->setField('QUANTITY', $quantity);
-        }
-    }
 }

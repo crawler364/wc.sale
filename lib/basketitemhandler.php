@@ -57,7 +57,7 @@ class BasketItemHandler
 
     protected function add()
     {
-        $this->basketItem->setQuantity($this->quantity);
+        $this->basketItem->setField('QUANTITY', $this->quantity);
 
         $fields = $this->basketItem->prepareBasketItemFields();
         $this->basketItem->setFields($fields);
@@ -74,7 +74,7 @@ class BasketItemHandler
         $productProviderFields = $this->productProviderClass::GetProductData(['PRODUCT_ID' => $this->basketItem->getProductId()]);
         $this->basketItem->setFields($productProviderFields);*/
 
-        $this->basketItem->setQuantity($this->quantity);
+        $this->basketItem->setField('QUANTITY', $this->quantity);
     }
 
     protected function delete()
