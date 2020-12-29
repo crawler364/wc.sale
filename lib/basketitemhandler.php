@@ -16,6 +16,7 @@ class BasketItemHandler
      */
     public $basketItem;
     public $basket;
+    protected $productProviderClass = \CCatalogProductProvider::class;
 
     public function __construct(BasketItem $basketItem)
     {
@@ -24,39 +25,63 @@ class BasketItemHandler
 
         $this->basket = $basketItem->getCollection();
         $this->basketItem = $basketItem;
+        $this->basketItem->setField('PRODUCT_PROVIDER_CLASS', $this->productProviderClass);
     }
 
-    public function update()
+    public function process($action, $quantity = null)
     {
-        // todo добавить сюда проверку количества?
+        /** @var \Bitrix\Main\Result $r */
 
-        // Собрать поля для нового basketItem
-        if ($this->basketItem->getId() == null) {
-            $fields = $this->basketItem->prepareBasketItemFields();
-            $this->basketItem->setFields($fields);
+        $this->quantity = $quantity ?: $this->basketItem->mathQuantity($action);
+
+        if ($this->quantity > 0) {
+            if ($this->basketItem->getId() == null) {
+                $this->add();
+            } else {
+                $this->update();
+            }
+        } else {
+            $this->delete();
         }
+
+        $r = $this->basket->save();
+
+        $this->result->mergeResult($r);
+
+        return $this->result;
+    }
+
+    protected function add()
+    {
+        $this->basketItem->setQuantity($this->quantity);
+
+        $fields = $this->basketItem->prepareBasketItemFields();
+
+        $this->basketItem->setFields($fields);
 
         $this->basketItem->setPriceName();
 
         $this->basketItem->setPropertyArticle();
-
-        $this->result = $this->basket->save();
-
-        if ($this->result->isSuccess()) {
-            $basketItemInfo = $this->basketItem->getInfo();
-            $this->result->setData($basketItemInfo);
-        }
-
-        return $this->result;
     }
 
-    public function delete()
+
+    protected function update()
+    {
+        /** @var \CCatalogProductProvider $productProvider */
+        /*$this->productProvider = $this->basketItem->getProvider();
+        $productProviderFields = $this->productProviderClass::GetProductData(['PRODUCT_ID' => $this->basketItem->getProductId()]);
+        $this->basketItem->setFields($productProviderFields);*/
+
+        $this->basketItem->setQuantity($this->quantity);
+
+        $this->basketItem->setPriceName();
+
+        $this->basketItem->setPropertyArticle();
+    }
+
+    protected function delete()
     {
         $this->basketItem->delete();
-
-        $this->result = $this->basket->save();
-
-        return $this->result;
     }
 
     /**

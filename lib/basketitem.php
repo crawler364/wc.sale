@@ -9,8 +9,6 @@ use Bitrix\Main\Localization\Loc;
 
 class BasketItem extends \Bitrix\Sale\BasketItem
 {
-    protected $productProviderClass = \CCatalogProductProvider::class;
-
     public function getInfo()
     {
         Loader::includeModule('iblock');
@@ -89,29 +87,36 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     }
 
     /**
-     * @param string $math = 'plus' | 'minus'
+     * @param string $action
+     * @return float|int
      */
-    public function mathQuantity(string $math)
+    public function mathQuantity(string $action)
     {
         $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
 
-        if (!$quantity = $this->getQuantity()) {
-            $quantity = 0.0;
-        }
+        $quantity = $this->getQuantity() ?: 0;
 
-        switch ($math) {
+        switch ($action) {
             case 'plus':
                 $quantity += $ratio;
                 break;
             case 'minus':
                 $quantity -= $ratio;
                 break;
+            case 'delete':
+            default:
+                $quantity = 0;
         }
 
-        $this->setQuantity($quantity);
+        return $quantity;
     }
 
-    public function setQuantity($quantity = 0.0)
+    /**
+     * @param float|int $quantity
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
+    public function setQuantity($quantity)
     {
         $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
 
@@ -124,10 +129,12 @@ class BasketItem extends \Bitrix\Sale\BasketItem
                 $multiply = floor($multiply);
                 $quantity = $multiply * $ratio;
             }
-        } else {
-            $quantity = 0.0;
         }
 
-        $this->setField('QUANTITY', $quantity);
+        if ($quantity > 0) {
+            $this->setField('QUANTITY', $quantity);
+        } else {
+            throw new \Bitrix\Main\ArgumentNullException;
+        }
     }
 }
