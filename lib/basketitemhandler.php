@@ -32,7 +32,10 @@ class BasketItemHandler
     {
         /** @var \Bitrix\Main\Result $r */
 
-        $quantity = $quantity ?: $this->basketItem->mathQuantity($action);
+        if ($action != 'set') {
+            $quantity = $this->basketItem->mathQuantity($action);
+        }
+
         $this->quantity = $this->basketItem->checkQuantity($quantity);
 
         if ($this->quantity > 0) {
