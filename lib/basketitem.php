@@ -116,7 +116,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\ArgumentOutOfRangeException
      */
-    public function setQuantity($quantity)
+    public function checkQuantity($quantity)
     {
         $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
 
@@ -131,10 +131,13 @@ class BasketItem extends \Bitrix\Sale\BasketItem
             }
         }
 
+        return $quantity;
+    }
+
+    public function setQuantity($quantity)
+    {
         if ($quantity > 0) {
             $this->setField('QUANTITY', $quantity);
-        } else {
-            throw new \Bitrix\Main\ArgumentNullException;
         }
     }
 }

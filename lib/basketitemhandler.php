@@ -16,7 +16,7 @@ class BasketItemHandler
      */
     public $basketItem;
     public $basket;
-    protected $productProviderClass = \CCatalogProductProvider::class;
+    public $productProviderClass = \CCatalogProductProvider::class;
 
     public function __construct(BasketItem $basketItem)
     {
@@ -32,7 +32,8 @@ class BasketItemHandler
     {
         /** @var \Bitrix\Main\Result $r */
 
-        $this->quantity = $quantity ?: $this->basketItem->mathQuantity($action);
+        $quantity = $quantity ?: $this->basketItem->mathQuantity($action);
+        $this->quantity = $this->basketItem->checkQuantity($quantity);
 
         if ($this->quantity > 0) {
             if ($this->basketItem->getId() == null) {
@@ -56,14 +57,12 @@ class BasketItemHandler
         $this->basketItem->setQuantity($this->quantity);
 
         $fields = $this->basketItem->prepareBasketItemFields();
-
         $this->basketItem->setFields($fields);
 
         $this->basketItem->setPriceName();
 
         $this->basketItem->setPropertyArticle();
     }
-
 
     protected function update()
     {
@@ -73,10 +72,6 @@ class BasketItemHandler
         $this->basketItem->setFields($productProviderFields);*/
 
         $this->basketItem->setQuantity($this->quantity);
-
-        $this->basketItem->setPriceName();
-
-        $this->basketItem->setPropertyArticle();
     }
 
     protected function delete()
