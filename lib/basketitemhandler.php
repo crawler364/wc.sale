@@ -49,8 +49,16 @@ class BasketItemHandler
         }
 
         $r = $this->basket->save();
-
         $this->result->mergeResult($r);
+
+        if ($this->result->isSuccess()){
+            $this->result->setData([
+                'ITEM' => $this->basketItem->getInfo(),
+                'BASKET' => $this->basket->getInfo(),
+            ]);
+        }
+
+        // todo $this->result += данные по доставке?
 
         return $this->result;
     }
