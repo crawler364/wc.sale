@@ -51,7 +51,7 @@ class BasketItemHandler
         $r = $this->basket->save();
         $this->result->mergeResult($r);
 
-        if ($this->result->isSuccess()){
+        if ($this->result->isSuccess()) {
             $this->result->setData([
                 'ITEM' => $this->basketItem->getInfo(),
                 'BASKET' => $this->basket->getInfo(),
@@ -99,10 +99,12 @@ class BasketItemHandler
     {
         Loader::includeModule('catalog');
         $basket = $basket ?: BasketHandler::getCurrentUserBasket();
-        if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
-            return $basket->getItemBy(['PRODUCT_ID' => $productId]) ?: $basket->createItem('catalog', $productId);
+        if (!$basketItem = $basket->getItemBy(['PRODUCT_ID' => $productId])) {
+            if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
+                $basketItem = $basket->createItem('catalog', $productId);
+            }
         }
 
-        return null;
+        return $basketItem;
     }
 }
