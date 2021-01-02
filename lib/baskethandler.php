@@ -34,7 +34,7 @@ class BasketHandler
         }
     }
 
-    public function processBasketItem($action, $quantity = null)
+    public function processBasketItem($action, $quantity = null): Result
     {
         /** @var \Bitrix\Main\Result $r */
 
@@ -46,12 +46,12 @@ class BasketHandler
 
         if ($this->quantity > 0) {
             if ($this->basketItem->getId() == null) {
-                $this->addBasketItem();
+                $this->addBasketItemFields();
             } else {
-                $this->updateBasketItem();
+                $this->updateBasketItemFields();
             }
         } else {
-            $this->deleteBasketItem();
+            $this->basketItem->delete();
         }
 
         $r = $this->basket->save();
@@ -69,7 +69,7 @@ class BasketHandler
         return $this->result;
     }
 
-    protected function addBasketItem()
+    protected function addBasketItemFields()
     {
         $this->basketItem->setField('PRODUCT_PROVIDER_CLASS', $this->productProvider);
 
@@ -78,19 +78,14 @@ class BasketHandler
         $fields = $this->basketItem->prepareBasketItemFields();
         $this->basketItem->setFields($fields);
 
-        $this->basketItem->setPriceName();
+        //$this->basketItem->setPriceName();
 
         $this->basketItem->setPropertyArticle();
     }
 
-    protected function updateBasketItem()
+    protected function updateBasketItemFields()
     {
         $this->basketItem->setField('QUANTITY', $this->quantity);
-    }
-
-    protected function deleteBasketItem()
-    {
-        $this->basketItem->delete();
     }
 
     /**
