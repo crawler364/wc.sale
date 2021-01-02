@@ -10,15 +10,12 @@ use WC\Main\Result;
 
 class BasketHandler
 {
-    /**
-     * @var BasketItem $basketItem
-     * @var Basket $basket
-     */
-    public $basketItem;
-    public $basket;
-    public $productProvider = \CCatalogProductProvider::class;
-
-    //protected Basket|BasketItem $object; Union types are available in PHP 8.0 only
+    /** @var BasketItem */
+    protected $basketItem;
+    /** @var Basket */
+    protected $basket;
+    /** @var \CCatalogProductProvider */
+    protected $productProvider = \CCatalogProductProvider::class;
 
     public function __construct($object)
     {
@@ -91,6 +88,13 @@ class BasketHandler
     protected function updateBasketItemFields()
     {
         $this->basketItem->setField('QUANTITY', $this->quantity);
+    }
+
+    protected function setProviderBasketItemFields()
+    {
+        $productProviderFields = $this->productProvider::GetProductData(['PRODUCT_ID' => $this->basketItem->getProductId()]);
+        unset($productProviderFields['AVAILABLE_QUANTITY']);
+        $this->basketItem->setFields($productProviderFields);
     }
 
     /**
