@@ -17,6 +17,7 @@ class BasketHandler
     public $basketItem;
     public $basket;
     public $productProvider = \CCatalogProductProvider::class;
+
     //protected Basket|BasketItem $object; Union types are available in PHP 8.0 only
 
     public function __construct($object)
@@ -36,8 +37,6 @@ class BasketHandler
 
     public function processBasketItem($action, $quantity = null): Result
     {
-        /** @var \Bitrix\Main\Result $r */
-
         if ($action != 'set') {
             $quantity = $this->basketItem->mathQuantity($action);
         }
@@ -54,7 +53,15 @@ class BasketHandler
             $this->basketItem->delete();
         }
 
+        // todo $this->result += данные по доставке?
+
+        return $this->result;
+    }
+
+    public function saveBasket(): Result
+    {
         $r = $this->basket->save();
+
         $this->result->mergeResult($r);
 
         if ($this->result->isSuccess()) {
@@ -63,8 +70,6 @@ class BasketHandler
                 'BASKET' => $this->basket->getInfo(),
             ]);
         }
-
-        // todo $this->result += данные по доставке?
 
         return $this->result;
     }
