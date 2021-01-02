@@ -2,7 +2,7 @@
 
 use Bitrix\Main\SystemException;
 
-class WCSaleOrder extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
+class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
     public function configureActions()
     {
