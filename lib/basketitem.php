@@ -22,7 +22,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
             'select' => ['ID', 'CODE', 'NAME'],
         ])->fetch();
 
-        $info['ID'] = (string)$productId;
+        $info['PRODUCT_ID'] = (string)$productId;
         $info['NAME'] = (string)$this->getField('NAME');
         $info['WEIGHT'] = (string)$this->getWeight();
         $info['WEIGHT_FORMATTED'] = \WC\Catalog\Tools::formatWeight($info['WEIGHT']);

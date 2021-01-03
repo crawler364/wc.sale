@@ -1,0 +1,18 @@
+table td {
+    border: 1px solid
+}
+
+table td img.detail-picture {
+    width: 100px;
+    height: 100px;
+}
+
+table table td {
+    border: none
+}
+
+td[data-basket-action] {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 20px;
+}

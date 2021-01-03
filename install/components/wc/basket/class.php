@@ -5,19 +5,20 @@ use WC\Main\Localization\Loc;
 
 class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
+    /** @var \WC\Sale\BasketHandler */
+    private $basketHandler = \WC\Sale\BasketHandler::class;
+
     public function configureActions(): array
     {
         return [
-            'process' => ['prefilters' => [], 'postfilters' => [],],
+            'process' => [
+                'prefilters' => [], 'postfilters' => [],
+            ],
         ];
     }
 
-    public function executeComponent()
+    public function processAction()
     {
-        $this->includeComponentTemplate();
-    }
-
-    public function processAction(){
         $this->result = new Result();
 
         $product = $this->request->get('product');
@@ -29,5 +30,20 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
             $basketHandler->processBasketItem($this->request['act'], $this->request['quantity']);
             $this->result = $basketHandler->saveBasket();
         }
+    }
+
+    private function setBasketHandler()
+    {
+        $this->basketHandler = $this->arParams['BASKET_HANDLER'] ?: $this->basketHandler;
+    }
+
+    public function executeComponent()
+    {
+        $this->setBasketHandler();
+        $this->basket = $this->basketHandler::getCurrentUserBasket();
+        $this->basketItems = $this->basket->getBasketItems();
+        $this->arResult = $this->basket->getInfo();
+
+        $this->includeComponentTemplate();
     }
 }
