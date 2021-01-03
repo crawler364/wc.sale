@@ -4,12 +4,15 @@
 namespace WC\Sale;
 
 
+use WC\Main\Localization\Loc;
+use WC\Main\Result;
+
 class OrderHandler
 {
     public function __construct(\Bitrix\Sale\Order $order = null)
     {
-        $this->result = new \WC\Main\Result();
-        $this->mess = new \WC\Main\Messages(__FILE__);
+        $this->result = new Result();
+        Loc::loadMessages(__FILE__);
 
         $this->order = $order ?: self::createOrder();
     }

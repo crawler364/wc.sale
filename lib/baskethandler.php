@@ -5,7 +5,7 @@ namespace WC\Sale;
 
 
 use Bitrix\Main\Loader;
-use WC\Main\Messages;
+use WC\Main\Localization\Loc;
 use WC\Main\Result;
 
 class BasketHandler
@@ -20,7 +20,7 @@ class BasketHandler
     public function __construct($object)
     {
         $this->result = new Result();
-        $this->mess = new Messages(__FILE__);
+        Loc::loadMessages(__FILE__);
 
         if ($object instanceof BasketItem) {
             $this->basketItem = $object;
