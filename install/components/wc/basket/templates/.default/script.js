@@ -2,57 +2,53 @@ class WCSaleBasket {
     constructor(params) {
         this.basketHandlerClass = params.basketHandlerClass;
 
-        let productId, actionObjects, basketAction, param, on, basket, products;
+        let actionObjects, basketAction, on, basket, products;
 
         basket = BX('wc-basket');
-        products = BX.findChild(basket, {
-                'attribute': 'data-basket-product-id',
-            },
-            true,
-            true,
-        );
+        products = BX.findChild(basket, {'attribute': 'data-basket-product-id'}, true, true);
 
         products.forEach((product) => {
-            productId = product.getAttribute('data-basket-product-id');
-
-            actionObjects = BX.findChild(product, {
-                    'attribute': 'data-basket-action',
-                },
-                true,
-                true,
-            );
+            actionObjects = BX.findChild(product, {'attribute': 'data-basket-action'}, true, true);
 
             actionObjects.forEach((actionObject) => {
                 basketAction = actionObject.getAttribute('data-basket-action');
-                param = {basketAction: basketAction, productId: productId};
-
                 if (basketAction == 'set') {
                     on = 'blur';
                 } else {
                     on = 'click';
                 }
 
-                BX.bind(actionObject, on, BX.delegate(this.action.bind(this, param, actionObject)));
+                BX.bind(actionObject, on, BX.delegate(this.action.bind(this, basketAction, product)));
             });
         });
     }
 
-    action(param, actionObject) {
+    action(basketAction, product) {
+        let productId, $input;
+
+        productId = product.getAttribute('data-basket-product-id');
+        $input = BX.findChild(product, {
+            'tag': 'input',
+            'attribute': {'data-basket-action': 'set'}
+        }, true, false);
+
         let data = {
-            basketAction: param.basketAction,
-            product: {id: param.productId},
+            basketAction: basketAction,
+            product: {id: productId},
             basketHandlerClass: this.basketHandlerClass
         }
 
-        if (param.basketAction == 'set') {
-            data.product.quantity = actionObject.value;
+        if (basketAction == 'set') {
+            data.product.quantity = $input.value;
         }
 
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'class',
             data: data
         }).then(function (response) {
-            console.log(response);
+            let item = response.data.item;
+            let basket = response.data.basket;
+            $input.value = item.quantity;
         }, function (response) {
             console.log(response);
         });

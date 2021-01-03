@@ -17,7 +17,7 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
         ];
     }
 
-    public function processAction($basketAction, $product, $basketHandlerClass): Result
+    public function processAction($basketAction, $product, $basketHandlerClass): \Bitrix\Main\Engine\Response\AjaxJson
     {
         $this->result = new Result();
 
@@ -29,7 +29,18 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
             $this->result = $basketHandler->saveBasket();
         }
 
-        return $this->result;
+        if ($this->result->isSuccess()) {
+            $basketItemInfo = $basketItem->getInfo();
+            $delivery = $this->request->get('delivery');
+            $orderInfo = \AF\Sale\Tools::getOrderInfo($delivery);
+
+            $this->result->setData([
+                'ITEM' => $basketItemInfo,
+                'BASKET' => $orderInfo,
+            ]);
+        }
+
+        return $this->result->prepareJson();
     }
 
     public function executeComponent()
