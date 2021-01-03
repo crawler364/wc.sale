@@ -1,10 +1,11 @@
 class WCSaleBasket {
-    constructor() {
-        let productId, actionObjects, action, param, on, basket, products;
+    constructor(params) {
+        this.basketHandlerClass = params.basketHandlerClass;
+
+        let productId, actionObjects, basketAction, param, on, basket, products;
 
         basket = BX('wc-basket');
         products = BX.findChild(basket, {
-                'tag': 'div',
                 'attribute': 'data-basket-product-id',
             },
             true,
@@ -22,10 +23,10 @@ class WCSaleBasket {
             );
 
             actionObjects.forEach((actionObject) => {
-                action = actionObject.getAttribute('data-basket-action');
-                param = {action: action, productId: productId};
+                basketAction = actionObject.getAttribute('data-basket-action');
+                param = {basketAction: basketAction, productId: productId};
 
-                if (action == 'set') {
+                if (basketAction == 'set') {
                     on = 'blur';
                 } else {
                     on = 'click';
@@ -38,11 +39,12 @@ class WCSaleBasket {
 
     action(param, actionObject) {
         let data = {
-            act: param.action,
-            product: {id: param.productId}
+            basketAction: param.basketAction,
+            product: {id: param.productId},
+            basketHandlerClass: this.basketHandlerClass
         }
 
-        if (param.action == 'set') {
+        if (param.basketAction == 'set') {
             data.product.quantity = actionObject.value;
         }
 

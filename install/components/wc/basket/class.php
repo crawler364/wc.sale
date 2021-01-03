@@ -6,7 +6,7 @@ use WC\Main\Localization\Loc;
 class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
     /** @var \WC\Sale\BasketHandler */
-    private $basketHandler = \WC\Sale\BasketHandler::class;
+    private $basketHandlerClass = \WC\Sale\BasketHandler::class;
 
     public function configureActions(): array
     {
@@ -17,30 +17,25 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
         ];
     }
 
-    public function processAction()
+    public function processAction($basketAction, $product, $basketHandlerClass): Result
     {
         $this->result = new Result();
 
-        $product = $this->request->get('product');
-
-        if (!$basketItem = \AF\Sale\BasketHandler::getBasketItem($product['id'])) {
+        if (!$basketItem = $basketHandlerClass::getBasketItem($product['id'])) {
             $this->result->addErrors(Loc::getMessageExt('WC_UNDEFINED_PRODUCT'));
         } else {
-            $basketHandler = new \AF\Sale\BasketHandler($basketItem);
-            $basketHandler->processBasketItem($this->request['act'], $this->request['quantity']);
+            $basketHandler = new $basketHandlerClass($basketItem);
+            $basketHandler->processBasketItem($basketAction, $product['quantity']);
             $this->result = $basketHandler->saveBasket();
         }
-    }
 
-    private function setBasketHandler()
-    {
-        $this->basketHandler = $this->arParams['BASKET_HANDLER'] ?: $this->basketHandler;
+        return $this->result;
     }
 
     public function executeComponent()
     {
-        $this->setBasketHandler();
-        $this->basket = $this->basketHandler::getCurrentUserBasket();
+        $this->basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
+        $this->basket = $this->basketHandlerClass::getCurrentUserBasket();
         $this->basketItems = $this->basket->getBasketItems();
         $this->arResult = $this->basket->getInfo();
 

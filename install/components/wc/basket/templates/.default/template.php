@@ -28,7 +28,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
               <td data-basket-action="minus">-</td>
               <td>
                 <label>
-                  <input type="text" data-basket-action="set">
+                  <input type="text" data-basket-action="set" value="<?= $item['QUANTITY'] ?>">
                 </label>
               </td>
               <td data-basket-action="plus">+</td>
@@ -46,5 +46,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 </table>
 
 <script type="text/javascript">
-    WCSaleBasket = new WCSaleBasket();
+    WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
+        'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
+    ])?>);
 </script>
