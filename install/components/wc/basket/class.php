@@ -35,7 +35,7 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
             $orderInfo = \AF\Sale\Tools::getOrderInfo($delivery);
 
             $this->result->setData([
-                'ITEM' => $basketItemInfo,
+                'BASKET_ITEM' => $basketItemInfo,
                 'BASKET' => $orderInfo,
             ]);
         }
