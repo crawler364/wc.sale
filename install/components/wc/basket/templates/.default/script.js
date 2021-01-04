@@ -29,7 +29,7 @@ class WCSaleBasket {
         let basketDom = {};
 
         basketDom.totalPrice = BX.findChild(basket, {
-            'attribute': {'data-basket-total-price': ''}
+            'attribute': {'data-basket-price': ''}
         }, true, false);
 
         return basketDom;

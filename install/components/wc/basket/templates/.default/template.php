@@ -2,22 +2,26 @@
 if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     die();
 }
+
+use \Bitrix\Main\Localization\Loc;
+
 ?>
 <table id="wc-basket">
   <thead>
   <tr>
-    <td><?= getMessage('DETAIL_PICTURE') ?></td>
-    <td><?= getMessage('ARTICLE') ?></td>
-    <td><?= getMessage('NAME') ?></td>
-    <td><?= getMessage('PRICE') ?></td>
+    <td><?= Loc::getMessage('DETAIL_PICTURE') ?></td>
+    <td><?= Loc::getMessage('ARTICLE') ?></td>
+    <td><?= Loc::getMessage('NAME') ?></td>
+    <td><?= Loc::getMessage('PRICE') ?></td>
     <td></td>
-    <td><?= getMessage('PRICE_SUM') ?></td>
+    <td><?= Loc::getMessage('PRICE_SUM') ?></td>
   </tr>
   </thead>
     <? foreach ($arResult['ITEMS'] as $item) { ?>
       <tr data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
         <td>
-          <img class="detail-picture" src="<?= $item['ELEMENT']['DETAIL_PICTURE'] ?>" alt="<?= getMessage('NAME') ?>">
+          <img class="detail-picture" src="<?= $item['ELEMENT']['DETAIL_PICTURE'] ?>"
+               alt="<?= Loc::getMessage('NAME') ?>">
         </td>
         <td><?= $item['ELEMENT']['PROPERTY_ARTICLE_VALUE'] ?></td>
         <td><?= $item['NAME'] ?></td>
@@ -40,8 +44,34 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
       </tr>
     <? } ?>
   <tr>
-    <td colspan="5"></td>
-    <td data-basket-total-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+    <td colspan="4"></td>
+    <td><?= Loc::getMessage('BASKET_WEIGHT') ?></td>
+    <td data-basket-price><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
+  </tr>
+  <tr>
+    <td colspan="4"></td>
+    <td><?= Loc::getMessage('BASKET_COUNT') ?></td>
+    <td data-basket-price><?= $arResult['INFO']['COUNT'] ?></td>
+  </tr>
+  <tr>
+    <td colspan="4"></td>
+    <td><?= Loc::getMessage('BASKET_VAT') ?></td>
+    <td data-basket-price><?= $arResult['INFO']['VAT_FORMATTED'] ?></td>
+  </tr>
+  <tr>
+    <td colspan="4"></td>
+    <td><?= Loc::getMessage('BASKET_PRICE') ?></td>
+    <td data-basket-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+  </tr>
+  <tr>
+    <td colspan="4"></td>
+    <td><?= Loc::getMessage('BASKET_DISCOUNT') ?></td>
+    <td data-basket-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+  </tr>
+  <tr>
+    <td colspan="4"></td>
+    <td><?= Loc::getMessage('BASKET_PRICE_TOTAL') ?></td>
+    <td data-basket-price-total></td>
   </tr>
 </table>
 
