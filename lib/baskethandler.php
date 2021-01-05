@@ -80,7 +80,7 @@ class BasketHandler
         $fields = $this->basketItem->prepareBasketItemFields();
         $this->basketItem->setFields($fields);
 
-        //$this->basketItem->setPriceName();
+        $this->basketItem->setPriceName();
 
         $this->basketItem->setPropertyArticle();
     }

@@ -76,7 +76,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     {
         // todo универсальный вариант под торговые предложения и товары
         return [
-            'PRODUCT_PROVIDER_CLASS' => $this->productProviderClass,
+
         ];
     }
 
