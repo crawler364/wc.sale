@@ -90,13 +90,6 @@ class BasketHandler
         $this->basketItem->setField('QUANTITY', $this->quantity);
     }
 
-    protected function setProviderBasketItemFields()
-    {
-        $productProviderFields = $this->productProvider::GetProductData(['PRODUCT_ID' => $this->basketItem->getProductId()]);
-        unset($productProviderFields['AVAILABLE_QUANTITY']);
-        $this->basketItem->setFields($productProviderFields);
-    }
-
     /**
      * @param $productId
      * @param Basket|null $basket
