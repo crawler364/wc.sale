@@ -4,7 +4,7 @@
 namespace WC\Sale;
 
 
-use WC\Main\Localization\Loc;
+use Bitrix\Main\Localization\Loc;
 use WC\Main\Result;
 
 class OrderHandler

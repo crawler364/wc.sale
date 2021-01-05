@@ -1,7 +1,7 @@
 <?php
 
 use WC\Main\Result;
-use WC\Main\Localization\Loc;
+use Bitrix\Main\Localization\Loc;
 
 class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
@@ -22,7 +22,7 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
         $this->result = new Result();
 
         if (!$basketItem = $basketHandlerClass::getBasketItem($product['id'])) {
-            $this->result->addErrors(Loc::getMessageExt('WC_UNDEFINED_PRODUCT'));
+            $this->result->addError('WC_UNDEFINED_PRODUCT');
         } else {
             $basketHandler = new $basketHandlerClass($basketItem);
             $basketHandler->processBasketItem($basketAction, $product['quantity']);
