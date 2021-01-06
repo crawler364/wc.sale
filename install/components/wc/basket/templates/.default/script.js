@@ -28,7 +28,22 @@ class WCSaleBasket {
     getBasketDom(basket) {
         let basketDom = {};
 
-        basketDom.totalPrice = BX.findChild(basket, {
+        basketDom.weight = BX.findChild(basket, {
+            'attribute': {'data-basket-weight': ''}
+        }, true, false);
+        basketDom.count = BX.findChild(basket, {
+            'attribute': {'data-basket-count': ''}
+        }, true, false);
+        basketDom.vat = BX.findChild(basket, {
+            'attribute': {'data-basket-vat': ''}
+        }, true, false);
+        basketDom.priceBase = BX.findChild(basket, {
+            'attribute': {'data-basket-price-base': ''}
+        }, true, false);
+        basketDom.discount = BX.findChild(basket, {
+            'attribute': {'data-basket-discount': ''}
+        }, true, false);
+        basketDom.price = BX.findChild(basket, {
             'attribute': {'data-basket-price': ''}
         }, true, false);
 
@@ -44,14 +59,37 @@ class WCSaleBasket {
             'tag': 'input',
             'attribute': {'data-basket-item-action': 'set'}
         }, true, false);
-        basketItemDom.price = BX.findChild(basketItem, {
-            'attribute': {'data-basket-item-price': ''}
-        }, true, false);
         basketItemDom.priceSum = BX.findChild(basketItem, {
             'attribute': {'data-basket-item-price-sum': ''}
         }, true, false);
-
+        basketItemDom.priceBaseSum = BX.findChild(basketItem, {
+            'attribute': {'data-basket-item-price-base-sum': ''}
+        }, true, false);
+        basketItemDom.discountSum = BX.findChild(basketItem, {
+            'attribute': {'data-basket-item-discount-sum': ''}
+        }, true, false);
         return basketItemDom;
+    }
+
+    setBasketDom(basket, basketDom) {
+        console.log(basketDom.priceBase);
+        BX.adjust(basketDom.weight, {html: basket.info.weightFormatted});
+        BX.adjust(basketDom.count, {html: basket.info.count});
+        BX.adjust(basketDom.vat, {html: basket.info.vatFormatted});
+        BX.adjust(basketDom.priceBase, {html: basket.info.priceBaseFormatted});
+        BX.adjust(basketDom.discount, {html: basket.info.discountFormatted});
+        BX.adjust(basketDom.price, {html: basket.info.priceFormatted});
+    }
+
+    setBasketItemDom(basketItem, basketItemDom) {
+        if (basketItem.quantity > 0) {
+            basketItemDom.input.value = basketItem.quantity;
+            BX.adjust(basketItemDom.priceSum, {html: basketItem.priceSumFormatted});
+            BX.adjust(basketItemDom.priceBaseSum, {html: basketItem.priceBaseSumFormatted});
+            BX.adjust(basketItemDom.discountSum, {html: basketItem.discountSumFormatted});
+        } else {
+            BX.remove(basketItemDom.ctn);
+        }
     }
 
     action(basketAction, basketDom, basketItemDom) {
@@ -68,22 +106,12 @@ class WCSaleBasket {
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'class',
             data: data
-        }).then(function (response) {
+        }).then((response) => {
             console.log(response);
-
             let basketItem = response.data.basketItem;
             let basket = response.data.basket;
-
-            // basketItemDom
-            basketItemDom.input.value = basketItem.quantity;
-            if (basketItem.quantity > 0) {
-                BX.adjust(basketItemDom.priceSum, {html: basketItem.priceSumFormatted});
-            } else {
-                BX.remove(basketItemDom.ctn);
-            }
-
-            // basketDom
-            BX.adjust(basketDom.totalPrice, {html: basket.info.totalPriceFormatted});
+            this.setBasketItemDom(basketItem, basketItemDom);
+            this.setBasketDom(basket, basketDom)
         }, function (response) {
             console.log(response);
         });

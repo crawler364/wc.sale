@@ -36,7 +36,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $info['PRICE_BASE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_BASE']);
         $info['PRICE_BASE_SUM'] = (string)($info['PRICE_BASE'] * $info['QUANTITY']);
         $info['PRICE_BASE_SUM_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_BASE_SUM']);
-        $info['DISCOUNT'] = (string)$this->getField('DISCOUNT_PRICE');
+        $info['DISCOUNT'] = (string)$this->getDiscountPrice();
         $info['DISCOUNT_PERCENT'] = $this->getField('DISCOUNT_VALUE');
         $info['DISCOUNT_SUM'] = (string)($info['DISCOUNT'] * $info['QUANTITY']);
         $info['DISCOUNT_SUM_FORMATTED'] = \WC\Currency\Tools::format($info['DISCOUNT_SUM']);

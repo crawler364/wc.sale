@@ -1,18 +1,22 @@
-table td {
+table#wc-basket td {
     border: 1px solid
 }
 
-table td img.detail-picture {
+table#wc-basket td img.detail-picture {
     width: 100px;
     height: 100px;
 }
 
-table table td {
+table#wc-basket table td {
     border: none
 }
 
-td[data-basket-item-action] {
+table#wc-basket td[data-basket-item-action] {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
+}
+
+table#wc-basket div.line-through {
+    text-decoration: line-through;
 }

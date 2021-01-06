@@ -1,7 +1,7 @@
 <?php
 
+use Bitrix\Main\Engine\Response\AjaxJson;
 use WC\Main\Result;
-use Bitrix\Main\Localization\Loc;
 
 class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
@@ -17,9 +17,11 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
         ];
     }
 
-    public function processAction($basketAction, $product, $basketHandlerClass): \Bitrix\Main\Engine\Response\AjaxJson
+    public function processAction(string $basketAction, array $product, $basketHandlerClass = null): AjaxJson
     {
         $this->result = new Result();
+
+        $basketHandlerClass = $basketHandlerClass ?: $this->basketHandlerClass;
 
         if (!$basketItem = $basketHandlerClass::getBasketItem($product['id'])) {
             $this->result->addError('WC_UNDEFINED_PRODUCT');
@@ -30,13 +32,10 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
         }
 
         if ($this->result->isSuccess()) {
-            $basketItemInfo = $basketItem->getInfo();
-            $delivery = $this->request->get('delivery');
-            $orderInfo = \AF\Sale\Tools::getOrderInfo($delivery);
-
+            $basket = $basketHandlerClass::getCurrentUserBasket();
             $this->result->setData([
-                'BASKET_ITEM' => $basketItemInfo,
-                'BASKET' => $orderInfo,
+                'BASKET_ITEM' => $basketItem->getInfo(),
+                'BASKET' => $basket->getInfo(),
             ]);
         }
 

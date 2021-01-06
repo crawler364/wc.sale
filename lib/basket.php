@@ -6,7 +6,7 @@ namespace WC\Sale;
 
 class Basket extends \Bitrix\Sale\Basket
 {
-    public function getInfo()
+    public function getInfo(): array
     {
         // $items
         foreach ($this->getBasketItems() as $basketItem) {
@@ -17,15 +17,17 @@ class Basket extends \Bitrix\Sale\Basket
         $removedItems = [];
 
         // $info
+        $info['COUNT'] = (string)$this->count();
         $info['WEIGHT'] = (string)$this->getWeight();
         $info['WEIGHT_FORMATTED'] = \WC\Catalog\Tools::formatWeight($info['WEIGHT']);
-        $info['PRICE'] = (string)$this->getPrice();
-        $info['PRICE_FORMATTED'] = \WC\Currency\Tools::format($this->getPrice());
         $info['VAT'] = (string)$this->getVatSum();
         $info['VAT_FORMATTED'] = \WC\Currency\Tools::format($info['VAT']);
-        $info['COUNT'] = (string)$this->count();
+        $info['PRICE_BASE'] = (string)$this->getBasePrice();
+        $info['PRICE_BASE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_BASE']);
         $info['DISCOUNT'] = (string)($this->getBasePrice() - (string)$this->getPrice());
         $info['DISCOUNT_FORMATTED'] = \WC\Currency\Tools::format($info['DISCOUNT']);
+        $info['PRICE'] = (string)($this->getPrice());
+        $info['PRICE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE']);
 
         return ['INFO' => $info, 'ITEMS' => $items, 'REMOVED_ITEMS' => $removedItems];
     }
