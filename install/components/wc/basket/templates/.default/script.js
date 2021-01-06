@@ -72,7 +72,6 @@ class WCSaleBasket {
     }
 
     setBasketDom(basket, basketDom) {
-        console.log(basketDom.priceBase);
         BX.adjust(basketDom.weight, {html: basket.info.weightFormatted});
         BX.adjust(basketDom.count, {html: basket.info.count});
         BX.adjust(basketDom.vat, {html: basket.info.vatFormatted});
@@ -85,8 +84,13 @@ class WCSaleBasket {
         if (basketItem.quantity > 0) {
             basketItemDom.input.value = basketItem.quantity;
             BX.adjust(basketItemDom.priceSum, {html: basketItem.priceSumFormatted});
-            BX.adjust(basketItemDom.priceBaseSum, {html: basketItem.priceBaseSumFormatted});
-            BX.adjust(basketItemDom.discountSum, {html: basketItem.discountSumFormatted});
+            if (basketItemDom.priceBaseSum) {
+                BX.adjust(basketItemDom.priceBaseSum, {html: basketItem.priceBaseSumFormatted});
+            }
+            if (basketItemDom.discountSum) {
+                BX.adjust(basketItemDom.discountSum, {html: basketItem.discountSumFormatted});
+            }
+
         } else {
             BX.remove(basketItemDom.ctn);
         }
