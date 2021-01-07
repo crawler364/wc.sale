@@ -108,7 +108,7 @@ class wc_sale extends CModule
         }
     }
 
-    private function getKernelDir()
+    private function getKernelDir(): string
     {
         $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
 

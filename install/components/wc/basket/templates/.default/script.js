@@ -68,6 +68,7 @@ class WCSaleBasket {
         basketItemDom.discountSum = BX.findChild(basketItem, {
             'attribute': {'data-basket-item-discount-sum': ''}
         }, true, false);
+
         return basketItemDom;
     }
 
