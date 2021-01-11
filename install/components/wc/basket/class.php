@@ -39,7 +39,7 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
             ]);
         }
 
-        return $this->result->prepareJson();
+        return $this->result->prepareAjaxJson();
     }
 
     public function executeComponent()

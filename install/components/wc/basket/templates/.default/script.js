@@ -9,10 +9,10 @@ class WCSaleBasket {
 
         basketItems.forEach((basketItem) => {
             basketItemDom = this.getBasketItemDom(basketItem);
-            actionObjects = BX.findChild(basketItem, {'attribute': 'data-basket-item-action'}, true, true);
+            actionObjects = BX.findChild(basketItem, {'attribute': 'data-action-basket-item'}, true, true);
 
             actionObjects.forEach((actionObject) => {
-                basketAction = actionObject.getAttribute('data-basket-item-action');
+                basketAction = actionObject.getAttribute('data-action-basket-item');
 
                 if (basketAction == 'set') {
                     on = 'blur';
@@ -57,7 +57,7 @@ class WCSaleBasket {
         basketItemDom.id = basketItem.getAttribute('data-basket-item-id');
         basketItemDom.input = BX.findChild(basketItem, {
             'tag': 'input',
-            'attribute': {'data-basket-item-action': 'set'}
+            'attribute': {'data-action-basket-item': 'set'}
         }, true, false);
         basketItemDom.priceSum = BX.findChild(basketItem, {
             'attribute': {'data-basket-item-price-sum': ''}

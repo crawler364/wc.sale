@@ -33,14 +33,14 @@ use \Bitrix\Main\Localization\Loc;
             <td>
                 <table>
                     <tr>
-                        <td data-basket-item-action="minus">-</td>
+                        <td data-action-basket-item="minus">-</td>
                         <td>
                             <label>
-                                <input type="text" data-basket-item-action="set" value="<?= $item['QUANTITY'] ?>">
+                                <input type="text" data-action-basket-item="set" value="<?= $item['QUANTITY'] ?>">
                             </label>
                         </td>
-                        <td data-basket-item-action="plus">+</td>
-                        <td data-basket-item-action="delete">x</td>
+                        <td data-action-basket-item="plus">+</td>
+                        <td data-action-basket-item="delete">x</td>
                     </tr>
                 </table>
             </td>

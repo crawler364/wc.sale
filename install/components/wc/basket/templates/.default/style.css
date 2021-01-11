@@ -11,7 +11,7 @@ table#wc-basket table td {
     border: none
 }
 
-table#wc-basket td[data-basket-item-action] {
+table#wc-basket td[data-action-basket-item] {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
