@@ -88,7 +88,11 @@ use \Bitrix\Main\Localization\Loc;
 </table>
 
 <script type="text/javascript">
-    WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
-        'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
-    ])?>);
+    BX.ready(function () {
+        if (!window.hasOwnProperty('WCSaleBasket')) {
+            window.WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
+                'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
+            ])?>);
+        }
+    });
 </script>

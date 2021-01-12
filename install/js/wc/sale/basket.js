@@ -1,29 +1,43 @@
 class WCSaleBasket {
     constructor(params) {
-        let actionObjects, basketAction, on, basketItemsContainers, basketContainer, basketItemsContainer, basketDom, basketItemDom;
+        let actionObjects, basketAction, on, basketItemsContainers, basketTopContainer, basketContainer,
+            basketItemsContainer, basketTopDom, basketDom, basketItemDom;
 
         this.basketHandlerClass = params.basketHandlerClass;
+
+        basketTopContainer = BX('wc-basket-top-container');
         basketContainer = BX('wc-basket-container');
         basketItemsContainer = BX('wc-basket-items-container');
+
         basketDom = this.getBasketDom(basketContainer);
+        basketTopDom = this.getBasketDom(basketTopContainer);
+
         basketItemsContainers = BX.findChild(basketItemsContainer, {'attribute': 'data-basket-item-id'}, true, true);
 
-        basketItemsContainers.forEach((basketItemContainer) => {
-            basketItemDom = this.getBasketItemDom(basketItemContainer);
-            actionObjects = BX.findChild(basketItemContainer, {'attribute': 'data-action-basket-item'}, true, true);
+        if (basketItemsContainers) {
+            basketItemsContainers.forEach((basketItemContainer) => {
+                basketItemDom = this.getBasketItemDom(basketItemContainer);
+                actionObjects = BX.findChild(basketItemContainer, {'attribute': 'data-action-basket-item'}, true, true);
 
-            actionObjects.forEach((actionObject) => {
-                basketAction = actionObject.getAttribute('data-action-basket-item');
+                actionObjects.forEach((actionObject) => {
+                    basketAction = actionObject.getAttribute('data-action-basket-item');
 
-                if (basketAction == 'set') {
-                    on = 'blur';
-                } else {
-                    on = 'click';
-                }
+                    if (basketAction == 'set') {
+                        on = 'blur';
+                    } else {
+                        on = 'click';
+                    }
 
-                BX.bind(actionObject, on, BX.delegate(this.action.bind(this, basketAction, basketDom, basketItemDom)));
+                    BX.bind(actionObject, on, BX.delegate(this.basketActionHandler.bind(
+                        this,
+                        basketAction,
+                        basketTopDom,
+                        basketDom,
+                        basketItemDom
+                    )));
+                });
             });
-        });
+        }
     }
 
     getBasketDom(basketContainer) {
@@ -113,7 +127,7 @@ class WCSaleBasket {
         }
     }
 
-    action(basketAction, basketDom, basketItemDom) {
+    basketActionHandler(basketAction, basketTopDom, basketDom, basketItemDom) {
         let data = {
             basketAction: basketAction,
             product: {id: basketItemDom.id},
@@ -131,8 +145,9 @@ class WCSaleBasket {
             console.log(response);
             let basketItem = response.data.basketItem;
             let basket = response.data.basket;
+            this.setBasketDom(basket, basketTopDom);
+            this.setBasketDom(basket, basketDom);
             this.setBasketItemDom(basketItem, basketItemDom);
-            this.setBasketDom(basket, basketDom)
         }, function (response) {
             console.log(response);
             // todo обработка ошибок
