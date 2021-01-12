@@ -1,12 +1,20 @@
 <?php
 
 use Bitrix\Main\Engine\Response\AjaxJson;
+use Bitrix\Main\Loader;
 use WC\Main\Result;
 
 class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
     /** @var \WC\Sale\BasketHandler */
     private $basketHandlerClass = \WC\Sale\BasketHandler::class;
+
+    public function __construct($component = null)
+    {
+        parent::__construct($component);
+
+        Loader::includeModule('wc.sale');
+    }
 
     public function configureActions(): array
     {
