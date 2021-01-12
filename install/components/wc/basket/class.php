@@ -44,7 +44,7 @@ class WCSaleBasket extends CBitrixComponent implements Bitrix\Main\Engine\Contra
 
     public function executeComponent()
     {
-        \CUtil::InitJSCore(['ajax']);
+        \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
         $this->basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
         $this->basket = $this->basketHandlerClass::getCurrentUserBasket();
         $this->basketItems = $this->basket->getBasketItems();

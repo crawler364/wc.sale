@@ -3,7 +3,7 @@
 use Bitrix\Main\ModuleManager;
 use Bitrix\Main;
 use Bitrix\Main\Localization\Loc;
-use \Bitrix\Main\IO\Directory;
+use Bitrix\Main\IO\Directory;
 
 class wc_sale extends CModule
 {
@@ -12,6 +12,7 @@ class wc_sale extends CModule
     var $MODULE_VERSION_DATE;
     var $MODULE_NAME;
     var $MODULE_DESCRIPTION;
+    private $kernelDir;
 
     public function __construct()
     {
@@ -27,6 +28,9 @@ class wc_sale extends CModule
         $this->MODULE_DESCRIPTION = Loc::getMessage('WC_SALE_MODULE_DESCRIPTION');
         $this->PARTNER_NAME = Loc::getMessage('WC_SALE_PARTNER_NAME');
         $this->PARTNER_URI = Loc::getMessage('WC_SALE_PARTNER_URI');
+
+        $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
+        $this->kernelDir = $_SERVER['DOCUMENT_ROOT'] . $kernelDir;
     }
 
     function DoInstall()
@@ -73,12 +77,13 @@ class wc_sale extends CModule
 
     function InstallFiles()
     {
-        CopyDirFiles(__DIR__ . '/components', $this->getKernelDir() . "/components", true, true);
+        CopyDirFiles(__DIR__ . '/components', $this->kernelDir . "/components", true, true);
+        CopyDirFiles(__DIR__ . '/js', $this->kernelDir . "/js", true, true);
     }
 
     function UnInstallFiles()
     {
-        //Directory::deleteDirectory($this->getKernelDir() . '/components/wc/order');
+        //Directory::deleteDirectory($this->kernelDir . '/components/wc/order');
     }
 
     private function checkRequirements()
@@ -106,12 +111,5 @@ class wc_sale extends CModule
                 }
             }
         }
-    }
-
-    private function getKernelDir(): string
-    {
-        $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
-
-        return $_SERVER['DOCUMENT_ROOT'] . $kernelDir;
     }
 }
