@@ -17,11 +17,6 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 
         $info['ELEMENT'] = static::getIblockElementInfo($productId);
 
-        $info['MAIN_SECTION'] = \Bitrix\Iblock\SectionTable::getList([
-            'filter' => ['=ID' => $info['ELEMENT']['IBLOCK_SECTION_ID']],
-            'select' => ['ID', 'CODE', 'NAME'],
-        ])->fetch();
-
         $info['PRODUCT_ID'] = (string)$productId;
         $info['NAME'] = (string)$this->getField('NAME');
         $info['WEIGHT'] = (string)$this->getWeight();
