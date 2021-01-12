@@ -4,8 +4,9 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 }
 
 use \Bitrix\Main\Localization\Loc;
+
 ?>
-<table id="wc-basket">
+<table id="wc-basket-items-container">
     <thead>
     <tr>
         <td><?= Loc::getMessage('DETAIL_PICTURE') ?></td>
@@ -46,42 +47,41 @@ use \Bitrix\Main\Localization\Loc;
             </td>
             <td>
                 <? if ($item['DISCOUNT_SUM']) { ?>
-                    <div class="line-through" data-basket-item-price-base-sum><?= $item['PRICE_BASE_SUM_FORMATTED'] ?></div>
+                    <div class="line-through"
+                         data-basket-item-price-base-sum><?= $item['PRICE_BASE_SUM_FORMATTED'] ?></div>
                 <? } ?>
                 <div data-basket-item-price-sum><?= $item['PRICE_SUM_FORMATTED'] ?></div>
                 <? if ($item['DISCOUNT_SUM']) { ?>
-                    <div><?= Loc::getMessage('DISCOUNT') ?> <span data-basket-item-discount-sum><?= $item['DISCOUNT_SUM_FORMATTED'] ?></span></div>
+                    <div><?= Loc::getMessage('DISCOUNT') ?> <span
+                                data-basket-item-discount-sum><?= $item['DISCOUNT_SUM_FORMATTED'] ?></span></div>
                 <? } ?>
             </td>
         </tr>
     <? } ?>
+</table>
+
+<table id="wc-basket-container">
     <tr>
-        <td colspan="4"></td>
         <td><?= Loc::getMessage('BASKET_WEIGHT') ?></td>
         <td data-basket-weight><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td colspan="4"></td>
         <td><?= Loc::getMessage('BASKET_COUNT') ?></td>
         <td data-basket-count><?= $arResult['INFO']['COUNT'] ?></td>
     </tr>
     <tr>
-        <td colspan="4"></td>
         <td><?= Loc::getMessage('BASKET_VAT') ?></td>
         <td data-basket-vat><?= $arResult['INFO']['VAT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td colspan="4"></td>
         <td><?= Loc::getMessage('BASKET_PRICE_BASE') ?></td>
         <td data-basket-price-base><?= $arResult['INFO']['PRICE_BASE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td colspan="4"></td>
         <td><?= Loc::getMessage('BASKET_DISCOUNT') ?></td>
         <td data-basket-discount><?= $arResult['INFO']['DISCOUNT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td colspan="4"></td>
         <td><?= Loc::getMessage('BASKET_PRICE') ?></td>
         <td data-basket-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
     </tr>

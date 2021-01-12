@@ -1,22 +1,22 @@
-table#wc-basket td {
+table#wc-basket-items-container td {
     border: 1px solid
 }
 
-table#wc-basket td img.detail-picture {
+table#wc-basket-items-container td img.detail-picture {
     width: 100px;
     height: 100px;
 }
 
-table#wc-basket table td {
+table#wc-basket-items-container table td {
     border: none
 }
 
-table#wc-basket td[data-action-basket-item] {
+table#wc-basket-items-container td[data-action-basket-item] {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
 }
 
-table#wc-basket div.line-through {
+table#wc-basket-items-container div.line-through {
     text-decoration: line-through;
 }
