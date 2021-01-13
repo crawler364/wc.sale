@@ -1,23 +1,23 @@
 class WCSaleBasket {
     constructor(params) {
-        let actionObjects, basketAction, on, basketItemsContainers, basketTopContainer, basketContainer,
-            basketItemsContainer, basketTopDom, basketDom, basketItemDom;
+        let actionObjects, basketAction, on, basketItemsContainers, basketTopDom, basketDom, basketItemDom,
+            restoreButton;
 
         this.basketHandlerClass = params.basketHandlerClass;
 
-        basketTopContainer = BX('wc-basket-top-container');
-        basketContainer = BX('wc-basket-container');
-        basketItemsContainer = BX('wc-basket-items-container');
+        basketDom = this.getBasketDom(BX('wc-basket-top-container'));
+        basketTopDom = this.getBasketDom(BX('wc-basket-container'));
 
-        basketDom = this.getBasketDom(basketContainer);
-        basketTopDom = this.getBasketDom(basketTopContainer);
-
-        basketItemsContainers = BX.findChild(basketItemsContainer, {'attribute': 'data-basket-item-id'}, true, true);
+        basketItemsContainers = BX.findChild(BX('wc-basket-items-container'), {'attribute': 'data-basket-item-id'}, true, true);
 
         if (basketItemsContainers) {
             basketItemsContainers.forEach((basketItemContainer) => {
                 basketItemDom = this.getBasketItemDom(basketItemContainer);
                 actionObjects = BX.findChild(basketItemContainer, {'attribute': 'data-action-basket-item'}, true, true);
+
+                restoreButton = BX.findNextSibling(basketItemContainer, {'class': 'restore-button'});
+                actionObjects.push(restoreButton);
+                basketItemDom.restoreButton = restoreButton;
 
                 actionObjects.forEach((actionObject) => {
                     basketAction = actionObject.getAttribute('data-action-basket-item');
@@ -69,7 +69,7 @@ class WCSaleBasket {
         let basketItemDom = {};
 
         basketItemDom.container = basketItemContainer;
-        basketItemDom.id = basketItemContainer.getAttribute('data-basket-item-id');
+        basketItemDom.productId = basketItemContainer.getAttribute('data-basket-item-id');
         basketItemDom.input = BX.findChild(basketItemContainer, {
             'tag': 'input',
             'attribute': {'data-action-basket-item': 'set'}
@@ -89,22 +89,22 @@ class WCSaleBasket {
 
     setBasketDom(basket, basketDom) {
         if (basketDom.weight) {
-            BX.adjust(basketDom.weight, {html: basket.info.weightFormatted});
+            BX.adjust(basketDom.weight, {text: basket.info.weightFormatted});
         }
         if (basketDom.count) {
-            BX.adjust(basketDom.count, {html: basket.info.count});
+            BX.adjust(basketDom.count, {text: basket.info.count});
         }
         if (basketDom.vat) {
-            BX.adjust(basketDom.vat, {html: basket.info.vatFormatted});
+            BX.adjust(basketDom.vat, {text: basket.info.vatFormatted});
         }
         if (basketDom.priceBase) {
-            BX.adjust(basketDom.priceBase, {html: basket.info.priceBaseFormatted});
+            BX.adjust(basketDom.priceBase, {text: basket.info.priceBaseFormatted});
         }
         if (basketDom.discount) {
-            BX.adjust(basketDom.discount, {html: basket.info.discountFormatted});
+            BX.adjust(basketDom.discount, {text: basket.info.discountFormatted});
         }
         if (basketDom.price) {
-            BX.adjust(basketDom.price, {html: basket.info.priceFormatted});
+            BX.adjust(basketDom.price, {text: basket.info.priceFormatted});
         }
     }
 
@@ -114,23 +114,28 @@ class WCSaleBasket {
                 basketItemDom.input.value = basketItem.quantity;
             }
             if (basketItemDom.priceSum) {
-                BX.adjust(basketItemDom.priceSum, {html: basketItem.priceSumFormatted});
+                BX.adjust(basketItemDom.priceSum, {text: basketItem.priceSumFormatted});
             }
             if (basketItemDom.priceBaseSum) {
-                BX.adjust(basketItemDom.priceBaseSum, {html: basketItem.priceBaseSumFormatted});
+                BX.adjust(basketItemDom.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
             }
             if (basketItemDom.discountSum) {
-                BX.adjust(basketItemDom.discountSum, {html: basketItem.discountSumFormatted});
+                BX.adjust(basketItemDom.discountSum, {text: basketItem.discountSumFormatted});
+            }
+            if (typeof UpdateDomTemplate.basketItemRestore === 'function') {
+                UpdateDomTemplate.basketItemRestore(basketItemDom);
             }
         } else {
-            BX.remove(basketItemDom.container);
+            if (typeof UpdateDomTemplate.basketItemDelete === 'function') {
+                UpdateDomTemplate.basketItemDelete(basketItemDom);
+            }
         }
     }
 
     basketActionHandler(basketAction, basketTopDom, basketDom, basketItemDom) {
         let data = {
             basketAction: basketAction,
-            product: {id: basketItemDom.id},
+            product: {id: basketItemDom.productId},
             basketHandlerClass: this.basketHandlerClass
         }
 
@@ -143,8 +148,8 @@ class WCSaleBasket {
             data: data
         }).then((response) => {
             console.log(response);
-            let basketItem = response.data.basketItem;
             let basket = response.data.basket;
+            let basketItem = response.data.basketItem;
             this.setBasketDom(basket, basketTopDom);
             this.setBasketDom(basket, basketDom);
             this.setBasketItemDom(basketItem, basketItemDom);

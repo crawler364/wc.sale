@@ -20,3 +20,16 @@ table#wc-basket-items-container td[data-action-basket-item] {
 table#wc-basket-items-container div.line-through {
     text-decoration: line-through;
 }
+
+table#wc-basket-items-container tr.restore-button td {
+    text-align: center;
+    cursor: pointer;
+}
+
+table#wc-basket-items-container tr.disabled {
+    pointer-events: none;
+    opacity: .5;
+}
+table#wc-basket-items-container tr.hide {
+     display: none;
+ }
