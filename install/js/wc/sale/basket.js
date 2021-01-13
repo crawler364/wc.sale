@@ -16,8 +16,10 @@ class WCSaleBasket {
                 actionObjects = BX.findChild(basketItemContainer, {'attribute': 'data-action-basket-item'}, true, true);
 
                 restoreButton = BX.findNextSibling(basketItemContainer, {'class': 'restore-button'});
-                actionObjects.push(restoreButton);
-                basketItemDom.restoreButton = restoreButton;
+                if (restoreButton) {
+                    actionObjects.push(restoreButton);
+                    basketItemDom.restoreButton = restoreButton;
+                }
 
                 actionObjects.forEach((actionObject) => {
                     basketAction = actionObject.getAttribute('data-action-basket-item');
@@ -122,12 +124,18 @@ class WCSaleBasket {
             if (basketItemDom.discountSum) {
                 BX.adjust(basketItemDom.discountSum, {text: basketItem.discountSumFormatted});
             }
-            if (typeof UpdateTemplateDom.basketItemUpdate === 'function') {
-                UpdateTemplateDom.basketItemRestore(basketItemDom);
+            if (typeof UpdateBasketItemDom.update === 'function') {
+                UpdateBasketItemDom.update(basketItemDom);
+            }
+            if (typeof UpdateBasketProductDom.update === 'function') {
+                UpdateBasketProductDom.update(basketItemDom);
             }
         } else {
-            if (typeof UpdateTemplateDom.basketItemDelete === 'function') {
-                UpdateTemplateDom.basketItemDelete(basketItemDom);
+            if (typeof UpdateBasketItemDom.delete === 'function') {
+                UpdateBasketItemDom.delete(basketItemDom);
+            }
+            if (typeof UpdateBasketProductDom.delete === 'function') {
+                UpdateBasketProductDom.delete(basketItemDom);
             }
         }
     }

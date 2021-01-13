@@ -1,7 +1,7 @@
-class UpdateTemplateDom {
-    static basketItemUpdate(dom) {
+class UpdateBasketProductDom {
+    static update(dom) {
     }
 
-    static basketItemDelete(dom) {
+    static delete(dom) {
     }
 }

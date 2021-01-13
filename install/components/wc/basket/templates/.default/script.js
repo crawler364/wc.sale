@@ -1,5 +1,5 @@
-class UpdateTemplateDom {
-    static basketItemUpdate(dom) {
+class UpdateBasketItemDom {
+    static update(dom) {
         if (dom.container) {
             BX.removeClass(dom.container, 'disabled');
         }
@@ -8,7 +8,7 @@ class UpdateTemplateDom {
         }
     }
 
-    static basketItemDelete(dom) {
+    static delete(dom) {
         if (dom.container) {
             BX.addClass(dom.container, 'disabled');
         }
