@@ -1,5 +1,5 @@
-class UpdateDomTemplate{
-    static basketItemRestore(dom) {
+class UpdateTemplateDom {
+    static basketItemUpdate(dom) {
         if (dom.container) {
             BX.removeClass(dom.container, 'disabled');
         }

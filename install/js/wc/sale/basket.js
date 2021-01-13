@@ -122,12 +122,12 @@ class WCSaleBasket {
             if (basketItemDom.discountSum) {
                 BX.adjust(basketItemDom.discountSum, {text: basketItem.discountSumFormatted});
             }
-            if (typeof UpdateDomTemplate.basketItemRestore === 'function') {
-                UpdateDomTemplate.basketItemRestore(basketItemDom);
+            if (typeof UpdateTemplateDom.basketItemUpdate === 'function') {
+                UpdateTemplateDom.basketItemRestore(basketItemDom);
             }
         } else {
-            if (typeof UpdateDomTemplate.basketItemDelete === 'function') {
-                UpdateDomTemplate.basketItemDelete(basketItemDom);
+            if (typeof UpdateTemplateDom.basketItemDelete === 'function') {
+                UpdateTemplateDom.basketItemDelete(basketItemDom);
             }
         }
     }
