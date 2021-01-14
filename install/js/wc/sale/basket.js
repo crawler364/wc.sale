@@ -150,7 +150,9 @@ class WCSaleBasket {
         }
     }
 
-    basketActionHandler(basketAction, basketTopDom, basketDom, basketItemDom) {
+    basketActionHandler(basketAction, basketTopDom, basketDom, basketItemDom, e) {
+        e.preventDefault();
+
         let data = {
             basketAction: basketAction,
             product: {id: basketItemDom.productId},
