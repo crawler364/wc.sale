@@ -1,43 +1,53 @@
 class WCSaleBasket {
     constructor(params) {
         let actionObjects, basketAction, on, basketItemsContainers, basketTopDom, basketDom, basketItemDom,
-            restoreButton;
+            restoreButton, basketItemsContainer;
 
         this.basketHandlerClass = params.basketHandlerClass;
 
         basketDom = this.getBasketDom(BX('wc-basket-top-container'));
         basketTopDom = this.getBasketDom(BX('wc-basket-container'));
-
-        basketItemsContainers = BX.findChild(BX('wc-basket-items-container'), {'attribute': 'data-basket-item-id'}, true, true);
+        basketItemsContainer = BX('wc-basket-items-container');
+        basketItemsContainers = BX.findChild(basketItemsContainer, {
+            'attribute': {'data-basket-item': ''}
+        }, true, true);
 
         if (basketItemsContainers) {
             basketItemsContainers.forEach((basketItemContainer) => {
                 basketItemDom = this.getBasketItemDom(basketItemContainer);
                 actionObjects = BX.findChild(basketItemContainer, {'attribute': 'data-action-basket-item'}, true, true);
 
-                restoreButton = BX.findNextSibling(basketItemContainer, {'class': 'restore-button'});
+                restoreButton = BX.findChild(basketItemsContainer, {
+                        'attribute': {
+                            'data-basket-item-id': basketItemDom.productId,
+                            'data-basket-item-restore-button': ''
+                        },
+                    }, true, false
+                );
                 if (restoreButton) {
                     actionObjects.push(restoreButton);
                     basketItemDom.restoreButton = restoreButton;
                 }
 
-                actionObjects.forEach((actionObject) => {
-                    basketAction = actionObject.getAttribute('data-action-basket-item');
+                if (actionObjects) {
+                    actionObjects.forEach((actionObject) => {
+                        basketAction = actionObject.getAttribute('data-action-basket-item');
 
-                    if (basketAction == 'set') {
-                        on = 'blur';
-                    } else {
-                        on = 'click';
-                    }
+                        if (basketAction == 'set') {
+                            on = 'blur';
+                        } else {
+                            on = 'click';
+                        }
 
-                    BX.bind(actionObject, on, BX.delegate(this.basketActionHandler.bind(
-                        this,
-                        basketAction,
-                        basketTopDom,
-                        basketDom,
-                        basketItemDom
-                    )));
-                });
+                        BX.bind(actionObject, on, BX.delegate(this.basketActionHandler.bind(
+                            this,
+                            basketAction,
+                            basketTopDom,
+                            basketDom,
+                            basketItemDom
+                        )));
+                    });
+                }
             });
         }
     }

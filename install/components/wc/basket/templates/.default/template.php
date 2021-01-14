@@ -18,7 +18,14 @@ use \Bitrix\Main\Localization\Loc;
     </tr>
     </thead>
     <? foreach ($arResult['ITEMS'] as $item) { ?>
-        <tr data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
+        <tr>
+            <td data-basket-item-restore-button data-basket-item-id="<?= $item['PRODUCT_ID'] ?>"
+                class="restore-button hide"
+                data-action-basket-item="plus" colspan="6">
+                <?= Loc::getMessage('WC_BASKET_RESTORE_BUTTON') ?>
+            </td>
+        </tr>
+        <tr data-basket-item data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
             <td>
                 <img class="detail-picture" src="<?= $item['ELEMENT']['DETAIL_PICTURE'] ?>"
                      alt="<?= Loc::getMessage('WC_BASKET_NAME') ?>">
@@ -37,7 +44,8 @@ use \Bitrix\Main\Localization\Loc;
                         <td data-action-basket-item="minus">-</td>
                         <td>
                             <label>
-                                <input type="text" data-action-basket-item="set" value="<?= $item['QUANTITY'] ?>">
+                                <input type="text" data-action-basket-item="set"
+                                       value="<?= $item['QUANTITY'] ?>">
                             </label>
                         </td>
                         <td data-action-basket-item="plus">+</td>
@@ -48,18 +56,15 @@ use \Bitrix\Main\Localization\Loc;
             <td>
                 <? if ($item['DISCOUNT_SUM']) { ?>
                     <div class="line-through"
-                         data-basket-item-price-base-sum><?= $item['PRICE_BASE_SUM_FORMATTED'] ?></div>
+                         data-basket-item-price-base-sum><?= $item['PRICE_BASE_SUM_FORMATTED'] ?>
+                    </div>
                 <? } ?>
                 <div data-basket-item-price-sum><?= $item['PRICE_SUM_FORMATTED'] ?></div>
                 <? if ($item['DISCOUNT_SUM']) { ?>
-                    <div><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?> <span
-                                data-basket-item-discount-sum><?= $item['DISCOUNT_SUM_FORMATTED'] ?></span></div>
+                    <div><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?>
+                        <span data-basket-item-discount-sum><?= $item['DISCOUNT_SUM_FORMATTED'] ?></span>
+                    </div>
                 <? } ?>
-            </td>
-        </tr>
-        <tr class="restore-button hide" data-action-basket-item="plus">
-            <td colspan="6">
-                <?= Loc::getMessage('WC_BASKET_RESTORE_BUTTON') ?>
             </td>
         </tr>
     <? } ?>
