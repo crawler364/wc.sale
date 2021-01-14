@@ -1,9 +1,10 @@
 <?php
 
-use Bitrix\Main\SystemException;
-
 class WCSaleOrder extends CBitrixComponent implements Bitrix\Main\Engine\Contract\Controllerable
 {
+    /** @var \WC\Sale\OrderHandler */
+    private $orderHandlerClass = \WC\Sale\OrderHandler::class;
+
     public function configureActions()
     {
         // TODO: Implement configureActions() method.
@@ -11,10 +12,15 @@ class WCSaleOrder extends CBitrixComponent implements Bitrix\Main\Engine\Contrac
 
     public function executeComponent()
     {
-        try {
-            $this->orderHandler = new \WC\Sale\OrderHandler();
-        } catch (SystemException $exception) {
-        }
+        $order = $this->orderHandlerClass::createOrder();
+        $orderHandler = new $this->orderHandlerClass($order);
+
+        $personTypes = $this->orderHandlerClass::getPersonTypes();
+
+
+        $this->arResult = [
+            'PERSON_TYPES' => $personTypes,
+        ];
 
         $this->includeComponentTemplate();
     }
