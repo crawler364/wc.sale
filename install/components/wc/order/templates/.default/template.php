@@ -18,6 +18,7 @@ $a = $arResult;
 
     <h2><?= Loc::getMessage('WC_ORDER_TEMPLATE_PROPERTIES_TITLE') ?></h2>
     <? foreach ($arResult['PROPERTIES'] as $property) { ?>
+        <?=$property['NAME']?>
 
     <? } ?>
 

@@ -17,9 +17,12 @@ class WCSaleOrder extends CBitrixComponent implements Bitrix\Main\Engine\Contrac
 
         $personTypes = $this->orderHandlerClass::getPersonTypes();
 
+        $a = $order->getPropertyCollection();
+        $properties = $order->loadPropertyCollection();
 
         $this->arResult = [
             'PERSON_TYPES' => $personTypes,
+            'PROPERTIES' => $properties->getArray()['properties'],
         ];
 
         $this->includeComponentTemplate();
