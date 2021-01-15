@@ -55,7 +55,8 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     public function setPriceName()
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
-        $price = \Bitrix\Catalog\GroupTable::getById($this->getField('PRICE_TYPE_ID'))->fetch();
+        $priceTypeId = $this->getField('PRICE_TYPE_ID');
+        $price = $priceTypeId ? \Bitrix\Catalog\GroupTable::getById($priceTypeId)->fetch() : null;
         $notes['PRICE_NAME'] = $price['NAME'];
 
         $this->setField('NOTES', serialize($notes));

@@ -2,11 +2,19 @@
 
 use Bitrix\Main\Engine\Response\AjaxJson;
 use WC\Main\Result;
+use Bitrix\Main\Loader;
 
 class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
 {
     /** @var \WC\Sale\BasketHandler */
     private $basketHandlerClass = \WC\Sale\BasketHandler::class;
+
+    public function __construct(\Bitrix\Main\Request $request = null)
+    {
+        parent::__construct($request);
+
+        Loader::includeModule('wc.sale');
+    }
 
     public function configureActions(): array
     {
