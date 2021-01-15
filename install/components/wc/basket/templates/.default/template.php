@@ -6,7 +6,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use \Bitrix\Main\Localization\Loc;
 
 ?>
-<table id="wc-basket-items-container">
+<table data-wc-basket-items-container>
     <thead>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_DETAIL_PICTURE') ?></td>
@@ -18,10 +18,10 @@ use \Bitrix\Main\Localization\Loc;
     </tr>
     </thead>
     <? foreach ($arResult['ITEMS'] as $item) { ?>
-        <tr>
-            <td data-basket-item-restore-button data-basket-item-id="<?= $item['PRODUCT_ID'] ?>"
-                class="restore-button hide"
-                data-action-basket-item="plus" colspan="6">
+        <tr data-basket-item-restore-button data-basket-item-id="<?= $item['PRODUCT_ID'] ?>"
+            class="restore-button hide"
+            data-action-basket-item="plus">
+            <td colspan="6">
                 <?= Loc::getMessage('WC_BASKET_RESTORE_BUTTON') ?>
             </td>
         </tr>
@@ -70,7 +70,7 @@ use \Bitrix\Main\Localization\Loc;
     <? } ?>
 </table>
 
-<table id="wc-basket-container">
+<table data-wc-basket-container>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_WEIGHT') ?></td>
         <td data-basket-weight><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
@@ -103,6 +103,7 @@ use \Bitrix\Main\Localization\Loc;
             window.WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
                 'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
             ])?>);
+            window.WCSaleBasket.init();
         }
     });
 </script>

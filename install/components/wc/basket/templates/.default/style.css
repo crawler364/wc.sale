@@ -1,36 +1,36 @@
-table#wc-basket-items-container td {
+table[data-wc-basket-items-container] td {
     border: 1px solid
 }
 
-table#wc-basket-items-container td img.detail-picture {
+table[data-wc-basket-items-container] td img.detail-picture {
     width: 100px;
     height: 100px;
 }
 
-table#wc-basket-items-container table td {
+table[data-wc-basket-items-container] table td {
     border: none
 }
 
-table#wc-basket-items-container td[data-action-basket-item] {
+table[data-wc-basket-items-container] td[data-action-basket-item] {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
 }
 
-table#wc-basket-items-container div.line-through {
+table[data-wc-basket-items-container] div.line-through {
     text-decoration: line-through;
 }
 
-table#wc-basket-items-container tr.restore-button td {
+table[data-wc-basket-items-container] tr.restore-button td {
     text-align: center;
     cursor: pointer;
 }
 
-table#wc-basket-items-container tr.disabled {
+table[data-wc-basket-items-container] tr.disabled {
     pointer-events: none;
     opacity: .5;
 }
 
-table#wc-basket-items-container td.hide {
+table[data-wc-basket-items-container] tr.hide {
     display: none;
 }

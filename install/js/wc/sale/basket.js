@@ -1,21 +1,34 @@
 class WCSaleBasket {
     constructor(params) {
-        let actionObjects, basketAction, on, basketItemsContainers, basketTopDom, basketDom, basketItemDom,
-            restoreButton, basketItemsContainer;
-
         this.basketHandlerClass = params.basketHandlerClass;
+    }
 
-        basketDom = this.getBasketDom(BX('wc-basket-top-container'));
-        basketTopDom = this.getBasketDom(BX('wc-basket-container'));
-        basketItemsContainer = BX('wc-basket-items-container');
-        basketItemsContainers = BX.findChild(basketItemsContainer, {
-            'attribute': {'data-basket-item': ''}
-        }, true, true);
+    init() {
+        let basketContainers, basketItemsContainers, basketDoms = [], basketItemContainers,
+            actionObjects, basketAction, on, basketItemDom, restoreButton;
 
-        if (basketItemsContainers) {
-            basketItemsContainers.forEach((basketItemContainer) => {
+        basketContainers = BX.findChildren(document.body, {
+            'attribute': {'data-wc-basket-container': ''}
+        }, true);
+        basketItemsContainers = BX.findChildren(document.body, {
+            'attribute': {'data-wc-basket-items-container': ''}
+        }, true);
+
+        basketContainers.forEach((basketContainer) => {
+            basketDoms.push(this.getBasketDom(basketContainer));
+        });
+
+        basketItemsContainers.forEach((basketItemsContainer) => {
+            basketItemContainers = BX.findChildren(basketItemsContainer, {
+                'attribute': {'data-basket-item': ''}
+            }, true);
+
+            basketItemContainers.forEach((basketItemContainer) => {
                 basketItemDom = this.getBasketItemDom(basketItemContainer);
-                actionObjects = BX.findChild(basketItemContainer, {'attribute': 'data-action-basket-item'}, true, true);
+
+                actionObjects = BX.findChildren(basketItemContainer, {
+                    'attribute': 'data-action-basket-item'
+                }, true);
 
                 restoreButton = BX.findChild(basketItemsContainer, {
                         'attribute': {
@@ -29,27 +42,24 @@ class WCSaleBasket {
                     basketItemDom.restoreButton = restoreButton;
                 }
 
-                if (actionObjects) {
-                    actionObjects.forEach((actionObject) => {
-                        basketAction = actionObject.getAttribute('data-action-basket-item');
+                actionObjects.forEach((actionObject) => {
+                    basketAction = actionObject.getAttribute('data-action-basket-item');
 
-                        if (basketAction == 'set') {
-                            on = 'blur';
-                        } else {
-                            on = 'click';
-                        }
+                    if (basketAction == 'set') {
+                        on = 'blur';
+                    } else {
+                        on = 'click';
+                    }
 
-                        BX.bind(actionObject, on, BX.delegate(this.basketActionHandler.bind(
-                            this,
-                            basketAction,
-                            basketTopDom,
-                            basketDom,
-                            basketItemDom
-                        )));
-                    });
-                }
+                    BX.bind(actionObject, on, BX.delegate(this.basketActionHandler.bind(
+                        this,
+                        basketAction,
+                        basketDoms,
+                        basketItemDom
+                    )));
+                });
             });
-        }
+        });
     }
 
     getBasketDom(basketContainer) {
@@ -150,7 +160,7 @@ class WCSaleBasket {
         }
     }
 
-    basketActionHandler(basketAction, basketTopDom, basketDom, basketItemDom, e) {
+    basketActionHandler(basketAction, basketDoms, basketItemDom, e) {
         e.preventDefault();
 
         let data = {
@@ -164,14 +174,15 @@ class WCSaleBasket {
         }
 
         BX.ajax.runComponentAction('wc:basket', 'process', {
-            mode: 'class',
+            mode: 'ajax',
             data: data
         }).then((response) => {
             console.log(response);
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
-            this.setBasketDom(basket, basketTopDom);
-            this.setBasketDom(basket, basketDom);
+            basketDoms.forEach((basketDom) => {
+                this.setBasketDom(basket, basketDom);
+            });
             this.setBasketItemDom(basketItem, basketItemDom);
         }, function (response) {
             console.log(response);
