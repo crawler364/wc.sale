@@ -22,16 +22,17 @@ class OrderHandler
 
         $this->order->setPersonTypeId(1);
 
-        foreach ($this->order->getPropertyCollection() as $prop) {
-
-        }
-
         //$this->result = $this->order->save();
     }
 
     protected function setOrderPropertys()
     {
 
+    }
+
+    public function saveOrder()
+    {
+        $this->order->save();
     }
 
     public static function createOrder(): Order

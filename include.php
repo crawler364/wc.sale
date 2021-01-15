@@ -14,6 +14,9 @@ $arJsConfig = [
     'wc.sale.basket' => [
         'js' => "$kernelDir/js/wc/sale/basket.js",
     ],
+    'wc.sale.order' => [
+        'js' => "$kernelDir/js/wc/sale/order.js",
+    ],
 ];
 
 foreach ($arJsConfig as $ext => $arExt) {
