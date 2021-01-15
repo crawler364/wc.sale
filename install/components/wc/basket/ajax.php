@@ -3,7 +3,7 @@
 use Bitrix\Main\Engine\Response\AjaxJson;
 use WC\Main\Result;
 
-class WCSaleBasketController extends \Bitrix\Main\Engine\Controller
+class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
 {
     /** @var \WC\Sale\BasketHandler */
     private $basketHandlerClass = \WC\Sale\BasketHandler::class;
