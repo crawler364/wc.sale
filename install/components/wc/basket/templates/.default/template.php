@@ -36,7 +36,7 @@ use \Bitrix\Main\Localization\Loc;
                 <? if ($item['DISCOUNT']) { ?>
                     <div class="line-through"><?= $item['PRICE_BASE_FORMATTED'] ?></div>
                 <? } ?>
-                <div data-basket-item-price><?= $item['PRICE_FORMATTED'] ?></div>
+                <div><?= $item['PRICE_FORMATTED'] ?></div>
             </td>
             <td>
                 <table>
