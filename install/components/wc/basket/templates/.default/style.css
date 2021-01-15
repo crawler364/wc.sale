@@ -30,6 +30,7 @@ table#wc-basket-items-container tr.disabled {
     pointer-events: none;
     opacity: .5;
 }
-table#wc-basket-items-container tr.hide {
-     display: none;
- }
+
+table#wc-basket-items-container td.hide {
+    display: none;
+}
