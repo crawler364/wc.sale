@@ -95,35 +95,37 @@ class WCSaleBasket {
         return basketItemContainerDom;
     }
 
-    setBasketContainerDom(basket, basketContainerDom) {
-        if (basketContainerDom.weight) {
-            BX.adjust(basketContainerDom.weight, {text: basket.info.weightFormatted});
-        }
-        if (basketContainerDom.count) {
-            BX.adjust(basketContainerDom.count, {text: basket.info.count});
-        }
-        if (basketContainerDom.vat) {
-            BX.adjust(basketContainerDom.vat, {text: basket.info.vatFormatted});
-        }
-        if (basketContainerDom.priceBase) {
-            BX.adjust(basketContainerDom.priceBase, {text: basket.info.priceBaseFormatted});
-        }
-        if (basketContainerDom.discount) {
-            BX.adjust(basketContainerDom.discount, {text: basket.info.discountFormatted});
-        }
-        if (basketContainerDom.price) {
-            BX.adjust(basketContainerDom.price, {text: basket.info.priceFormatted});
-        }
+    setBasketContainersDom(basket, basketContainersDom) {
+        basketContainersDom.forEach((basketContainerDom) => {
+            if (basketContainerDom.weight) {
+                BX.adjust(basketContainerDom.weight, {text: basket.info.weightFormatted});
+            }
+            if (basketContainerDom.count) {
+                BX.adjust(basketContainerDom.count, {text: basket.info.count});
+            }
+            if (basketContainerDom.vat) {
+                BX.adjust(basketContainerDom.vat, {text: basket.info.vatFormatted});
+            }
+            if (basketContainerDom.priceBase) {
+                BX.adjust(basketContainerDom.priceBase, {text: basket.info.priceBaseFormatted});
+            }
+            if (basketContainerDom.discount) {
+                BX.adjust(basketContainerDom.discount, {text: basket.info.discountFormatted});
+            }
+            if (basketContainerDom.price) {
+                BX.adjust(basketContainerDom.price, {text: basket.info.priceFormatted});
+            }
 
-        if (basket.info.count > 0) {
-            if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.update === 'function') {
-                UpdateBasketDom.update(basketContainerDom);
+            if (basket.info.count > 0) {
+                if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.update === 'function') {
+                    UpdateBasketDom.update(basketContainerDom);
+                }
+            } else {
+                if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.delete === 'function') {
+                    UpdateBasketItemDom.delete(basketContainerDom);
+                }
             }
-        } else {
-            if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.delete === 'function') {
-                UpdateBasketItemDom.delete(basketContainerDom);
-            }
-        }
+        });
     }
 
     setBasketItemContainerDom(basketItem, basketItemContainerDom) {
@@ -182,9 +184,7 @@ class WCSaleBasket {
             console.log(response);
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
-            basketContainersDom.forEach((basketContainerDom) => {
-                this.setBasketContainerDom(basket, basketContainerDom);
-            });
+            this.setBasketContainersDom(basket, basketContainersDom);
             this.setBasketItemContainerDom(basketItem, basketItemContainerDom);
         }, function (response) {
             console.log(response);
