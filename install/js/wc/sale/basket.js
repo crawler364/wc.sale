@@ -114,22 +114,33 @@ class WCSaleBasket {
         if (basketContainerDom.price) {
             BX.adjust(basketContainerDom.price, {text: basket.info.priceFormatted});
         }
+
+        if (basket.info.count > 0) {
+            if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.update === 'function') {
+                UpdateBasketDom.update(basketContainerDom);
+            }
+        } else {
+            if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.delete === 'function') {
+                UpdateBasketItemDom.delete(basketContainerDom);
+            }
+        }
     }
 
     setBasketItemContainerDom(basketItem, basketItemContainerDom) {
+        if (basketItemContainerDom.input) {
+            basketItemContainerDom.input.value = basketItem.quantity;
+        }
+        if (basketItemContainerDom.priceSum) {
+            BX.adjust(basketItemContainerDom.priceSum, {text: basketItem.priceSumFormatted});
+        }
+        if (basketItemContainerDom.priceBaseSum) {
+            BX.adjust(basketItemContainerDom.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
+        }
+        if (basketItemContainerDom.discountSum) {
+            BX.adjust(basketItemContainerDom.discountSum, {text: basketItem.discountSumFormatted});
+        }
+
         if (basketItem.quantity > 0) {
-            if (basketItemContainerDom.input) {
-                basketItemContainerDom.input.value = basketItem.quantity;
-            }
-            if (basketItemContainerDom.priceSum) {
-                BX.adjust(basketItemContainerDom.priceSum, {text: basketItem.priceSumFormatted});
-            }
-            if (basketItemContainerDom.priceBaseSum) {
-                BX.adjust(basketItemContainerDom.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
-            }
-            if (basketItemContainerDom.discountSum) {
-                BX.adjust(basketItemContainerDom.discountSum, {text: basketItem.discountSumFormatted});
-            }
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
                 UpdateBasketItemDom.update(basketItemContainerDom);
             }

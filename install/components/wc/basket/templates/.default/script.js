@@ -25,3 +25,11 @@ class UpdateBasketProductDom {
     static delete(dom) {
     }
 }
+
+class UpdateBasketDom {
+    static update(dom) {
+    }
+
+    static delete(dom) {
+    }
+}
