@@ -1,36 +1,36 @@
-table[data-wc-basket-items-container] td {
+table#wc-basket-items-container td {
     border: 1px solid
 }
 
-table[data-wc-basket-items-container] td img.detail-picture {
+table#wc-basket-items-container td img.detail-picture {
     width: 100px;
     height: 100px;
 }
 
-table[data-wc-basket-items-container] table td {
+table#wc-basket-items-container table td {
     border: none
 }
 
-table[data-wc-basket-items-container] td[data-action-basket-item] {
+table#wc-basket-items-container td[data-action-basket-item] {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
 }
 
-table[data-wc-basket-items-container] div.line-through {
+table#wc-basket-items-container div.line-through {
     text-decoration: line-through;
 }
 
-table[data-wc-basket-items-container] tr.restore-button td {
-    text-align: center;
-    cursor: pointer;
-}
-
-table[data-wc-basket-items-container] tr.disabled {
+table#wc-basket-items-container tr.disabled {
     pointer-events: none;
     opacity: .5;
 }
 
-table[data-wc-basket-items-container] tr.hide {
+table#wc-basket-items-container td.hide {
     display: none;
+}
+
+table#wc-basket-items-container tr td.restore-button {
+    text-align: center;
+    cursor: pointer;
 }

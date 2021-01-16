@@ -6,7 +6,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use \Bitrix\Main\Localization\Loc;
 
 ?>
-<table data-wc-basket-items-container>
+<table id="wc-basket-items-container">
     <thead>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_DETAIL_PICTURE') ?></td>
@@ -18,14 +18,13 @@ use \Bitrix\Main\Localization\Loc;
     </tr>
     </thead>
     <? foreach ($arResult['ITEMS'] as $item) { ?>
-        <tr data-basket-item-restore-button data-basket-item-id="<?= $item['PRODUCT_ID'] ?>"
-            class="restore-button hide"
-            data-action-basket-item="plus">
-            <td colspan="6">
+        <tbody data-basket-item-container data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
+        <tr>
+            <td data-basket-item-restore-button data-action-basket-item="plus" class="restore-button hide" colspan="6">
                 <?= Loc::getMessage('WC_BASKET_RESTORE_BUTTON') ?>
             </td>
         </tr>
-        <tr data-basket-item data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
+        <tr data-basket-item>
             <td>
                 <img class="detail-picture" src="<?= $item['ELEMENT']['DETAIL_PICTURE'] ?>"
                      alt="<?= Loc::getMessage('WC_BASKET_NAME') ?>">
@@ -67,6 +66,7 @@ use \Bitrix\Main\Localization\Loc;
                 <? } ?>
             </td>
         </tr>
+        </tbody>
     <? } ?>
 </table>
 
@@ -98,12 +98,10 @@ use \Bitrix\Main\Localization\Loc;
 </table>
 
 <script type="text/javascript">
-    BX.ready(function () {
-        if (!window.hasOwnProperty('WCSaleBasket')) {
-            window.WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
-                'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
-            ])?>);
-            window.WCSaleBasket.init();
-        }
-    });
+    if (!window.hasOwnProperty('WCSaleBasket')) {
+        window.WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
+            'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
+        ])?>);
+        window.WCSaleBasket.init();
+    }
 </script>

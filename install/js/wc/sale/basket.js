@@ -4,173 +4,164 @@ class WCSaleBasket {
     }
 
     init() {
-        let basketContainers, basketItemsContainers, basketDoms = [], basketItemContainers,
-            actionObjects, basketAction, on, basketItemDom, restoreButton;
+        BX.ready(() => {
+            BX.bindDelegate(
+                document.body,
+                'change',
+                {
+                    tag: 'input',
+                    attribute: 'data-action-basket-item'
+                },
+                BX.delegate(this.processAction.bind(this))
+            );
+
+            BX.bindDelegate(
+                document.body,
+                'click',
+                {
+                    attribute: 'data-action-basket-item'
+                },
+                BX.delegate(this.processAction.bind(this))
+            );
+        });
+    }
+
+    getBasketContainersDom() {
+        let basketContainers, basketContainersDom = [];
 
         basketContainers = BX.findChildren(document.body, {
             'attribute': {'data-wc-basket-container': ''}
         }, true);
-        basketItemsContainers = BX.findChildren(document.body, {
-            'attribute': {'data-wc-basket-items-container': ''}
-        }, true);
 
-        basketContainers.forEach((basketContainer) => {
-            basketDoms.push(this.getBasketDom(basketContainer));
+        basketContainers.forEach((basketContainer, key) => {
+            let basketContainerDom = {};
+
+            basketContainerDom.weight = BX.findChild(basketContainer, {
+                'attribute': {'data-basket-weight': ''}
+            }, true, false);
+            basketContainerDom.count = BX.findChild(basketContainer, {
+                'attribute': {'data-basket-count': ''}
+            }, true, false);
+            basketContainerDom.vat = BX.findChild(basketContainer, {
+                'attribute': {'data-basket-vat': ''}
+            }, true, false);
+            basketContainerDom.priceBase = BX.findChild(basketContainer, {
+                'attribute': {'data-basket-price-base': ''}
+            }, true, false);
+            basketContainerDom.discount = BX.findChild(basketContainer, {
+                'attribute': {'data-basket-discount': ''}
+            }, true, false);
+            basketContainerDom.price = BX.findChild(basketContainer, {
+                'attribute': {'data-basket-price': ''}
+            }, true, false);
+
+            basketContainersDom[key] = basketContainerDom;
         });
 
-        basketItemsContainers.forEach((basketItemsContainer) => {
-            basketItemContainers = BX.findChildren(basketItemsContainer, {
-                'attribute': {'data-basket-item': ''}
-            }, true);
+        return basketContainersDom;
+    }
 
-            basketItemContainers.forEach((basketItemContainer) => {
-                basketItemDom = this.getBasketItemDom(basketItemContainer);
+    getBasketItemContainerDom(target) {
+        let basketItemContainer;
+        let basketItemContainerDom = {};
 
-                actionObjects = BX.findChildren(basketItemContainer, {
-                    'attribute': 'data-action-basket-item'
-                }, true);
-
-                restoreButton = BX.findChild(basketItemsContainer, {
-                        'attribute': {
-                            'data-basket-item-id': basketItemDom.productId,
-                            'data-basket-item-restore-button': ''
-                        },
-                    }, true, false
-                );
-                if (restoreButton) {
-                    actionObjects.push(restoreButton);
-                    basketItemDom.restoreButton = restoreButton;
-                }
-
-                actionObjects.forEach((actionObject) => {
-                    basketAction = actionObject.getAttribute('data-action-basket-item');
-
-                    if (basketAction == 'set') {
-                        on = 'blur';
-                    } else {
-                        on = 'click';
-                    }
-
-                    BX.bind(actionObject, on, BX.delegate(this.basketActionHandler.bind(
-                        this,
-                        basketAction,
-                        basketDoms,
-                        basketItemDom
-                    )));
-                });
-            });
+        basketItemContainer = BX.findParent(target, {
+            attribute: {'data-basket-item-container': ''}
         });
-    }
 
-    getBasketDom(basketContainer) {
-        let basketDom = {};
-
-        basketDom.weight = BX.findChild(basketContainer, {
-            'attribute': {'data-basket-weight': ''}
+        basketItemContainerDom.action = target.getAttribute('data-action-basket-item');
+        basketItemContainerDom.container = basketItemContainer;
+        basketItemContainerDom.productId = basketItemContainer.getAttribute('data-basket-item-id');
+        basketItemContainerDom.basketItem = BX.findChild(basketItemContainer, {
+            'attribute': {'data-basket-item': ''}
         }, true, false);
-        basketDom.count = BX.findChild(basketContainer, {
-            'attribute': {'data-basket-count': ''}
-        }, true, false);
-        basketDom.vat = BX.findChild(basketContainer, {
-            'attribute': {'data-basket-vat': ''}
-        }, true, false);
-        basketDom.priceBase = BX.findChild(basketContainer, {
-            'attribute': {'data-basket-price-base': ''}
-        }, true, false);
-        basketDom.discount = BX.findChild(basketContainer, {
-            'attribute': {'data-basket-discount': ''}
-        }, true, false);
-        basketDom.price = BX.findChild(basketContainer, {
-            'attribute': {'data-basket-price': ''}
-        }, true, false);
-
-        return basketDom;
-    }
-
-    getBasketItemDom(basketItemContainer) {
-        let basketItemDom = {};
-
-        basketItemDom.container = basketItemContainer;
-        basketItemDom.productId = basketItemContainer.getAttribute('data-basket-item-id');
-        basketItemDom.input = BX.findChild(basketItemContainer, {
+        basketItemContainerDom.input = BX.findChild(basketItemContainer, {
             'tag': 'input',
             'attribute': {'data-action-basket-item': 'set'}
         }, true, false);
-        basketItemDom.priceSum = BX.findChild(basketItemContainer, {
+        basketItemContainerDom.priceSum = BX.findChild(basketItemContainer, {
             'attribute': {'data-basket-item-price-sum': ''}
         }, true, false);
-        basketItemDom.priceBaseSum = BX.findChild(basketItemContainer, {
+        basketItemContainerDom.priceBaseSum = BX.findChild(basketItemContainer, {
             'attribute': {'data-basket-item-price-base-sum': ''}
         }, true, false);
-        basketItemDom.discountSum = BX.findChild(basketItemContainer, {
+        basketItemContainerDom.discountSum = BX.findChild(basketItemContainer, {
             'attribute': {'data-basket-item-discount-sum': ''}
         }, true, false);
+        basketItemContainerDom.restoreButton = BX.findChild(basketItemContainer, {
+            'attribute': {'data-basket-item-restore-button': ''}
+        }, true, false);
 
-        return basketItemDom;
+        return basketItemContainerDom;
     }
 
-    setBasketDom(basket, basketDom) {
-        if (basketDom.weight) {
-            BX.adjust(basketDom.weight, {text: basket.info.weightFormatted});
+    setBasketContainerDom(basket, basketContainerDom) {
+        if (basketContainerDom.weight) {
+            BX.adjust(basketContainerDom.weight, {text: basket.info.weightFormatted});
         }
-        if (basketDom.count) {
-            BX.adjust(basketDom.count, {text: basket.info.count});
+        if (basketContainerDom.count) {
+            BX.adjust(basketContainerDom.count, {text: basket.info.count});
         }
-        if (basketDom.vat) {
-            BX.adjust(basketDom.vat, {text: basket.info.vatFormatted});
+        if (basketContainerDom.vat) {
+            BX.adjust(basketContainerDom.vat, {text: basket.info.vatFormatted});
         }
-        if (basketDom.priceBase) {
-            BX.adjust(basketDom.priceBase, {text: basket.info.priceBaseFormatted});
+        if (basketContainerDom.priceBase) {
+            BX.adjust(basketContainerDom.priceBase, {text: basket.info.priceBaseFormatted});
         }
-        if (basketDom.discount) {
-            BX.adjust(basketDom.discount, {text: basket.info.discountFormatted});
+        if (basketContainerDom.discount) {
+            BX.adjust(basketContainerDom.discount, {text: basket.info.discountFormatted});
         }
-        if (basketDom.price) {
-            BX.adjust(basketDom.price, {text: basket.info.priceFormatted});
+        if (basketContainerDom.price) {
+            BX.adjust(basketContainerDom.price, {text: basket.info.priceFormatted});
         }
     }
 
-    setBasketItemDom(basketItem, basketItemDom) {
+    setBasketItemContainerDom(basketItem, basketItemContainerDom) {
         if (basketItem.quantity > 0) {
-            if (basketItemDom.input) {
-                basketItemDom.input.value = basketItem.quantity;
+            if (basketItemContainerDom.input) {
+                basketItemContainerDom.input.value = basketItem.quantity;
             }
-            if (basketItemDom.priceSum) {
-                BX.adjust(basketItemDom.priceSum, {text: basketItem.priceSumFormatted});
+            if (basketItemContainerDom.priceSum) {
+                BX.adjust(basketItemContainerDom.priceSum, {text: basketItem.priceSumFormatted});
             }
-            if (basketItemDom.priceBaseSum) {
-                BX.adjust(basketItemDom.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
+            if (basketItemContainerDom.priceBaseSum) {
+                BX.adjust(basketItemContainerDom.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
             }
-            if (basketItemDom.discountSum) {
-                BX.adjust(basketItemDom.discountSum, {text: basketItem.discountSumFormatted});
+            if (basketItemContainerDom.discountSum) {
+                BX.adjust(basketItemContainerDom.discountSum, {text: basketItem.discountSumFormatted});
             }
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
-                UpdateBasketItemDom.update(basketItemDom);
+                UpdateBasketItemDom.update(basketItemContainerDom);
             }
             if (typeof UpdateBasketProductDom !== 'undefined' && typeof UpdateBasketProductDom.update === 'function') {
-                UpdateBasketProductDom.update(basketItemDom);
+                UpdateBasketProductDom.update(basketItemContainerDom);
             }
         } else {
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.delete === 'function') {
-                UpdateBasketItemDom.delete(basketItemDom);
+                UpdateBasketItemDom.delete(basketItemContainerDom);
             }
             if (typeof UpdateBasketProductDom !== 'undefined' && typeof UpdateBasketProductDom.delete === 'function') {
-                UpdateBasketProductDom.delete(basketItemDom);
+                UpdateBasketProductDom.delete(basketItemContainerDom);
             }
         }
     }
 
-    basketActionHandler(basketAction, basketDoms, basketItemDom, e) {
-        e.preventDefault();
+    processAction(e) {
+        BX.PreventDefault(e);
+
+        let basketContainersDom = this.getBasketContainersDom();
+        let basketItemContainerDom = this.getBasketItemContainerDom(e.target);
 
         let data = {
-            basketAction: basketAction,
-            product: {id: basketItemDom.productId},
+            basketAction: basketItemContainerDom.action,
+            product: {
+                id: basketItemContainerDom.productId
+            },
             basketHandlerClass: this.basketHandlerClass
         }
 
-        if (basketAction == 'set') {
-            data.product.quantity = basketItemDom.input.value;
+        if (data.basketAction == 'set') {
+            data.product.quantity = basketItemContainerDom.input.value;
         }
 
         BX.ajax.runComponentAction('wc:basket', 'process', {
@@ -180,10 +171,10 @@ class WCSaleBasket {
             console.log(response);
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
-            basketDoms.forEach((basketDom) => {
-                this.setBasketDom(basket, basketDom);
+            basketContainersDom.forEach((basketContainerDom) => {
+                this.setBasketContainerDom(basket, basketContainerDom);
             });
-            this.setBasketItemDom(basketItem, basketItemDom);
+            this.setBasketItemContainerDom(basketItem, basketItemContainerDom);
         }, function (response) {
             console.log(response);
             // todo обработка ошибок
