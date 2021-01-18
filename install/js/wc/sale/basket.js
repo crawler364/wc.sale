@@ -87,7 +87,6 @@ class WCSaleBasket {
                 'attribute': {'data-basket-item': ''}
             }, true, false),
             input: BX.findChild(basketItemContainer, {
-                'tag': 'input',
                 'attribute': {'data-action-basket-item': 'set'}
             }, true, false),
             priceSum: BX.findChild(basketItemContainer, {
