@@ -28,18 +28,26 @@ class UpdateBasketProductDom {
 
 class UpdateBasketDom {
     static update(dom) {
-        BX.addClass(dom.nodes.empty, 'hide');
-        let tbody = BX.findChild(dom.container, {
-            'tag': 'tbody',
-        }, false, false);
-        BX.removeClass(tbody, 'hide');
+        if (dom.nodes.empty) {
+            BX.addClass(dom.nodes.empty, 'hide');
+        }
+        if (dom.container) {
+            let tbody = BX.findChild(dom.container, {
+                'tag': 'tbody',
+            }, false, false);
+            BX.removeClass(tbody, 'hide');
+        }
     }
 
     static delete(dom) {
-        BX.removeClass(dom.nodes.empty, 'hide');
-        let tbody = BX.findChild(dom.container, {
-            'tag': 'tbody',
-        }, false, false);
-        BX.addClass(tbody, 'hide');
+        if (dom.nodes.empty) {
+            BX.removeClass(dom.nodes.empty, 'hide');
+        }
+        if (dom.container) {
+            let tbody = BX.findChild(dom.container, {
+                'tag': 'tbody',
+            }, false, false);
+            BX.addClass(tbody, 'hide');
+        }
     }
 }
