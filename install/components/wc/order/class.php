@@ -1,18 +1,9 @@
 <?php
 
-use Bitrix\Main\Loader;
-
 class WCSaleOrder extends CBitrixComponent
 {
     /** @var \WC\Sale\OrderHandler */
     private $orderHandlerClass = \WC\Sale\OrderHandler::class;
-
-    public function __construct($component = null)
-    {
-        parent::__construct($component);
-
-        Loader::includeModule('wc.sale');
-    }
 
     public function executeComponent()
     {
@@ -23,8 +14,10 @@ class WCSaleOrder extends CBitrixComponent
 
         $personTypes = $this->orderHandlerClass::getPersonTypes();
 
-        // $a = $order->getPropertyCollection();
+        $order->setPersonTypeId(1);
+        $a = $order->getPropertyCollection();
         $properties = $order->loadPropertyCollection();
+       $c =  $order->getShipmentCollection();
 
         $this->arResult = [
             'PERSON_TYPES' => $personTypes,
