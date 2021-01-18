@@ -36,24 +36,30 @@ class WCSaleBasket {
         basketContainers.forEach((basketContainer, key) => {
             let basketContainerDom = {};
 
-            basketContainerDom.weight = BX.findChild(basketContainer, {
-                'attribute': {'data-basket-weight': ''}
-            }, true, false);
-            basketContainerDom.count = BX.findChild(basketContainer, {
-                'attribute': {'data-basket-count': ''}
-            }, true, false);
-            basketContainerDom.vat = BX.findChild(basketContainer, {
-                'attribute': {'data-basket-vat': ''}
-            }, true, false);
-            basketContainerDom.priceBase = BX.findChild(basketContainer, {
-                'attribute': {'data-basket-price-base': ''}
-            }, true, false);
-            basketContainerDom.discount = BX.findChild(basketContainer, {
-                'attribute': {'data-basket-discount': ''}
-            }, true, false);
-            basketContainerDom.price = BX.findChild(basketContainer, {
-                'attribute': {'data-basket-price': ''}
-            }, true, false);
+            basketContainerDom.container = basketContainer;
+            basketContainerDom.nodes = {
+                weight: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-weight': ''}
+                }, true, false),
+                count: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-count': ''}
+                }, true, false),
+                vat: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-vat': ''}
+                }, true, false),
+                priceBase: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-price-base': ''}
+                }, true, false),
+                discount: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-discount': ''}
+                }, true, false),
+                price: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-price': ''}
+                }, true, false),
+                empty: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-empty': ''}
+                }, true, false),
+            }
 
             basketContainersDom[key] = basketContainerDom;
         });
@@ -69,51 +75,57 @@ class WCSaleBasket {
             attribute: {'data-basket-item-container': ''}
         });
 
-        basketItemContainerDom.action = target.getAttribute('data-action-basket-item');
         basketItemContainerDom.container = basketItemContainer;
-        basketItemContainerDom.productId = basketItemContainer.getAttribute('data-basket-item-id');
-        basketItemContainerDom.basketItem = BX.findChild(basketItemContainer, {
-            'attribute': {'data-basket-item': ''}
-        }, true, false);
-        basketItemContainerDom.input = BX.findChild(basketItemContainer, {
-            'tag': 'input',
-            'attribute': {'data-action-basket-item': 'set'}
-        }, true, false);
-        basketItemContainerDom.priceSum = BX.findChild(basketItemContainer, {
-            'attribute': {'data-basket-item-price-sum': ''}
-        }, true, false);
-        basketItemContainerDom.priceBaseSum = BX.findChild(basketItemContainer, {
-            'attribute': {'data-basket-item-price-base-sum': ''}
-        }, true, false);
-        basketItemContainerDom.discountSum = BX.findChild(basketItemContainer, {
-            'attribute': {'data-basket-item-discount-sum': ''}
-        }, true, false);
-        basketItemContainerDom.restoreButton = BX.findChild(basketItemContainer, {
-            'attribute': {'data-basket-item-restore-button': ''}
-        }, true, false);
+
+        basketItemContainerDom.propertys = {
+            action: target.getAttribute('data-action-basket-item'),
+            productId: basketItemContainer.getAttribute('data-basket-item-id'),
+        };
+
+        basketItemContainerDom.nodes = {
+            basketItem: BX.findChild(basketItemContainer, {
+                'attribute': {'data-basket-item': ''}
+            }, true, false),
+            input: BX.findChild(basketItemContainer, {
+                'tag': 'input',
+                'attribute': {'data-action-basket-item': 'set'}
+            }, true, false),
+            priceSum: BX.findChild(basketItemContainer, {
+                'attribute': {'data-basket-item-price-sum': ''}
+            }, true, false),
+            priceBaseSum: BX.findChild(basketItemContainer, {
+                'attribute': {'data-basket-item-price-base-sum': ''}
+            }, true, false),
+            discountSum: BX.findChild(basketItemContainer, {
+                'attribute': {'data-basket-item-discount-sum': ''}
+            }, true, false),
+            restoreButton: BX.findChild(basketItemContainer, {
+                'attribute': {'data-basket-item-restore-button': ''}
+            }, true, false),
+        };
 
         return basketItemContainerDom;
     }
 
     setBasketContainersDom(basket, basketContainersDom) {
         basketContainersDom.forEach((basketContainerDom) => {
-            if (basketContainerDom.weight) {
-                BX.adjust(basketContainerDom.weight, {text: basket.info.weightFormatted});
+            if (basketContainerDom.nodes.weight) {
+                BX.adjust(basketContainerDom.nodes.weight, {text: basket.info.weightFormatted});
             }
-            if (basketContainerDom.count) {
-                BX.adjust(basketContainerDom.count, {text: basket.info.count});
+            if (basketContainerDom.nodes.count) {
+                BX.adjust(basketContainerDom.nodes.count, {text: basket.info.count});
             }
-            if (basketContainerDom.vat) {
-                BX.adjust(basketContainerDom.vat, {text: basket.info.vatFormatted});
+            if (basketContainerDom.nodes.vat) {
+                BX.adjust(basketContainerDom.nodes.vat, {text: basket.info.vatFormatted});
             }
-            if (basketContainerDom.priceBase) {
-                BX.adjust(basketContainerDom.priceBase, {text: basket.info.priceBaseFormatted});
+            if (basketContainerDom.nodes.priceBase) {
+                BX.adjust(basketContainerDom.nodes.priceBase, {text: basket.info.priceBaseFormatted});
             }
-            if (basketContainerDom.discount) {
-                BX.adjust(basketContainerDom.discount, {text: basket.info.discountFormatted});
+            if (basketContainerDom.nodes.discount) {
+                BX.adjust(basketContainerDom.nodes.discount, {text: basket.info.discountFormatted});
             }
-            if (basketContainerDom.price) {
-                BX.adjust(basketContainerDom.price, {text: basket.info.priceFormatted});
+            if (basketContainerDom.nodes.price) {
+                BX.adjust(basketContainerDom.nodes.price, {text: basket.info.priceFormatted});
             }
 
             if (basket.info.count > 0) {
@@ -122,24 +134,24 @@ class WCSaleBasket {
                 }
             } else {
                 if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.delete === 'function') {
-                    UpdateBasketItemDom.delete(basketContainerDom);
+                    UpdateBasketDom.delete(basketContainerDom);
                 }
             }
         });
     }
 
     setBasketItemContainerDom(basketItem, basketItemContainerDom) {
-        if (basketItemContainerDom.input) {
-            basketItemContainerDom.input.value = basketItem.quantity;
+        if (basketItemContainerDom.nodes.input) {
+            basketItemContainerDom.nodes.input.value = basketItem.quantity;
         }
-        if (basketItemContainerDom.priceSum) {
-            BX.adjust(basketItemContainerDom.priceSum, {text: basketItem.priceSumFormatted});
+        if (basketItemContainerDom.nodes.priceSum) {
+            BX.adjust(basketItemContainerDom.nodes.priceSum, {text: basketItem.priceSumFormatted});
         }
-        if (basketItemContainerDom.priceBaseSum) {
-            BX.adjust(basketItemContainerDom.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
+        if (basketItemContainerDom.nodes.priceBaseSum) {
+            BX.adjust(basketItemContainerDom.nodes.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
         }
-        if (basketItemContainerDom.discountSum) {
-            BX.adjust(basketItemContainerDom.discountSum, {text: basketItem.discountSumFormatted});
+        if (basketItemContainerDom.nodes.discountSum) {
+            BX.adjust(basketItemContainerDom.nodes.discountSum, {text: basketItem.discountSumFormatted});
         }
 
         if (basketItem.quantity > 0) {
@@ -166,15 +178,15 @@ class WCSaleBasket {
         let basketItemContainerDom = this.getBasketItemContainerDom(e.target);
 
         let data = {
-            basketAction: basketItemContainerDom.action,
+            basketAction: basketItemContainerDom.propertys.action,
             product: {
-                id: basketItemContainerDom.productId
+                id: basketItemContainerDom.propertys.productId
             },
             basketHandlerClass: this.basketHandlerClass
         }
 
         if (data.basketAction == 'set') {
-            data.product.quantity = basketItemContainerDom.input.value;
+            data.product.quantity = basketItemContainerDom.nodes.input.value;
         }
 
         BX.ajax.runComponentAction('wc:basket', 'process', {

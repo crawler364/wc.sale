@@ -6,7 +6,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use \Bitrix\Main\Localization\Loc;
 
 ?>
-<table id="wc-basket-items-container">
+<table class="wc-basket-items-container">
     <thead>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_DETAIL_PICTURE') ?></td>
@@ -70,7 +70,8 @@ use \Bitrix\Main\Localization\Loc;
     <? } ?>
 </table>
 
-<table data-wc-basket-container>
+<table data-wc-basket-container class="wc-basket-container">
+    <tbody>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_WEIGHT') ?></td>
         <td data-basket-weight><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
@@ -94,6 +95,10 @@ use \Bitrix\Main\Localization\Loc;
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_PRICE') ?></td>
         <td data-basket-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+    </tr>
+    </tbody>
+    <tr>
+        <td data-basket-empty class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
     </tr>
 </table>
 

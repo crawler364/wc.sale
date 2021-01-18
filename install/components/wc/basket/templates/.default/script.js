@@ -1,19 +1,19 @@
 class UpdateBasketItemDom {
     static update(dom) {
-        if (dom.container) {
-            BX.removeClass(dom.basketItem, 'disabled');
+        if (dom.nodes.basketItem) {
+            BX.removeClass(dom.nodes.basketItem, 'disabled');
         }
-        if (dom.restoreButton) {
-            BX.addClass(dom.restoreButton, 'hide');
+        if (dom.nodes.restoreButton) {
+            BX.addClass(dom.nodes.restoreButton, 'hide');
         }
     }
 
     static delete(dom) {
         if (dom.container) {
-            BX.addClass(dom.basketItem, 'disabled');
+            BX.addClass(dom.nodes.basketItem, 'disabled');
         }
-        if (dom.restoreButton) {
-            BX.removeClass(dom.restoreButton, 'hide');
+        if (dom.nodes.restoreButton) {
+            BX.removeClass(dom.nodes.restoreButton, 'hide');
         }
     }
 }
@@ -28,8 +28,18 @@ class UpdateBasketProductDom {
 
 class UpdateBasketDom {
     static update(dom) {
+        BX.addClass(dom.nodes.empty, 'hide');
+        let tbody = BX.findChild(dom.container, {
+            'tag': 'tbody',
+        }, false, false);
+        BX.removeClass(tbody, 'hide');
     }
 
     static delete(dom) {
+        BX.removeClass(dom.nodes.empty, 'hide');
+        let tbody = BX.findChild(dom.container, {
+            'tag': 'tbody',
+        }, false, false);
+        BX.addClass(tbody, 'hide');
     }
 }

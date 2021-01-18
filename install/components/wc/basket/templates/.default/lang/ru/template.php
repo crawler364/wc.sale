@@ -11,3 +11,4 @@ $MESS['WC_BASKET_WEIGHT'] = 'Вес';
 $MESS['WC_BASKET_VAT'] = 'НДС';
 $MESS['WC_BASKET_DISCOUNT'] = 'Скидка';
 $MESS['WC_BASKET_RESTORE_BUTTON'] = 'Вернуть в корзину';
+$MESS['WC_BASKET_EMPTY'] = 'Корзина пуста';
