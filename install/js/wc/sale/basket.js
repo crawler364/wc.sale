@@ -12,7 +12,7 @@ class WCSaleBasket {
                     tag: 'input',
                     attribute: 'data-action-basket-item'
                 },
-                BX.delegate(this.processAction.bind(this))
+                this.processAction.bind(this)
             );
 
             BX.bindDelegate(
@@ -21,7 +21,7 @@ class WCSaleBasket {
                 {
                     attribute: 'data-action-basket-item'
                 },
-                BX.delegate(this.processAction.bind(this))
+                this.processAction.bind(this)
             );
         });
     }
