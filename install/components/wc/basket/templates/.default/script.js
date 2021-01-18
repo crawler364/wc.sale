@@ -1,5 +1,5 @@
 class UpdateBasketItemDom {
-    static update(dom) {
+    static update(dom, basketItem) {
         if (dom.nodes.basketItem) {
             BX.removeClass(dom.nodes.basketItem, 'disabled');
         }
@@ -8,7 +8,7 @@ class UpdateBasketItemDom {
         }
     }
 
-    static delete(dom) {
+    static delete(dom, basketItem) {
         if (dom.container) {
             BX.addClass(dom.nodes.basketItem, 'disabled');
         }
@@ -19,15 +19,15 @@ class UpdateBasketItemDom {
 }
 
 class UpdateBasketProductDom {
-    static update(dom) {
+    static update(dom, basketProduct) {
     }
 
-    static delete(dom) {
+    static delete(dom, basketProduct) {
     }
 }
 
 class UpdateBasketDom {
-    static update(dom) {
+    static update(dom, basket) {
         if (dom.nodes.empty) {
             BX.addClass(dom.nodes.empty, 'hide');
         }

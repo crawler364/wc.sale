@@ -106,7 +106,7 @@ class WCSaleBasket {
         return basketItemContainerDom;
     }
 
-    setBasketContainersDom(basket, basketContainersDom) {
+    setBasketContainersDom(basketContainersDom, basket) {
         basketContainersDom.forEach((basketContainerDom) => {
             if (basketContainerDom.nodes.weight) {
                 BX.adjust(basketContainerDom.nodes.weight, {text: basket.info.weightFormatted});
@@ -129,17 +129,17 @@ class WCSaleBasket {
 
             if (basket.info.count > 0) {
                 if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.update === 'function') {
-                    UpdateBasketDom.update(basketContainerDom);
+                    UpdateBasketDom.update(basketContainerDom, basket);
                 }
             } else {
                 if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.delete === 'function') {
-                    UpdateBasketDom.delete(basketContainerDom);
+                    UpdateBasketDom.delete(basketContainerDom, basket);
                 }
             }
         });
     }
 
-    setBasketItemContainerDom(basketItem, basketItemContainerDom) {
+    setBasketItemContainerDom(basketItemContainerDom, basketItem) {
         if (basketItemContainerDom.nodes.input) {
             basketItemContainerDom.nodes.input.value = basketItem.quantity;
         }
@@ -155,17 +155,17 @@ class WCSaleBasket {
 
         if (basketItem.quantity > 0) {
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
-                UpdateBasketItemDom.update(basketItemContainerDom);
+                UpdateBasketItemDom.update(basketItemContainerDom, basketItem);
             }
             if (typeof UpdateBasketProductDom !== 'undefined' && typeof UpdateBasketProductDom.update === 'function') {
-                UpdateBasketProductDom.update(basketItemContainerDom);
+                UpdateBasketProductDom.update(basketItemContainerDom, basketItem);
             }
         } else {
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.delete === 'function') {
-                UpdateBasketItemDom.delete(basketItemContainerDom);
+                UpdateBasketItemDom.delete(basketItemContainerDom, basketItem);
             }
             if (typeof UpdateBasketProductDom !== 'undefined' && typeof UpdateBasketProductDom.delete === 'function') {
-                UpdateBasketProductDom.delete(basketItemContainerDom);
+                UpdateBasketProductDom.delete(basketItemContainerDom, basketItem);
             }
         }
     }
@@ -195,8 +195,8 @@ class WCSaleBasket {
             console.log(response);
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
-            this.setBasketContainersDom(basket, basketContainersDom);
-            this.setBasketItemContainerDom(basketItem, basketItemContainerDom);
+            this.setBasketContainersDom(basketContainersDom, basket);
+            this.setBasketItemContainerDom(basketItemContainerDom, basketItem);
         }, function (response) {
             console.log(response);
             // todo обработка ошибок
