@@ -7,6 +7,7 @@ namespace WC\Sale;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Order;
 use WC\Main\Result;
+use Bitrix\Main\Context;
 
 class OrderHandler
 {
@@ -16,23 +17,47 @@ class OrderHandler
         Loc::loadMessages(__FILE__);
 
         $this->order = $order;
+    }
 
+    public function processOrder()
+    {
+        $context = Context::getCurrent();
+        $request = $context->getRequest();
+
+        $personTypes = $this->initPersonType();
+
+
+        //$a = $order->getPropertyCollection();
+        //$properties = $order->loadPropertyCollection();
 
         $this->order->setBasket(\WC\Sale\BasketHandler::getCurrentUserBasket());
 
-        $this->order->setPersonTypeId(1);
 
-        //$this->result = $this->order->save();
+        //$c = $order->getShipmentCollection();
+        // $r = $order->getPaymentCollection();
+
+        return $personTypes;
     }
 
-    protected function setOrderPropertys()
+    protected function initPersonType()
     {
+        $personTypes = $this->getPersonTypes();
+        $personTypeId = 2 ?: $personTypes[0]['ID'];
 
+        $this->order->setPersonTypeId($personTypeId);
+
+        foreach ($personTypes as &$personType) {
+            if ($personType['ID'] == $personTypeId) {
+                $personType['CHECKED'] = 'Y';
+            }
+        }
+
+        return $personTypes;
     }
 
     public function saveOrder()
     {
-        $this->order->save();
+        return $this->order->save();
     }
 
     public static function createOrder(): Order
@@ -43,7 +68,7 @@ class OrderHandler
         return Order::create($siteId, $userId);
     }
 
-    public static function getPersonTypes(): ?array
+    protected function getPersonTypes(): ?array
     {
         $res = \Bitrix\Sale\PersonType::getList([
             'order' => ['SORT' => 'ASC'],
