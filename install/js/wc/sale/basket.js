@@ -1,5 +1,8 @@
 class WCSaleBasket {
     basketHandlerClass;
+    productId;
+    action;
+    quantity;
 
     constructor(params) {
         this.basketHandlerClass = params.basketHandlerClass;
@@ -70,25 +73,29 @@ class WCSaleBasket {
     }
 
     getBasketItemContainersDom(target) {
-        let currentBasketItemContainer, productId, action, basketItemContainers, basketItemContainersDom = [];
+        let currentBasketItemContainer, basketItemContainers, basketItemContainersDom = [];
 
         currentBasketItemContainer = BX.findParent(target, {
             attribute: {'data-basket-item-container': ''}
         });
 
-        productId = currentBasketItemContainer.getAttribute('data-basket-item-id');
-        action = target.getAttribute('data-action-basket-item');
+        this.productId = currentBasketItemContainer.getAttribute('data-basket-item-id');
+        this.action = target.getAttribute('data-action-basket-item');
+        this.quantity = BX.findChild(currentBasketItemContainer, {
+            'attribute': {'data-action-basket-item': 'set'}
+        }, true, false).value;
 
         basketItemContainers = BX.findChildren(document.body, {
-            'attribute': {'data-basket-item-container': '', 'data-basket-item-id': productId}
+            'attribute': {'data-basket-item-container': '', 'data-basket-item-id': this.productId}
         }, true);
 
         basketItemContainers.forEach((basketItemContainer, key) => {
             let basketItemContainerDom = {};
 
             basketItemContainerDom.propertys = {
-                action: action,
-                productId: productId,
+                action: this.action,
+                productId: this.productId,
+                quantity: this.quantity,
             };
 
             basketItemContainerDom.nodes = {
@@ -184,13 +191,12 @@ class WCSaleBasket {
 
         let basketContainersDom = this.getBasketContainersDom();
         let basketItemContainersDom = this.getBasketItemContainersDom(e.target);
-        let basketItemContainerDom = basketItemContainersDom[0];
 
         let data = {
-            basketAction: basketItemContainerDom.propertys.action,
+            basketAction: this.action,
             product: {
-                id: basketItemContainerDom.propertys.productId,
-                quantity: basketItemContainerDom.propertys.action == 'set' ? basketItemContainerDom.nodes.input.value : '',
+                id: this.productId,
+                quantity: this.action === 'set' ? this.quantity : '',
             },
             basketHandlerClass: this.basketHandlerClass
         };
