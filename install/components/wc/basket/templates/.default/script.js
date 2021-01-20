@@ -18,14 +18,6 @@ class UpdateBasketItemDom {
     }
 }
 
-class UpdateBasketProductDom {
-    static update(dom, basketProduct) {
-    }
-
-    static delete(dom, basketProduct) {
-    }
-}
-
 class UpdateBasketDom {
     static update(dom, basket) {
         if (dom.nodes.empty) {

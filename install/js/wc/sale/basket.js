@@ -157,15 +157,9 @@ class WCSaleBasket {
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
                 UpdateBasketItemDom.update(basketItemContainerDom, basketItem);
             }
-            if (typeof UpdateBasketProductDom !== 'undefined' && typeof UpdateBasketProductDom.update === 'function') {
-                UpdateBasketProductDom.update(basketItemContainerDom, basketItem);
-            }
         } else {
             if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.delete === 'function') {
                 UpdateBasketItemDom.delete(basketItemContainerDom, basketItem);
-            }
-            if (typeof UpdateBasketProductDom !== 'undefined' && typeof UpdateBasketProductDom.delete === 'function') {
-                UpdateBasketProductDom.delete(basketItemContainerDom, basketItem);
             }
         }
     }
