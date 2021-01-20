@@ -9,7 +9,7 @@ class UpdateBasketItemDom {
     }
 
     static delete(dom, basketItem) {
-        if (dom.container) {
+        if (dom.nodes.basketItem) {
             BX.addClass(dom.nodes.basketItem, 'disabled');
         }
         if (dom.nodes.restoreButton) {
@@ -23,8 +23,8 @@ class UpdateBasketDom {
         if (dom.nodes.empty) {
             BX.addClass(dom.nodes.empty, 'hide');
         }
-        if (dom.container) {
-            let tbody = BX.findChild(dom.container, {
+        if (dom.nodes.container) {
+            let tbody = BX.findChild(dom.nodes.container, {
                 'tag': 'tbody',
             }, false, false);
             BX.removeClass(tbody, 'hide');
@@ -35,8 +35,8 @@ class UpdateBasketDom {
         if (dom.nodes.empty) {
             BX.removeClass(dom.nodes.empty, 'hide');
         }
-        if (dom.container) {
-            let tbody = BX.findChild(dom.container, {
+        if (dom.nodes.container) {
+            let tbody = BX.findChild(dom.nodes.container, {
                 'tag': 'tbody',
             }, false, false);
             BX.addClass(tbody, 'hide');

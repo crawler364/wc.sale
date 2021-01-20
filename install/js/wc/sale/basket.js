@@ -1,4 +1,6 @@
 class WCSaleBasket {
+    basketHandlerClass;
+
     constructor(params) {
         this.basketHandlerClass = params.basketHandlerClass;
     }
@@ -36,8 +38,8 @@ class WCSaleBasket {
         basketContainers.forEach((basketContainer, key) => {
             let basketContainerDom = {};
 
-            basketContainerDom.container = basketContainer;
             basketContainerDom.nodes = {
+                container: basketContainer,
                 weight: BX.findChild(basketContainer, {
                     'attribute': {'data-basket-weight': ''}
                 }, true, false),
@@ -67,43 +69,54 @@ class WCSaleBasket {
         return basketContainersDom;
     }
 
-    getBasketItemContainerDom(target) {
-        let basketItemContainer;
-        let basketItemContainerDom = {};
+    getBasketItemContainersDom(target) {
+        let currentBasketItemContainer, productId, action, basketItemContainers, basketItemContainersDom = [];
 
-        basketItemContainer = BX.findParent(target, {
+        currentBasketItemContainer = BX.findParent(target, {
             attribute: {'data-basket-item-container': ''}
         });
 
-        basketItemContainerDom.container = basketItemContainer;
+        productId = currentBasketItemContainer.getAttribute('data-basket-item-id');
+        action = target.getAttribute('data-action-basket-item');
 
-        basketItemContainerDom.propertys = {
-            action: target.getAttribute('data-action-basket-item'),
-            productId: basketItemContainer.getAttribute('data-basket-item-id'),
-        };
+        basketItemContainers = BX.findChildren(document.body, {
+            'attribute': {'data-basket-item-container': '', 'data-basket-item-id': productId}
+        }, true);
 
-        basketItemContainerDom.nodes = {
-            basketItem: BX.findChild(basketItemContainer, {
-                'attribute': {'data-basket-item': ''}
-            }, true, false),
-            input: BX.findChild(basketItemContainer, {
-                'attribute': {'data-action-basket-item': 'set'}
-            }, true, false),
-            priceSum: BX.findChild(basketItemContainer, {
-                'attribute': {'data-basket-item-price-sum': ''}
-            }, true, false),
-            priceBaseSum: BX.findChild(basketItemContainer, {
-                'attribute': {'data-basket-item-price-base-sum': ''}
-            }, true, false),
-            discountSum: BX.findChild(basketItemContainer, {
-                'attribute': {'data-basket-item-discount-sum': ''}
-            }, true, false),
-            restoreButton: BX.findChild(basketItemContainer, {
-                'attribute': {'data-basket-item-restore-button': ''}
-            }, true, false),
-        };
+        basketItemContainers.forEach((basketItemContainer, key) => {
+            let basketItemContainerDom = {};
 
-        return basketItemContainerDom;
+            basketItemContainerDom.propertys = {
+                action: action,
+                productId: productId,
+            };
+
+            basketItemContainerDom.nodes = {
+                container: basketItemContainer,
+                basketItem: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item': ''}
+                }, true, false),
+                input: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-action-basket-item': 'set'}
+                }, true, false),
+                priceSum: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item-price-sum': ''}
+                }, true, false),
+                priceBaseSum: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item-price-base-sum': ''}
+                }, true, false),
+                discountSum: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item-discount-sum': ''}
+                }, true, false),
+                restoreButton: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item-restore-button': ''}
+                }, true, false),
+            };
+
+            basketItemContainersDom[key] = basketItemContainerDom;
+        });
+
+        return basketItemContainersDom;
     }
 
     setBasketContainersDom(basketContainersDom, basket) {
@@ -139,48 +152,48 @@ class WCSaleBasket {
         });
     }
 
-    setBasketItemContainerDom(basketItemContainerDom, basketItem) {
-        if (basketItemContainerDom.nodes.input) {
-            basketItemContainerDom.nodes.input.value = basketItem.quantity;
-        }
-        if (basketItemContainerDom.nodes.priceSum) {
-            BX.adjust(basketItemContainerDom.nodes.priceSum, {text: basketItem.priceSumFormatted});
-        }
-        if (basketItemContainerDom.nodes.priceBaseSum) {
-            BX.adjust(basketItemContainerDom.nodes.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
-        }
-        if (basketItemContainerDom.nodes.discountSum) {
-            BX.adjust(basketItemContainerDom.nodes.discountSum, {text: basketItem.discountSumFormatted});
-        }
+    setBasketItemContainersDom(basketItemContainersDom, basketItem) {
+        basketItemContainersDom.forEach((basketItemContainerDom) => {
+            if (basketItemContainerDom.nodes.input) {
+                basketItemContainerDom.nodes.input.value = basketItem.quantity;
+            }
+            if (basketItemContainerDom.nodes.priceSum) {
+                BX.adjust(basketItemContainerDom.nodes.priceSum, {text: basketItem.priceSumFormatted});
+            }
+            if (basketItemContainerDom.nodes.priceBaseSum) {
+                BX.adjust(basketItemContainerDom.nodes.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
+            }
+            if (basketItemContainerDom.nodes.discountSum) {
+                BX.adjust(basketItemContainerDom.nodes.discountSum, {text: basketItem.discountSumFormatted});
+            }
 
-        if (basketItem.quantity > 0) {
-            if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
-                UpdateBasketItemDom.update(basketItemContainerDom, basketItem);
+            if (basketItem.quantity > 0) {
+                if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
+                    UpdateBasketItemDom.update(basketItemContainerDom, basketItem);
+                }
+            } else {
+                if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.delete === 'function') {
+                    UpdateBasketItemDom.delete(basketItemContainerDom, basketItem);
+                }
             }
-        } else {
-            if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.delete === 'function') {
-                UpdateBasketItemDom.delete(basketItemContainerDom, basketItem);
-            }
-        }
+        });
     }
 
     processAction(e) {
         BX.PreventDefault(e);
 
         let basketContainersDom = this.getBasketContainersDom();
-        let basketItemContainerDom = this.getBasketItemContainerDom(e.target);
+        let basketItemContainersDom = this.getBasketItemContainersDom(e.target);
+        let basketItemContainerDom = basketItemContainersDom[0];
 
         let data = {
             basketAction: basketItemContainerDom.propertys.action,
             product: {
-                id: basketItemContainerDom.propertys.productId
+                id: basketItemContainerDom.propertys.productId,
+                quantity: basketItemContainerDom.propertys.action == 'set' ? basketItemContainerDom.nodes.input.value : '',
             },
             basketHandlerClass: this.basketHandlerClass
-        }
-
-        if (data.basketAction == 'set') {
-            data.product.quantity = basketItemContainerDom.nodes.input.value;
-        }
+        };
 
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'ajax',
@@ -190,7 +203,7 @@ class WCSaleBasket {
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
             this.setBasketContainersDom(basketContainersDom, basket);
-            this.setBasketItemContainerDom(basketItemContainerDom, basketItem);
+            this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
         }, function (response) {
             console.log(response);
             // todo обработка ошибок
