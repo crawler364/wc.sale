@@ -37,22 +37,6 @@ class OrderHandler
         // todo
     }
 
-    protected function initProperties(): array
-    {
-        //$properties = $order->loadPropertyCollection();
-        /** @var \Bitrix\Sale\PropertyValue $property */
-        foreach ($this->order->getPropertyCollection() as $property) {
-            if ($property->isUtil()) {
-                continue;
-            }
-            $arProperty = $property->getProperty();
-            $arProperty['VALUE'] = $this->orderData[$arProperty['CODE']] ?? $arProperty['DEFAULT_VALUE'];
-
-            $properties[] = $arProperty;
-        }
-
-        return $properties;
-    }
 
     protected function initPersonType(): array
     {
@@ -77,6 +61,51 @@ class OrderHandler
         return $personTypes;
     }
 
+    protected function initProperties(): array
+    {
+        //$properties = $order->loadPropertyCollection();
+        /** @var \Bitrix\Sale\PropertyValue $property */
+        foreach ($this->order->getPropertyCollection() as $property) {
+            if ($property->isUtil()) {
+                continue;
+            }
+            $arProperty = $property->getProperty();
+            $arProperty['VALUE'] = $this->orderData[$arProperty['CODE']] ?? $arProperty['DEFAULT_VALUE'];
+
+            $properties[] = $arProperty;
+        }
+
+        return $properties;
+    }
+
+    protected function initShipment(): \Bitrix\Sale\Shipment
+    {
+        $shipmentCollection = $this->order->getShipmentCollection();
+        $shipment = $shipmentCollection->createItem();
+        $shipmentItemCollection = $shipment->getShipmentItemCollection();
+        $shipment->setField('CURRENCY', $this->order->getCurrency());
+
+        foreach ($this->order->getBasket() as $item) {
+            /** @var \Bitrix\Sale\ShipmentItem $shipmentItem */
+            $shipmentItem = $shipmentItemCollection->createItem($item);
+            $shipmentItem->setQuantity($item->getQuantity());
+        }
+
+        return $shipment;
+    }
+
+    protected function initDelivery($shipment): array
+    {
+        /** @var \Bitrix\Sale\Delivery\Services\Base $arDeliveryServiceAll */
+        $arDeliveryServiceAll = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment);
+        foreach ($arDeliveryServiceAll as $delivery){
+            $deliveries[] = \Bitrix\Sale\Delivery\Services\Manager::getById($delivery->getId());
+        }
+
+        return $deliveries;
+
+    }
+
     public function processOrder(): Result
     {
         $personTypes = $this->initPersonType();
@@ -85,14 +114,16 @@ class OrderHandler
 
         $this->order->setBasket(\WC\Sale\BasketHandler::getCurrentUserBasket());
 
+        $shipment = $this->initShipment();
+        $deliveries = $this->initDelivery($shipment);
 
-        //$c = $order->getShipmentCollection();
         // $r = $order->getPaymentCollection();
 
 
         $data = [
             'PERSON_TYPES' => $personTypes,
             'PROPERTIES' => $properties,
+            'DELIVERIES' => $deliveries,
         ];
 
         $this->result->setData($data);
