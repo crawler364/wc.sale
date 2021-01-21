@@ -52,11 +52,9 @@ class OrderHandler
         foreach ($personTypes as &$personType) {
             if ($personTypeId == $personType['ID']) {
                 $personType['CHECKED'] = true;
+                $this->order->setPersonTypeId($personTypeId);
             }
         }
-        unset($personType);
-
-        $this->order->setPersonTypeId($personTypeId);
 
         return $personTypes;
     }
@@ -91,6 +89,7 @@ class OrderHandler
             $shipmentItem->setQuantity($item->getQuantity());
         }
 
+
         return $shipment;
     }
 
@@ -98,12 +97,19 @@ class OrderHandler
     {
         /** @var \Bitrix\Sale\Delivery\Services\Base $arDeliveryServiceAll */
         $arDeliveryServiceAll = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment);
-        foreach ($arDeliveryServiceAll as $delivery){
+        foreach ($arDeliveryServiceAll as $delivery) {
             $deliveries[] = \Bitrix\Sale\Delivery\Services\Manager::getById($delivery->getId());
         }
 
-        return $deliveries;
+        $deliveryId = $this->orderData['DELIVERY_ID'] ?? $deliveries[0]['ID'];
 
+        foreach ($deliveries as &$delivery) {
+            if ($deliveryId == $delivery['ID']) {
+                $delivery['CHECKED'] = true;
+            }
+        }
+
+        return $deliveries;
     }
 
     public function processOrder(): Result
