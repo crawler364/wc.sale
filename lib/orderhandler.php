@@ -11,24 +11,77 @@ use Bitrix\Main\Context;
 
 class OrderHandler
 {
-    public function __construct(Order $order)
+    public function __construct(Order $order, array $orderData = null)
     {
         $this->result = new Result();
         Loc::loadMessages(__FILE__);
 
         $this->order = $order;
+        $this->orderData = $orderData ?: $this->getOrderDataFromRequest();
     }
 
-    public function processOrder()
+    protected function getOrderDataFromRequest()
     {
         $context = Context::getCurrent();
         $request = $context->getRequest();
+        return $request->get('data');
+    }
 
+    protected function addOrder()
+    {
+
+    }
+
+    protected function updateOrder()
+    {
+        // todo
+    }
+
+    protected function initProperties(): array
+    {
+        //$properties = $order->loadPropertyCollection();
+        /** @var \Bitrix\Sale\PropertyValue $property */
+        foreach ($this->order->getPropertyCollection() as $property) {
+            if ($property->isUtil()) {
+                continue;
+            }
+            $arProperty = $property->getProperty();
+            $arProperty['VALUE'] = $this->orderData[$arProperty['CODE']] ?? $arProperty['DEFAULT_VALUE'];
+
+            $properties[] = $arProperty;
+        }
+
+        return $properties;
+    }
+
+    protected function initPersonType(): array
+    {
+        $obPersonTypes = \Bitrix\Sale\PersonType::getList([
+            'order' => ['SORT' => 'ASC'],
+        ]);
+        while ($personType = $obPersonTypes->fetch()) {
+            $personTypes[] = $personType;
+        }
+
+        $personTypeId = $this->orderData['PERSON_TYPE_ID'] ?: $personTypes[0]['ID'];
+
+        foreach ($personTypes as &$personType) {
+            if ($personTypeId == $personType['ID']) {
+                $personType['CHECKED'] = true;
+            }
+        }
+        unset($personType);
+
+        $this->order->setPersonTypeId($personTypeId);
+
+        return $personTypes;
+    }
+
+    public function processOrder(): Result
+    {
         $personTypes = $this->initPersonType();
 
-
-        //$a = $order->getPropertyCollection();
-        //$properties = $order->loadPropertyCollection();
+        $properties = $this->initProperties();
 
         $this->order->setBasket(\WC\Sale\BasketHandler::getCurrentUserBasket());
 
@@ -36,26 +89,18 @@ class OrderHandler
         //$c = $order->getShipmentCollection();
         // $r = $order->getPaymentCollection();
 
-        return $personTypes;
+
+        $data = [
+            'PERSON_TYPES' => $personTypes,
+            'PROPERTIES' => $properties,
+        ];
+
+        $this->result->setData($data);
+
+        return $this->result;
     }
 
-    protected function initPersonType()
-    {
-        $personTypes = $this->getPersonTypes();
-        $personTypeId = 2 ?: $personTypes[0]['ID'];
-
-        $this->order->setPersonTypeId($personTypeId);
-
-        foreach ($personTypes as &$personType) {
-            if ($personType['ID'] == $personTypeId) {
-                $personType['CHECKED'] = 'Y';
-            }
-        }
-
-        return $personTypes;
-    }
-
-    public function saveOrder()
+    public function saveOrder(): \Bitrix\Sale\Result
     {
         return $this->order->save();
     }
@@ -66,17 +111,5 @@ class OrderHandler
         $siteId = \WC\Main\Tools::getSiteId();
         $userId = $USER->GetID();
         return Order::create($siteId, $userId);
-    }
-
-    protected function getPersonTypes(): ?array
-    {
-        $res = \Bitrix\Sale\PersonType::getList([
-            'order' => ['SORT' => 'ASC'],
-        ]);
-        while ($ar = $res->fetch()) {
-            $personTypes[] = $ar;
-        }
-
-        return $personTypes;
     }
 }
