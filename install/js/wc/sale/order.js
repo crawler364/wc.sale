@@ -6,11 +6,39 @@ class WCSaleOrder {
     init() {
         BX.ready(() => {
             console.log(this)
-            BX.bind(BX('wc-order'), 'submit', this.testGetData.bind(this));
+
+            BX.bindDelegate(
+                BX('wc-order'),
+                'click',
+                {
+                    attribute: {'data-person-type-id': ''}
+                },
+                this.testGetData.bind(this, BX('wc-order'))
+            );
+
+            BX.bindDelegate(
+                BX('wc-order'),
+                'click',
+                {
+                    attribute: {'data-delivery-id': ''}
+                },
+                this.testGetData.bind(this, BX('wc-order'))
+            );
+
+            BX.bindDelegate(
+                BX('wc-order'),
+                'click',
+                {
+                    attribute: {'data-action-submit': ''}
+                },
+                this.saveOrderAction.bind(this, BX('wc-order'))
+            );
+
+            //BX.bind(BX('wc-order'), 'submit', this.saveOrderAction.bind(this));
         });
     }
 
-    saveOrderAction(e) {
+    saveOrderAction(order,e) {
         BX.PreventDefault(e);
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
@@ -26,12 +54,13 @@ class WCSaleOrder {
         });
     }
 
-    testGetData(e) {
+    testGetData(order, e) {
         BX.PreventDefault(e);
+        console.log(BX.ajax.prepareForm(order));
 
         BX.ajax({
             url: '/local/components/wc/order/get.php',
-            data: {},
+            data: BX.ajax.prepareForm(order),
             method: 'POST',
             dataType: 'html',
             timeout: 30,
@@ -42,7 +71,7 @@ class WCSaleOrder {
             start: true,
             cache: false,
             onsuccess: function (data) {
-                BX('wc-order').innerHTML += data
+                BX('wc-order').innerHTML = data
             }
         });
     }

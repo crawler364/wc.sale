@@ -1,5 +1,6 @@
 <?php
 
+
 class WCSaleOrder extends CBitrixComponent
 {
     /** @var \WC\Sale\OrderHandler */
@@ -9,20 +10,15 @@ class WCSaleOrder extends CBitrixComponent
     {
         \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
 
-        $order = $this->orderHandlerClass::createOrder();
-        $orderHandler = new $this->orderHandlerClass($order);
+        $orderHandlerClass = $this->arParams['ORDER_HANDLER_CLASS'] ?: $this->orderHandlerClass;
 
-        $personTypes = $this->orderHandlerClass::getPersonTypes();
+        $order = $orderHandlerClass::createOrder();
+        $orderHandler = new $orderHandlerClass($order);
+        $result = $orderHandler->processOrder();
 
-        $order->setPersonTypeId(1);
-        $a = $order->getPropertyCollection();
-        $properties = $order->loadPropertyCollection();
-       $c =  $order->getShipmentCollection();
+        // $result = $orderHandler->saveOrder();
 
-        $this->arResult = [
-            'PERSON_TYPES' => $personTypes,
-            'PROPERTIES' => $properties->getArray()['properties'],
-        ];
+        $this->arResult = $result->getData();
 
         $this->includeComponentTemplate();
     }

@@ -5,16 +5,21 @@ use Bitrix\Main\Localization\Loc;
 ?>
 <form id="wc-order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
-    <div>
+    <table>
         <? foreach ($arResult['PERSON_TYPES'] as $personType) { ?>
-            <label>
-                <input type="radio" value="<?= $personType['ID'] ?>" name="person_type_id">
-                <?= $personType['NAME'] ?>
-            </label>
+            <tr>
+                <td>
+                    <label>
+                        <input type="radio" value="<?= $personType['ID'] ?>"
+                               name="PERSON_TYPE_ID" <?= $personType['CHECKED'] ? 'checked' : '' ?> data-person-type-id>
+                        <?= $personType['NAME'] ?>
+                    </label>
+                </td>
+            </tr>
         <? } ?>
-    </div>
+    </table>
 
-    <h2><?= Loc::getMessage('WC_ORDER_TEMPLATE_PROPERTIES_TITLE') ?></h2>
+    <h2><?= Loc::getMessage('WC_ORDER_PROPERTIES_TITLE') ?></h2>
     <table>
         <? foreach ($arResult['PROPERTIES'] as $property) { ?>
             <tr>
@@ -28,14 +33,30 @@ use Bitrix\Main\Localization\Loc;
                         case 'LOCATION':
                         default: ?>
                             <input id="<?= $property['CODE'] ?>" type="text" name="<?= $property['CODE'] ?>"
-                                   value="<?= $property['VALUE'][0] ?>">
+                                   value="<?= $property['VALUE'] ?>">
                         <? } ?>
                 </td>
             </tr>
         <? } ?>
     </table>
 
-    <button type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
+    <h2><?= Loc::getMessage('WC_DELIVERIES_TITLE') ?></h2>
+    <table>
+        <? foreach ($arResult['DELIVERIES'] as $delivery) { ?>
+            <tr>
+                <td>
+                    <label>
+                        <input type="radio" name="DELIVERY_ID"
+                               value="<?= $delivery['ID'] ?>" <?= $delivery['CHECKED'] ? 'checked' : '' ?>
+                               data-delivery-id>
+                        <?= $delivery['NAME'] ?>
+                    </label>
+                </td>
+            </tr>
+        <? } ?>
+    </table>
+
+    <button data-action-submit type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
 </form>
 
 <script type="text/javascript">
