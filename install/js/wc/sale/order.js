@@ -11,16 +11,7 @@ class WCSaleOrder {
                 BX('wc-order'),
                 'click',
                 {
-                    attribute: {'data-person-type-id': ''}
-                },
-                this.testGetData.bind(this, BX('wc-order'))
-            );
-
-            BX.bindDelegate(
-                BX('wc-order'),
-                'click',
-                {
-                    attribute: {'data-delivery-id': ''}
+                    attribute: {'data-action-refresh': ''}
                 },
                 this.testGetData.bind(this, BX('wc-order'))
             );

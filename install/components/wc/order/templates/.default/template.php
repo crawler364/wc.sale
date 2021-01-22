@@ -10,8 +10,8 @@ use Bitrix\Main\Localization\Loc;
             <tr>
                 <td>
                     <label>
-                        <input type="radio" value="<?= $personType['ID'] ?>"
-                               name="PERSON_TYPE_ID" <?= $personType['CHECKED'] ? 'checked' : '' ?> data-person-type-id>
+                        <input type="radio" value="<?= $personType['ID'] ?>" name="PERSON_TYPE_ID"
+                            <?= $personType['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
                         <?= $personType['NAME'] ?>
                     </label>
                 </td>
@@ -46,10 +46,24 @@ use Bitrix\Main\Localization\Loc;
             <tr>
                 <td>
                     <label>
-                        <input type="radio" name="DELIVERY_ID"
-                               value="<?= $delivery['ID'] ?>" <?= $delivery['CHECKED'] ? 'checked' : '' ?>
-                               data-delivery-id>
+                        <input type="radio" name="DELIVERY_ID" value="<?= $delivery['ID'] ?>"
+                            <?= $delivery['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
                         <?= $delivery['NAME'] ?>
+                    </label>
+                </td>
+            </tr>
+        <? } ?>
+    </table>
+
+    <h2><?= Loc::getMessage('WC_PAY_SYSTEMS_TITLE') ?>:</h2>
+    <table>
+        <? foreach ($arResult['PAY_SYSTEMS'] as $paySystem) { ?>
+            <tr>
+                <td>
+                    <label>
+                        <input type="radio" name="PAY_SYSTEM_ID" value="<?= $paySystem['ID'] ?>"
+                            <?= $paySystem['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
+                        <?= $paySystem['NAME'] ?>
                     </label>
                 </td>
             </tr>

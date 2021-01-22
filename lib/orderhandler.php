@@ -93,7 +93,7 @@ class OrderHandler
         return $shipment;
     }
 
-    protected function initDelivery($shipment): array
+    protected function initDeliveries($shipment): array
     {
         /** @var \Bitrix\Sale\Delivery\Services\Base $arDeliveryServiceAll */
         $arDeliveryServiceAll = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment);
@@ -102,14 +102,43 @@ class OrderHandler
         }
 
         $deliveryId = $this->orderData['DELIVERY_ID'] ?? $deliveries[0]['ID'];
+        $shipment->setField('DELIVERY_ID', $deliveryId);
 
         foreach ($deliveries as &$delivery) {
             if ($deliveryId == $delivery['ID']) {
                 $delivery['CHECKED'] = true;
+                break;
             }
         }
 
         return $deliveries;
+    }
+
+    protected function initPayment(): array
+    {
+        $paymentCollection = $this->order->getPaymentCollection();
+        $payment = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
+        $payment->setField('SUM', $this->order->getPrice());
+        $payment->setField('CURRENCY', $this->order->getCurrency());
+
+        $payment->setField('PAY_SYSTEM_ID', $this->orderData['PAY_SYSTEM_ID']);
+
+        $arPaySystemServices = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+        foreach ($arPaySystemServices as $paySystem) {
+            $paySystems[] = \Bitrix\Sale\PaySystem\Manager::getById($paySystem['ID']);
+        }
+
+        $paySystemId = $this->orderData['PAY_SYSTEM_ID'] ?? $paySystems[0]['ID'];
+
+        foreach ($paySystems as &$paySystem) {
+            if ($paySystemId == $paySystem['ID']) {
+                $paySystem['CHECKED'] = true;
+                break;
+            }
+        }
+
+        return $paySystems;
+
     }
 
     public function processOrder(): Result
@@ -121,7 +150,10 @@ class OrderHandler
         $this->order->setBasket(\WC\Sale\BasketHandler::getCurrentUserBasket());
 
         $shipment = $this->initShipment();
-        $deliveries = $this->initDelivery($shipment);
+        $deliveries = $this->initDeliveries($shipment);
+
+        $payments = $this->initPayment();
+
 
         // $r = $order->getPaymentCollection();
 
@@ -130,6 +162,7 @@ class OrderHandler
             'PERSON_TYPES' => $personTypes,
             'PROPERTIES' => $properties,
             'DELIVERIES' => $deliveries,
+            'PAY_SYSTEMS' => $payments,
         ];
 
         $this->result->setData($data);
