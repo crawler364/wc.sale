@@ -91,6 +91,38 @@ use Bitrix\Main\Localization\Loc;
     <button data-action-submit type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
 </form>
 
+<table data-wc-basket-container class="wc-basket-container">
+    <tbody>
+    <tr>
+        <td><?= Loc::getMessage('WC_BASKET_WEIGHT') ?></td>
+        <td data-basket-weight><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_BASKET_COUNT') ?></td>
+        <td data-basket-count><?= $arResult['INFO']['COUNT'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_BASKET_VAT') ?></td>
+        <td data-basket-vat><?= $arResult['INFO']['VAT_FORMATTED'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_BASKET_PRICE_BASE') ?></td>
+        <td data-basket-price-base><?= $arResult['INFO']['PRICE_BASE_FORMATTED'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?></td>
+        <td data-basket-discount><?= $arResult['INFO']['DISCOUNT_FORMATTED'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_BASKET_PRICE') ?></td>
+        <td data-basket-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+    </tr>
+    </tbody>
+    <tr>
+        <td data-basket-empty class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
+    </tr>
+</table>
+
 <script type="text/javascript">
     if (!window.hasOwnProperty('WCSaleOrder')) {
         window.WCSaleOrder = new WCSaleOrder(<?=Bitrix\Main\Web\Json::encode([

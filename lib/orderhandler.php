@@ -187,6 +187,7 @@ class OrderHandler
             'DELIVERIES' => $deliveries,
             'PAY_SYSTEMS' => $payments,
             'PRODUCT_LIST' => $productList,
+            'INFO' => $this->order->getInfo(),
         ];
 
         $this->result->setData($data);

@@ -7,6 +7,7 @@ Loader::includeModule('wc.main');
 
 WC\Sale\Tools::setRegistry(WC\Sale\Basket::class, 'ENTITY_BASKET');
 WC\Sale\Tools::setRegistry(WC\Sale\BasketItem::class, 'ENTITY_BASKET_ITEM');
+WC\Sale\Tools::setRegistry(WC\Sale\Order::class, 'ENTITY_ORDER');
 
 $kernelDir = Bitrix\Main\IO\Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
 
