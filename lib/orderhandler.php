@@ -11,6 +11,9 @@ use Bitrix\Main\Context;
 
 class OrderHandler
 {
+    /** @var BasketHandler */
+    protected $basketHandler = BasketHandler::class;
+
     public function __construct(Order $order, array $orderData = null)
     {
         $this->result = new Result();
@@ -76,6 +79,14 @@ class OrderHandler
         return $properties;
     }
 
+    protected function initProductList(): array
+    {
+        $basket = $this->basketHandler::getCurrentUserBasket();
+        $this->order->setBasket($basket);
+
+        return $basket->getInfo()['ITEMS'];
+    }
+
     protected function initShipment(): \Bitrix\Sale\Shipment
     {
         $shipmentCollection = $this->order->getShipmentCollection();
@@ -88,7 +99,6 @@ class OrderHandler
             $shipmentItem = $shipmentItemCollection->createItem($item);
             $shipmentItem->setQuantity($item->getQuantity());
         }
-
 
         return $shipment;
     }
@@ -141,13 +151,26 @@ class OrderHandler
 
     }
 
+    public function saveOrder(): \Bitrix\Sale\Result
+    {
+        return $this->order->save();
+    }
+
+    public static function createOrder(): Order
+    {
+        global $USER;
+        $siteId = \WC\Main\Tools::getSiteId();
+        $userId = $USER->GetID();
+        return Order::create($siteId, $userId);
+    }
+
     public function processOrder(): Result
     {
         $personTypes = $this->initPersonType();
 
         $properties = $this->initProperties();
 
-        $this->order->setBasket(\WC\Sale\BasketHandler::getCurrentUserBasket());
+        $productList = $this->initProductList();
 
         $shipment = $this->initShipment();
         $deliveries = $this->initDeliveries($shipment);
@@ -163,23 +186,11 @@ class OrderHandler
             'PROPERTIES' => $properties,
             'DELIVERIES' => $deliveries,
             'PAY_SYSTEMS' => $payments,
+            'PRODUCT_LIST' => $productList,
         ];
 
         $this->result->setData($data);
 
         return $this->result;
-    }
-
-    public function saveOrder(): \Bitrix\Sale\Result
-    {
-        return $this->order->save();
-    }
-
-    public static function createOrder(): Order
-    {
-        global $USER;
-        $siteId = \WC\Main\Tools::getSiteId();
-        $userId = $USER->GetID();
-        return Order::create($siteId, $userId);
     }
 }

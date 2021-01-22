@@ -16,8 +16,6 @@ class WCSaleOrder extends CBitrixComponent
         $orderHandler = new $orderHandlerClass($order);
         $result = $orderHandler->processOrder();
 
-        // $result = $orderHandler->saveOrder();
-
         $this->arResult = $result->getData();
 
         $this->includeComponentTemplate();
