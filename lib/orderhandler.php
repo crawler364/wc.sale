@@ -20,14 +20,32 @@ class OrderHandler
         Loc::loadMessages(__FILE__);
 
         $this->order = $order;
-        $this->orderData = $orderData ?: $this->getOrderDataFromRequest();
+        $orderData = $orderData ?? $this->getOrderData();
+        $this->orderData = $this->prepareOrderData($orderData);
     }
 
-    protected function getOrderDataFromRequest()
+    protected function getOrderData(): ?array
     {
-        $context = Context::getCurrent();
-        $request = $context->getRequest();
-        return $request->get('data');
+        return Context::getCurrent()->getRequest()->get('data');
+    }
+
+    protected function prepareOrderData($orderData): array
+    {
+        if (!$orderData['PERSON_TYPE_ID']) {
+            if ($personType = \Bitrix\Sale\PersonType::getList([
+                'order' => ['SORT' => 'ASC'],
+            ])->fetch()) {
+                $orderData['PERSON_TYPE_ID'] = $personType['ID'];
+            } else {
+                $this->result->addError('WC_ORDER_NULL_PERSON_TYPE');
+            }
+        }
+
+
+
+
+        return $orderData;
+
     }
 
     protected function addOrder()
@@ -50,10 +68,8 @@ class OrderHandler
             $personTypes[] = $personType;
         }
 
-        $personTypeId = $this->orderData['PERSON_TYPE_ID'] ?: $personTypes[0]['ID'];
-
         foreach ($personTypes as &$personType) {
-            if ($personTypeId == $personType['ID']) {
+            if ($this->orderData['PERSON_TYPE_ID'] == $personType['ID']) {
                 $personType['CHECKED'] = true;
                 $this->order->setPersonTypeId($personTypeId);
             }
@@ -130,7 +146,6 @@ class OrderHandler
         $payment = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
         $payment->setField('SUM', $this->order->getPrice());
         $payment->setField('CURRENCY', $this->order->getCurrency());
-
         $payment->setField('PAY_SYSTEM_ID', $this->orderData['PAY_SYSTEM_ID']);
 
         $arPaySystemServices = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
@@ -166,6 +181,10 @@ class OrderHandler
 
     public function processOrder(): Result
     {
+        if (!$this->result->isSuccess()) {
+            // return $this->result;
+        }
+
         $personTypes = $this->initPersonType();
 
         $properties = $this->initProperties();

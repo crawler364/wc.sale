@@ -47,7 +47,8 @@ class WCSaleOrder {
 
     testGetData(order, e) {
         BX.PreventDefault(e);
-        console.log(BX.ajax.prepareForm(order));
+
+        BX('notes').innerHTML='123';
 
         BX.ajax({
             url: '/local/components/wc/order/get.php',
@@ -62,7 +63,12 @@ class WCSaleOrder {
             start: true,
             cache: false,
             onsuccess: function (data) {
-                BX('wc-order').innerHTML = data
+                BX('wc-order').innerHTML = data;
+
+                BX('notes').innerHTML='done';
+            },
+            onfailure: function (data){
+                BX('notes').innerHTML='done';
             }
         });
     }

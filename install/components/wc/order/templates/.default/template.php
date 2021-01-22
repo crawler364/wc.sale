@@ -3,9 +3,10 @@
 use Bitrix\Main\Localization\Loc;
 
 ?>
+<div id="notes">123</div>
 <form id="wc-order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
-    <table>
+    <table class="person-type">
         <? foreach ($arResult['PERSON_TYPES'] as $personType) { ?>
             <tr>
                 <td>
