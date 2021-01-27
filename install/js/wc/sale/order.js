@@ -29,7 +29,7 @@ class WCSaleOrder {
         });
     }
 
-    saveOrderAction(order,e) {
+    saveOrderAction(order, e) {
         BX.PreventDefault(e);
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
@@ -48,7 +48,7 @@ class WCSaleOrder {
     testGetData(order, e) {
         BX.PreventDefault(e);
 
-        BX('notes').innerHTML='123';
+        OrderLoader.showWait();
 
         BX.ajax({
             url: '/local/components/wc/order/get.php',
@@ -62,13 +62,12 @@ class WCSaleOrder {
             emulateOnload: true,
             start: true,
             cache: false,
-            onsuccess: function (data) {
+            onsuccess: (data) => {
                 BX('wc-order').innerHTML = data;
-
-                BX('notes').innerHTML='done';
+                OrderLoader.closeWait();
             },
-            onfailure: function (data){
-                BX('notes').innerHTML='done';
+            onfailure: (data) => {
+                OrderLoader.closeWait();
             }
         });
     }

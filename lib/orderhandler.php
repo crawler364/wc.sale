@@ -41,11 +41,7 @@ class OrderHandler
             }
         }
 
-
-
-
         return $orderData;
-
     }
 
     protected function addOrder()
@@ -71,7 +67,7 @@ class OrderHandler
         foreach ($personTypes as &$personType) {
             if ($this->orderData['PERSON_TYPE_ID'] == $personType['ID']) {
                 $personType['CHECKED'] = true;
-                $this->order->setPersonTypeId($personTypeId);
+                $this->order->setPersonTypeId($this->orderData['PERSON_TYPE_ID']);
             }
         }
 
