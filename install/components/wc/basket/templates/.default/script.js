@@ -31,7 +31,7 @@ class UpdateBasketDom {
         }
     }
 
-    static delete(dom) {
+    static delete(dom, basket) {
         if (dom.nodes.empty) {
             BX.removeClass(dom.nodes.empty, 'hide');
         }
@@ -49,5 +49,15 @@ class ResponseHandler {
     }
 
     static error(response) {
+    }
+}
+
+class BasketLoader {
+    static showWait() {
+        BX.showWait();
+    }
+
+    static closeWait() {
+        BX.closeWait();
     }
 }

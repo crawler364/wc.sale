@@ -148,12 +148,12 @@ class WCSaleBasket {
             }
 
             if (basket.info.count > 0) {
-                if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.update === 'function') {
-                    UpdateBasketDom.update(basketContainerDom, basket);
+                if (typeof UpdateBasketDom === 'function') {
+                    UpdateBasketDom.update?.(basketContainerDom, basket);
                 }
             } else {
-                if (typeof UpdateBasketDom !== 'undefined' && typeof UpdateBasketDom.delete === 'function') {
-                    UpdateBasketDom.delete(basketContainerDom, basket);
+                if (typeof UpdateBasketDom === 'function') {
+                    UpdateBasketDom.delete?.(basketContainerDom, basket);
                 }
             }
         });
@@ -175,12 +175,12 @@ class WCSaleBasket {
             }
 
             if (basketItem.quantity > 0) {
-                if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.update === 'function') {
-                    UpdateBasketItemDom.update(basketItemContainerDom, basketItem);
+                if (typeof UpdateBasketItemDom === 'function') {
+                    UpdateBasketItemDom.update?.(basketItemContainerDom, basketItem);
                 }
             } else {
-                if (typeof UpdateBasketItemDom !== 'undefined' && typeof UpdateBasketItemDom.delete === 'function') {
-                    UpdateBasketItemDom.delete(basketItemContainerDom, basketItem);
+                if (typeof UpdateBasketItemDom === 'function') {
+                    UpdateBasketItemDom.delete?.(basketItemContainerDom, basketItem);
                 }
             }
         });
@@ -188,6 +188,10 @@ class WCSaleBasket {
 
     processAction(e) {
         BX.PreventDefault(e);
+
+        if (typeof BasketLoader === 'function') {
+            BasketLoader.showWait?.();
+        }
 
         let basketContainersDom = this.getBasketContainersDom();
         let basketItemContainersDom = this.getBasketItemContainersDom(e.target);
@@ -205,16 +209,30 @@ class WCSaleBasket {
             mode: 'ajax',
             data: data
         }).then((response) => {
+            if (typeof BasketLoader === 'function') {
+                BasketLoader.closeWait?.();
+            }
+
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
             this.setBasketContainersDom(basketContainersDom, basket);
             this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
-            ResponseHandler.success(response);
+
+            if (typeof ResponseHandler === 'function') {
+                ResponseHandler.success?.(response);
+            }
         }, function (response) {
-            response?.errors.forEach((error) => {
+            if (typeof BasketLoader === 'function') {
+                BasketLoader.closeWait?.();
+            }
+
+            response.errors.forEach((error) => {
                 console.error(error);
             });
-            ResponseHandler.error(response);
+
+            if (typeof ResponseHandler === 'function') {
+                ResponseHandler.error?.(response);
+            }
         });
     }
 }
