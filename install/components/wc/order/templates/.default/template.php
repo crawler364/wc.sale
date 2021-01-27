@@ -3,7 +3,6 @@
 use Bitrix\Main\Localization\Loc;
 
 ?>
-<div id="notes">123</div>
 <form id="wc-order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
     <table class="person-type">

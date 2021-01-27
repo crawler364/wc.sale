@@ -55,7 +55,7 @@ class OrderHandler
     }
 
 
-    protected function initPersonType(): array
+    protected function getPersonTypes(): array
     {
         $obPersonTypes = \Bitrix\Sale\PersonType::getList([
             'order' => ['SORT' => 'ASC'],
@@ -67,7 +67,6 @@ class OrderHandler
         foreach ($personTypes as &$personType) {
             if ($this->orderData['PERSON_TYPE_ID'] == $personType['ID']) {
                 $personType['CHECKED'] = true;
-                $this->order->setPersonTypeId($this->orderData['PERSON_TYPE_ID']);
             }
         }
 
@@ -123,8 +122,12 @@ class OrderHandler
             $deliveries[] = \Bitrix\Sale\Delivery\Services\Manager::getById($delivery->getId());
         }
 
+
         $deliveryId = $this->orderData['DELIVERY_ID'] ?? $deliveries[0]['ID'];
         $shipment->setField('DELIVERY_ID', $deliveryId);
+
+        $shipmentCollection = $shipment->getCollection();
+        $shipmentCollection->calculateDelivery();
 
         foreach ($deliveries as &$delivery) {
             if ($deliveryId == $delivery['ID']) {
@@ -178,10 +181,12 @@ class OrderHandler
     public function processOrder(): Result
     {
         if (!$this->result->isSuccess()) {
-            // return $this->result;
+            return $this->result;
         }
 
-        $personTypes = $this->initPersonType();
+        $this->order->setPersonTypeId($this->orderData['PERSON_TYPE_ID']);
+
+        $personTypes = $this->getPersonTypes();
 
         $properties = $this->initProperties();
 
