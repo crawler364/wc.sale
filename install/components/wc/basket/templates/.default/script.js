@@ -43,3 +43,11 @@ class UpdateBasketDom {
         }
     }
 }
+
+class ResponseHandler {
+    static success(response) {
+    }
+
+    static error(response) {
+    }
+}

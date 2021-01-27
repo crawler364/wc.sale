@@ -205,14 +205,16 @@ class WCSaleBasket {
             mode: 'ajax',
             data: data
         }).then((response) => {
-            console.log(response);
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
             this.setBasketContainersDom(basketContainersDom, basket);
             this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
+            ResponseHandler.success(response);
         }, function (response) {
-            console.log(response);
-            // todo обработка ошибок
+            response?.errors.forEach((error) => {
+                console.error(error);
+            });
+            ResponseHandler.error(response);
         });
     }
 }
