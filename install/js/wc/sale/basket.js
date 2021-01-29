@@ -11,8 +11,7 @@ class WCSaleBasket {
     init() {
         BX.ready(() => {
             BX.bindDelegate(
-                document.body,
-                'change',
+                document.body, 'change',
                 {
                     tag: 'input',
                     attribute: 'data-action-basket-item'
@@ -21,8 +20,7 @@ class WCSaleBasket {
             );
 
             BX.bindDelegate(
-                document.body,
-                'click',
+                document.body, 'click',
                 {
                     attribute: 'data-action-basket-item'
                 },
@@ -146,16 +144,6 @@ class WCSaleBasket {
             if (basketContainerDom.nodes.price) {
                 BX.adjust(basketContainerDom.nodes.price, {text: basket.info.priceFormatted});
             }
-
-            if (basket.info.count > 0) {
-                if (typeof UpdateBasketDom === 'function') {
-                    UpdateBasketDom.update?.(basketContainerDom, basket);
-                }
-            } else {
-                if (typeof UpdateBasketDom === 'function') {
-                    UpdateBasketDom.delete?.(basketContainerDom, basket);
-                }
-            }
         });
     }
 
@@ -173,16 +161,6 @@ class WCSaleBasket {
             if (basketItemContainerDom.nodes.discountSum) {
                 BX.adjust(basketItemContainerDom.nodes.discountSum, {text: basketItem.discountSumFormatted});
             }
-
-            if (basketItem.quantity > 0) {
-                if (typeof UpdateBasketItemDom === 'function') {
-                    UpdateBasketItemDom.update?.(basketItemContainerDom, basketItem);
-                }
-            } else {
-                if (typeof UpdateBasketItemDom === 'function') {
-                    UpdateBasketItemDom.delete?.(basketItemContainerDom, basketItem);
-                }
-            }
         });
     }
 
@@ -192,8 +170,13 @@ class WCSaleBasket {
         let basketContainersDom = this.getBasketContainersDom();
         let basketItemContainersDom = this.getBasketItemContainersDom(e.target);
 
-        if (typeof BasketLoader === 'function') {
-            BasketLoader.showWait?.(basketContainersDom, basketItemContainersDom);
+        const basketDomHandler = new WCSaleBasketDomHandler({
+            basketContainersDom: basketContainersDom,
+            basketItemContainersDom: basketItemContainersDom,
+        });
+
+        if (typeof basketDomHandler === 'object') {
+            basketDomHandler.processStart?.();
         }
 
         let data = {
@@ -209,8 +192,8 @@ class WCSaleBasket {
             mode: 'ajax',
             data: data
         }).then((response) => {
-            if (typeof BasketLoader === 'function') {
-                BasketLoader.closeWait?.(basketContainersDom, basketItemContainersDom);
+            if (typeof basketDomHandler === 'object') {
+                basketDomHandler.processEnd?.();
             }
 
             let basket = response.data.basket;
@@ -218,20 +201,20 @@ class WCSaleBasket {
             this.setBasketContainersDom(basketContainersDom, basket);
             this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
 
-            if (typeof ResponseHandler === 'function') {
-                ResponseHandler.success?.(response);
+            if (typeof basketDomHandler === 'object') {
+                basketDomHandler.processResponse?.(response);
             }
         }, (response) => {
-            if (typeof BasketLoader === 'function') {
-                BasketLoader.closeWait?.(basketContainersDom, basketItemContainersDom);
+            if (typeof basketDomHandler === 'object') {
+                basketDomHandler.processEnd?.();
             }
 
             response.errors.forEach((error) => {
                 console.error(error);
             });
 
-            if (typeof ResponseHandler === 'function') {
-                ResponseHandler.error?.(response);
+            if (typeof basketDomHandler === 'object') {
+                basketDomHandler.processResponse?.(response);
             }
         });
     }
