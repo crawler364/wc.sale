@@ -189,12 +189,12 @@ class WCSaleBasket {
     processAction(e) {
         BX.PreventDefault(e);
 
-        if (typeof BasketLoader === 'function') {
-            BasketLoader.showWait?.();
-        }
-
         let basketContainersDom = this.getBasketContainersDom();
         let basketItemContainersDom = this.getBasketItemContainersDom(e.target);
+
+        if (typeof BasketLoader === 'function') {
+            BasketLoader.showWait?.(basketContainersDom, basketItemContainersDom);
+        }
 
         let data = {
             basketAction: this.action,
@@ -210,7 +210,7 @@ class WCSaleBasket {
             data: data
         }).then((response) => {
             if (typeof BasketLoader === 'function') {
-                BasketLoader.closeWait?.();
+                BasketLoader.closeWait?.(basketContainersDom, basketItemContainersDom);
             }
 
             let basket = response.data.basket;
@@ -221,9 +221,9 @@ class WCSaleBasket {
             if (typeof ResponseHandler === 'function') {
                 ResponseHandler.success?.(response);
             }
-        }, function (response) {
+        }, (response) => {
             if (typeof BasketLoader === 'function') {
-                BasketLoader.closeWait?.();
+                BasketLoader.closeWait?.(basketContainersDom, basketItemContainersDom);
             }
 
             response.errors.forEach((error) => {

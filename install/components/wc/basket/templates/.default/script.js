@@ -53,11 +53,11 @@ class ResponseHandler {
 }
 
 class BasketLoader {
-    static showWait() {
+    static showWait(basketContainersDom, basketItemContainersDom) {
         BX.showWait();
     }
 
-    static closeWait() {
+    static closeWait(basketContainersDom, basketItemContainersDom) {
         BX.closeWait();
     }
 }
