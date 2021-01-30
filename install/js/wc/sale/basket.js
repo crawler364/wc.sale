@@ -169,11 +169,14 @@ class WCSaleBasket {
 
         let basketContainersDom = this.getBasketContainersDom();
         let basketItemContainersDom = this.getBasketItemContainersDom(e.target);
+        let basketDomHandler;
 
-        const basketDomHandler = new WCSaleBasketDomHandler({
-            basketContainersDom: basketContainersDom,
-            basketItemContainersDom: basketItemContainersDom,
-        });
+        if (typeof WCSaleBasketDomHandler === 'function') {
+            basketDomHandler = new WCSaleBasketDomHandler({
+                basketContainersDom: basketContainersDom,
+                basketItemContainersDom: basketItemContainersDom,
+            });
+        }
 
         if (typeof basketDomHandler === 'object') {
             basketDomHandler.processStart?.();
