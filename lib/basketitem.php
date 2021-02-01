@@ -42,7 +42,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     public function setProperty($name, $code, $value)
     {
         $propertyCollection = $this->getPropertyCollection();
-        if (!$propertyCollection->getItemByIndex($code)) {
+        if (!$propertyCollection->getItemByIndex($code)) { // todo исправить, так работать не будет. Настройка свойств для добавления в корзину
             $basketItemProperty = $propertyCollection->createItem();
             $basketItemProperty->setFields([
                 'NAME' => $name,

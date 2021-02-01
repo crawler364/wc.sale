@@ -1,9 +1,4 @@
 class WCSaleBasket {
-    basketHandlerClass;
-    productId;
-    action;
-    quantity;
-
     constructor(params) {
         this.basketHandlerClass = params.basketHandlerClass;
     }
@@ -178,8 +173,8 @@ class WCSaleBasket {
             });
         }
 
-        if (typeof basketDomHandler === 'object') {
-            basketDomHandler.processStart?.();
+        if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processStart === 'function') {
+            basketDomHandler.processStart();
         }
 
         let data = {
@@ -195,8 +190,8 @@ class WCSaleBasket {
             mode: 'ajax',
             data: data
         }).then((response) => {
-            if (typeof basketDomHandler === 'object') {
-                basketDomHandler.processEnd?.();
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
+                basketDomHandler.processEnd();
             }
 
             let basket = response.data.basket;
@@ -204,20 +199,20 @@ class WCSaleBasket {
             this.setBasketContainersDom(basketContainersDom, basket);
             this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
 
-            if (typeof basketDomHandler === 'object') {
-                basketDomHandler.processResponse?.(response);
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
+                basketDomHandler.processResponse(response);
             }
         }, (response) => {
-            if (typeof basketDomHandler === 'object') {
-                basketDomHandler.processEnd?.();
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
+                basketDomHandler.processEnd();
             }
 
             response.errors.forEach((error) => {
                 console.error(error);
             });
 
-            if (typeof basketDomHandler === 'object') {
-                basketDomHandler.processResponse?.(response);
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
+                basketDomHandler.processResponse(response);
             }
         });
     }
