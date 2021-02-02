@@ -1,9 +1,4 @@
 class WCSaleBasketDomHandler {
-    basketContainersDom;
-    basketItemContainersDom;
-    basket;
-    basketItem;
-
     constructor(params) {
         this.basketContainersDom = params.basketContainersDom;
         this.basketItemContainersDom = params.basketItemContainersDom;
