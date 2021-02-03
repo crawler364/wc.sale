@@ -10,7 +10,7 @@ class WCSaleBasket extends CBitrixComponent
         \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
 
         $basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
-        $basket = $basketHandlerClass::getCurrentUserBasket();
+        $basket = $basketHandlerClass::getBasket();
 
         $this->arResult = $basket->getInfo();
 

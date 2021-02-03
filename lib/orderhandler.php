@@ -23,40 +23,50 @@ class OrderHandler
         $this->orderData = $orderData ?? Context::getCurrent()->getRequest()->get('data');
     }
 
-    protected function prepareOrderData()
-    {
-        if (!$this->orderData['PERSON_TYPE_ID']) {
-            if ($personType = \Bitrix\Sale\PersonType::getList([
-                'order' => ['SORT' => 'ASC'],
-            ])->fetch()) {
-                $this->orderData['PERSON_TYPE_ID'] = $personType['ID'];
-            } else {
-                $this->result->addError('WC_ORDER_NULL_PERSON_TYPE');
-            }
-        }
-    }
-
     public function saveOrder(): \Bitrix\Sale\Result
     {
         // todo $this->checkOrderData();
 
         $this->setPersonType();
         $this->setProperties();
+        $this->setBasket();
+        $this->setShipment();
+        $this->setPayment();
 
         return $this->order->save();
     }
 
-    public static function createOrder(): Order
-    {
-        global $USER;
-        $siteId = \WC\Main\Tools::getSiteId();
-        $userId = $USER->GetID();
-        return Order::create($siteId, $userId);
-    }
-
     protected function setPersonType()
     {
-        $this->order->setPersonTypeId($this->orderData['PERSON_TYPE_ID']);
+        if ($this->orderData['PERSON_TYPE_ID']) {
+            $personTypeId = $this->orderData['PERSON_TYPE_ID'];
+        } elseif ($personType = \Bitrix\Sale\PersonType::getList(['order' => ['SORT' => 'ASC']])->fetch()) {
+            $personTypeId = $personType['ID'];
+        } else {
+            $this->result->addError('WC_ORDER_NULL_PERSON_TYPE');
+        }
+
+        $this->order->setPersonTypeId($personTypeId);
+    }
+
+    protected function setProperties()
+    {
+        /** @var \Bitrix\Sale\PropertyValue $orderProperty */
+        foreach ($this->order->getPropertyCollection() as $orderProperty) {
+            if ($orderProperty->isUtil()) {
+                continue;
+            }
+
+            $propertyValue = $this->orderData[$orderProperty->getField('CODE')] ?? $orderProperty->getProperty()['DEFAULT_VALUE'];
+
+            $orderProperty->setValue($propertyValue);
+        }
+    }
+
+    protected function setBasket()
+    {
+        $basket = $this->basketHandler::getBasket($this->order->getUserId());
+        $this->order->setBasket($basket);
     }
 
     protected function getPersonTypes(): array
@@ -77,19 +87,6 @@ class OrderHandler
         return $personTypes;
     }
 
-    protected function setProperties()
-    {
-        foreach ($this->order->getPropertyCollection() as $orderProperty) {
-            if ($orderProperty->isUtil()) {
-                continue;
-            }
-
-            $propertyValue = $this->orderData[$orderProperty->getField('CODE')] ?? $orderProperty->getProperty()['DEFAULT_VALUE'];
-
-            $orderProperty->setValue($propertyValue);
-        }
-    }
-
     protected function getProperties(): array
     {
         /** @var \Bitrix\Sale\PropertyValue $property */
@@ -107,12 +104,6 @@ class OrderHandler
         return $properties;
     }
 
-    protected function setBasket()
-    {
-        $basket = $this->basketHandler::getCurrentUserBasket();
-        $this->order->setBasket($basket);
-    }
-
     protected function getProductList(): array
     {
         $basket = $this->order->getBasket();
@@ -122,7 +113,7 @@ class OrderHandler
     protected function setShipment()
     {
         $shipmentCollection = $this->order->getShipmentCollection();
-        $shipment = $shipmentCollection->createItem(\Bitrix\Sale\Delivery\Services\Manager::getObjectById($deliveryId));
+        $shipment = $shipmentCollection->createItem(/*\Bitrix\Sale\Delivery\Services\Manager::getObjectById($deliveryId)*/);
         $shipmentItemCollection = $shipment->getShipmentItemCollection();
         $shipment->setField('CURRENCY', $this->order->getCurrency());
 
@@ -141,7 +132,7 @@ class OrderHandler
 
         $this->orderData['DELIVERY_ID'] = $this->orderData['DELIVERY_ID'] ?? $deliveries[0]['ID'];
 
-        $shipment->setField('DELIVERY_ID', $deliveryId);
+        $shipment->setField('DELIVERY_ID', $this->orderData['DELIVERY_ID']);
         $shipmentCollection = $shipment->getCollection();
         $shipmentCollection->calculateDelivery();
     }
@@ -170,24 +161,14 @@ class OrderHandler
         $payment->setField('SUM', $this->order->getPrice());
         $payment->setField('CURRENCY', $this->order->getCurrency());
         $payment->setField('PAY_SYSTEM_ID', $this->orderData['PAY_SYSTEM_ID']);
-
-        $arPaySystemServices = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
-        foreach ($arPaySystemServices as $paySystem) {
-            $paySystems[] = \Bitrix\Sale\PaySystem\Manager::getById($paySystem['ID']);
-        }
-
-        $this->orderData['PAY_SYSTEM_ID']  = $this->orderData['PAY_SYSTEM_ID'] ?? $paySystems[0]['ID'];
     }
 
-    protected function getPayment(): array
+    protected function getPaySystems(): array
     {
-        $paymentCollection = $this->order->getPaymentCollection();
-        $payment = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
-        $payment->setField('SUM', $this->order->getPrice());
-        $payment->setField('CURRENCY', $this->order->getCurrency());
-        $payment->setField('PAY_SYSTEM_ID', $this->orderData['PAY_SYSTEM_ID']);
 
-        $arPaySystemServices = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+        $paymentCollection = $this->order->getPaymentCollection();
+        $arPaySystemServices = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($paymentCollection[0]);
+
         foreach ($arPaySystemServices as $paySystem) {
             $paySystems[] = \Bitrix\Sale\PaySystem\Manager::getById($paySystem['ID']);
         }
@@ -210,8 +191,6 @@ class OrderHandler
         if (!$this->result->isSuccess()) {
             return $this->result;
         }
-
-        $this->prepareOrderData();
 
         // todo $this->checkOrderData();
 
@@ -243,6 +222,18 @@ class OrderHandler
         $this->result->setData($data);
 
         return $this->result;
+    }
+
+    public static function createOrder(int $userId = null): Order
+    {
+        if (!$userId) {
+            global $USER;
+            $userId = $USER->GetID();
+        }
+
+        $siteId = \WC\Main\Tools::getSiteId();
+
+        return Order::create($siteId, $userId);
     }
 
     protected function addOrder()

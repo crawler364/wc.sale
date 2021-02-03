@@ -5,8 +5,6 @@ class WCSaleOrder {
 
     init() {
         BX.ready(() => {
-            console.log(this)
-
             BX.bindDelegate(
                 BX('wc-order'),
                 'click',
@@ -29,7 +27,6 @@ class WCSaleOrder {
 
     saveOrderAction(e) {
         BX.PreventDefault(e);
-        console.log(BX.ajax.prepareForm(e.target));
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
             mode: 'ajax',

@@ -98,7 +98,7 @@ class BasketHandler
     public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
     {
         Loader::includeModule('catalog');
-        $basket = $basket ?: self::getCurrentUserBasket();
+        $basket = $basket ?: self::getBasket();
         if (!$basketItem = $basket->getItemBy(['PRODUCT_ID' => $productId])) {
             if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
                 $basketItem = $basket->createItem('catalog', $productId);
@@ -108,10 +108,16 @@ class BasketHandler
         return $basketItem;
     }
 
-    public static function getCurrentUserBasket(): Basket
+    public static function getBasket(int $userId = null): Basket
     {
+        if ($userId) {
+            $fUserId = \Bitrix\Sale\Fuser::getIdByUserId($userId);
+        } else {
+            $fUserId = \Bitrix\Sale\Fuser::getId();
+        }
+
         $siteId = \WC\Main\Tools::getSiteId();
-        $fUserId = \Bitrix\Sale\Fuser::getId();
+
         return Basket::loadItemsForFUser($fUserId, $siteId);
     }
 }
