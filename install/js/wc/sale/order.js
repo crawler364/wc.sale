@@ -17,25 +17,24 @@ class WCSaleOrder {
             );
 
             BX.bindDelegate(
+                document.body,
+                'submit',
                 BX('wc-order'),
-                'click',
-                {
-                    attribute: {'data-action-submit': ''}
-                },
                 this.saveOrderAction.bind(this, BX('wc-order'))
             );
 
-            //BX.bind(BX('wc-order'), 'submit', this.saveOrderAction.bind(this));
+            BX.bind(BX('wc-order'), 'submit', this.saveOrderAction.bind(this));
         });
     }
 
-    saveOrderAction(order, e) {
+    saveOrderAction(e) {
         BX.PreventDefault(e);
+        console.log(BX.ajax.prepareForm(e.target));
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
             mode: 'ajax',
             data: {
-                formData: BX.ajax.prepareForm(e.target)
+                orderData: BX.ajax.prepareForm(e.target).data
             }
         }).then((response) => {
             console.log(response);

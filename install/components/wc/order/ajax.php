@@ -26,10 +26,10 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
         ];
     }
 
-    public function saveOrderAction($formData)
+    public function saveOrderAction($orderData)
     {
         $order = $this->orderHandlerClass::createOrder();
-        $orderHandler = new $this->orderHandlerClass($order);
+        $orderHandler = new $this->orderHandlerClass($order, $orderData);
         $orderHandler->saveOrder();
     }
 
