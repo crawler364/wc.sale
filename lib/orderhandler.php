@@ -73,13 +73,15 @@ class OrderHandler
     {
         $obPersonTypes = \Bitrix\Sale\PersonType::getList([
             'order' => ['SORT' => 'ASC'],
+            'filter' => ['ACTIVE' => 'Y'],
         ]);
         while ($personType = $obPersonTypes->fetch()) {
             $personTypes[] = $personType;
         }
 
+        $orderPersonTypeId = $this->order->getPersonTypeId();
         foreach ($personTypes as &$personType) {
-            if ($this->orderData['PERSON_TYPE_ID'] == $personType['ID']) {
+            if ($orderPersonTypeId == $personType['ID']) {
                 $personType['CHECKED'] = true;
             }
         }
@@ -90,10 +92,13 @@ class OrderHandler
     protected function getProperties(): array
     {
         /** @var \Bitrix\Sale\PropertyValue $property */
+        /** @var \Bitrix\Sale\Property $orderProperty */
         foreach ($this->order->getPropertyCollection() as $orderProperty) {
             if ($orderProperty->isUtil()) {
                 continue;
             }
+
+            $a = $orderProperty->getRelations();
 
             $property = $orderProperty->getProperty();
             $property['VALUE'] = $orderProperty->getValue();
@@ -205,10 +210,6 @@ class OrderHandler
         $productList = $this->getProductList();
         $deliveries = $this->getDeliveries();
         $paySystems = $this->getPaySystems();
-
-
-        // $r = $order->getPaymentCollection();
-
 
         $data = [
             'PERSON_TYPES' => $personTypes,
