@@ -92,7 +92,7 @@ class OrderHandler
     protected function getProperties(): array
     {
         /** @var \Bitrix\Sale\PropertyValue $property */
-        /** @var \Bitrix\Sale\Property $orderProperty */
+        /** @var \Bitrix\Sale\PropertyValue $orderProperty */
         foreach ($this->order->getPropertyCollection() as $orderProperty) {
             if ($orderProperty->isUtil()) {
                 continue;
