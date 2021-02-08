@@ -9,7 +9,7 @@ use Bitrix\Main\Localization\Loc;
 
 class BasketItem extends \Bitrix\Sale\BasketItem
 {
-    public function getInfo()
+    public function getInfo(): array
     {
         Loader::includeModule('iblock');
 
@@ -68,7 +68,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $this->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
     }
 
-    public function prepareBasketItemFields()
+    public function prepareBasketItemFields(): array
     {
         // todo универсальный вариант под торговые предложения и товары
         return [
@@ -76,7 +76,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         ];
     }
 
-    public static function getIblockElementInfo($productId)
+    public static function getIblockElementInfo($productId): array
     {
         // todo
         return [];
@@ -109,8 +109,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 
     /**
      * @param float|int $quantity
-     * @throws \Bitrix\Main\ArgumentNullException
-     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @return float|int
      */
     public function checkQuantity($quantity)
     {
@@ -121,7 +120,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         // Проверить количество по коэффициенту
         if (is_numeric($quantity) && $quantity > $ratio && $quantity > 0) {
             $multiply = round($quantity / $ratio, 2);
-            if (round($multiply, 0) !== $multiply) {
+            if (round($multiply) !== $multiply) {
                 $multiply = floor($multiply);
                 $quantity = $multiply * $ratio;
             }
