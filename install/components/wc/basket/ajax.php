@@ -44,7 +44,7 @@ class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
             $basket = $basketHandlerClass::getBasket();
             $this->result->setData([
                 'BASKET_ITEM' => $basketItem->getInfo(),
-                'BASKET_DATA' => $basket->getData(),
+                'BASKET' => $basket->getData(),
             ]);
         }
 
