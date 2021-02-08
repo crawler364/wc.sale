@@ -42,6 +42,7 @@ class OrderHandler
     protected function setProperties()
     {
         /** @var \Bitrix\Sale\PropertyValue $orderProperty */
+
         foreach ($this->order->getPropertyCollection() as $orderProperty) {
             if ($orderProperty->isUtil()) {
                 continue;
@@ -76,12 +77,10 @@ class OrderHandler
         $shipment = $shipmentCollection->createItem(Services\Manager::getObjectById($deliveryId));
         $shipmentItemCollection = $shipment->getShipmentItemCollection();
 
-        foreach ($this->order->getBasket() as $item) {
-            $shipmentItem = $shipmentItemCollection->createItem($item);
-            $shipmentItem->setQuantity($item->getQuantity());
+        foreach ($this->order->getBasket() as $basketItem) {
+            $shipmentItem = $shipmentItemCollection->createItem($basketItem);
+            $shipmentItem->setQuantity($basketItem->getQuantity());
         }
-
-        $shipmentCollection->calculateDelivery();
     }
 
     protected function setPayment()
@@ -237,7 +236,7 @@ class OrderHandler
 
     public static function createOrder(int $userId = null): Order
     {
-        if (!$userId) {
+        if ($userId == null) {
             global $USER;
             $userId = $USER->GetID();
         }
