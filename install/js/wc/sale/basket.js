@@ -193,7 +193,7 @@ class WCSaleBasket {
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
-
+            
             let basket = response.data.basket;
             let basketItem = response.data.basketItem;
             this.setBasketContainersDom(basketContainersDom, basket);
