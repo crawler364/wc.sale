@@ -5,12 +5,13 @@ namespace WC\Sale;
 
 
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Sale\Order;
 use WC\Main\Result;
 use Bitrix\Main\Context;
 
 class OrderHandler
 {
+    /** @var Order */
+    protected $order;
     /** @var BasketHandler */
     protected $basketHandler = BasketHandler::class;
 
@@ -80,6 +81,7 @@ class OrderHandler
         }
 
         $orderPersonTypeId = $this->order->getPersonTypeId();
+
         foreach ($personTypes as &$personType) {
             if ($orderPersonTypeId == $personType['ID']) {
                 $personType['CHECKED'] = true;
@@ -91,18 +93,13 @@ class OrderHandler
 
     protected function getProperties(): array
     {
-        /** @var \Bitrix\Sale\PropertyValue $property */
         /** @var \Bitrix\Sale\PropertyValue $orderProperty */
-        foreach ($this->order->getPropertyCollection() as $orderProperty) {
-            if ($orderProperty->isUtil()) {
-                continue;
-            }
 
-            $a = $orderProperty->getRelations();
+        $orderProperties = $this->order->getRestrictedProperties();
 
+        foreach ($orderProperties as $orderProperty) {
             $property = $orderProperty->getProperty();
             $property['VALUE'] = $orderProperty->getValue();
-
             $properties[] = $property;
         }
 
@@ -127,7 +124,6 @@ class OrderHandler
             $shipmentItem = $shipmentItemCollection->createItem($item);
             $shipmentItem->setQuantity($item->getQuantity());
         }
-
 
         /** @var \Bitrix\Sale\Delivery\Services\Base $arDeliveryServiceAll */
         $arDeliveryServiceAll = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment);
@@ -239,12 +235,11 @@ class OrderHandler
 
     protected function addOrder()
     {
-
+        // todo
     }
 
     protected function updateOrder()
     {
         // todo
     }
-
 }
