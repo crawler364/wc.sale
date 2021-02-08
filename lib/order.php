@@ -9,9 +9,9 @@ class Order extends \Bitrix\Sale\Order
     public function getInfo(): array
     {
         $basket = $this->getBasket();
-        $basketInfo = $basket->getInfo();
-
-        return $basketInfo['INFO'];
+        $info = $basket->getInfo();
+        // todo delivery info
+        return $info;
     }
 
     public function getRestrictedProperties(): array

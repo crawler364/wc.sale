@@ -64,7 +64,7 @@ class BasketHandler
         if ($this->result->isSuccess()) {
             $this->result->setData([
                 'ITEM' => $this->basketItem->getInfo(),
-                'BASKET' => $this->basket->getInfo(),
+                'BASKET_DATA' => $this->basket->getData(),
             ]);
         }
 

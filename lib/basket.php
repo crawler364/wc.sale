@@ -8,7 +8,11 @@ class Basket extends \Bitrix\Sale\Basket
 {
     public function getData(): array
     {
-        return ['INFO' => $this->getInfo(), 'ITEMS' => $this->getItemsList(), 'REMOVED_ITEMS' => $this->getRemovedItemsList()];
+        return [
+            'INFO' => $this->getInfo(),
+            'ITEMS' => $this->getItemsList(),
+            'REMOVED_ITEMS' => $this->getRemovedItemsList(),
+        ];
     }
 
     public function getInfo(): array
