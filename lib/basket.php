@@ -6,8 +6,14 @@ namespace WC\Sale;
 
 class Basket extends \Bitrix\Sale\Basket
 {
+    public function getData(): array
+    {
+        return ['INFO' => $this->getInfo(), 'ITEMS' => $this->getItemsList(), 'REMOVED_ITEMS' => $this->getRemovedItemsList()];
+    }
+
     public function getInfo(): array
     {
+        $info = [];
         $info['COUNT'] = (string)$this->count();
         $info['WEIGHT'] = (string)$this->getWeight();
         $info['WEIGHT_FORMATTED'] = \WC\Catalog\Tools::formatWeight($info['WEIGHT']);
@@ -20,9 +26,8 @@ class Basket extends \Bitrix\Sale\Basket
         $info['PRICE'] = (string)($this->getPrice());
         $info['PRICE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE']);
 
-        return ['INFO' => $info, 'ITEMS' => $this->getItemsList(), 'REMOVED_ITEMS' => $this->getRemovedItemsList()];
+        return $info;
     }
-
 
     /** @noinspection PhpUnnecessaryLocalVariableInspection
      * @noinspection OneTimeUseVariablesInspection
