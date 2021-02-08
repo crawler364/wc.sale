@@ -4,9 +4,11 @@
 namespace WC\Sale;
 
 
-use Bitrix\Main\Localization\Loc;
 use WC\Main\Result;
 use Bitrix\Main\Context;
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Delivery\Restrictions\Manager;
+use Bitrix\Sale\Delivery\Services;
 
 class OrderHandler
 {
@@ -22,19 +24,6 @@ class OrderHandler
 
         $this->order = $order;
         $this->orderData = $orderData ?? Context::getCurrent()->getRequest()->get('data');
-    }
-
-    public function saveOrder(): \Bitrix\Sale\Result
-    {
-        // todo $this->checkOrderData();
-
-        $this->setPersonType();
-        $this->setProperties();
-        $this->setBasket();
-        $this->setShipment();
-        $this->setPayment();
-
-        return $this->order->save();
     }
 
     protected function setPersonType()
@@ -70,22 +59,61 @@ class OrderHandler
         $this->order->setBasket($basket);
     }
 
+    protected function setShipment()
+    {
+        /** @var \Bitrix\Sale\ShipmentItem $shipmentItem */
+
+        $shipmentCollection = $this->order->getShipmentCollection();
+
+        if ($this->orderData['PAY_SYSTEM_ID']) {
+            $deliveryId = $this->orderData['DELIVERY_ID'];
+        } else {
+            $shipment = \Bitrix\Sale\Shipment::create($shipmentCollection);
+            $restrictedDeliveries = Services\Manager::getRestrictedList($shipment, Manager::MODE_CLIENT);
+            $deliveryId = $restrictedDeliveries[array_keys($restrictedDeliveries)[0]]['ID'];
+        }
+
+        $shipment = $shipmentCollection->createItem(Services\Manager::getObjectById($deliveryId));
+        $shipmentItemCollection = $shipment->getShipmentItemCollection();
+
+        foreach ($this->order->getBasket() as $item) {
+            $shipmentItem = $shipmentItemCollection->createItem($item);
+            $shipmentItem->setQuantity($item->getQuantity());
+        }
+
+        $shipmentCollection->calculateDelivery();
+    }
+
+    protected function setPayment()
+    {
+        $paymentCollection = $this->order->getPaymentCollection();
+
+        if ($this->orderData['PAY_SYSTEM_ID']) {
+            $paySystemId = $this->orderData['PAY_SYSTEM_ID'];
+        } else {
+            $payment = \Bitrix\Sale\Payment::create($paymentCollection);
+            $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+            $paySystemId = $restrictedPaySystems[array_keys($restrictedPaySystems)[0]]['ID'];
+        }
+
+        $payment = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
+        $payment->setField('SUM', $this->order->getPrice());
+        $payment->setField('CURRENCY', $this->order->getCurrency());
+    }
+
     protected function getPersonTypes(): array
     {
+        $orderPersonTypeId = $this->order->getPersonTypeId();
+
         $obPersonTypes = \Bitrix\Sale\PersonType::getList([
             'order' => ['SORT' => 'ASC'],
             'filter' => ['ACTIVE' => 'Y'],
         ]);
         while ($personType = $obPersonTypes->fetch()) {
-            $personTypes[] = $personType;
-        }
-
-        $orderPersonTypeId = $this->order->getPersonTypeId();
-
-        foreach ($personTypes as &$personType) {
             if ($orderPersonTypeId == $personType['ID']) {
                 $personType['CHECKED'] = true;
             }
+            $personTypes[] = $personType;
         }
 
         return $personTypes;
@@ -112,79 +140,42 @@ class OrderHandler
         return $basket->getItemsList();
     }
 
-    protected function setShipment()
-    {
-        $shipmentCollection = $this->order->getShipmentCollection();
-        $shipment = $shipmentCollection->createItem(/*\Bitrix\Sale\Delivery\Services\Manager::getObjectById($deliveryId)*/);
-        $shipmentItemCollection = $shipment->getShipmentItemCollection();
-        $shipment->setField('CURRENCY', $this->order->getCurrency());
-
-        foreach ($this->order->getBasket() as $item) {
-            /** @var \Bitrix\Sale\ShipmentItem $shipmentItem */
-            $shipmentItem = $shipmentItemCollection->createItem($item);
-            $shipmentItem->setQuantity($item->getQuantity());
-        }
-
-        /** @var \Bitrix\Sale\Delivery\Services\Base $arDeliveryServiceAll */
-        $arDeliveryServiceAll = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment);
-        foreach ($arDeliveryServiceAll as $delivery) {
-            $deliveries[] = \Bitrix\Sale\Delivery\Services\Manager::getById($delivery->getId());
-        }
-
-        $this->orderData['DELIVERY_ID'] = $this->orderData['DELIVERY_ID'] ?? $deliveries[0]['ID'];
-
-        $shipment->setField('DELIVERY_ID', $this->orderData['DELIVERY_ID']);
-        $shipmentCollection = $shipment->getCollection();
-        $shipmentCollection->calculateDelivery();
-    }
-
     protected function getDeliveries(): array
     {
         $shipmentCollection = $this->order->getShipmentCollection();
-        $arDeliveryServiceAll = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipmentCollection[1]);
-        foreach ($arDeliveryServiceAll as $delivery) {
-            $deliveries[] = \Bitrix\Sale\Delivery\Services\Manager::getById($delivery->getId());
-        }
-        foreach ($deliveries as &$delivery) {
-            if ($this->orderData['DELIVERY_ID'] == $delivery['ID']) {
+        $restrictedDeliveries = Services\Manager::getRestrictedObjectsList($shipmentCollection[1]);
+        $deliveryId = $shipmentCollection[1]->getDeliveryId();
+
+        foreach ($restrictedDeliveries as $restrictedDelivery) {
+            $delivery = Services\Manager::getById($restrictedDelivery->getId());
+
+            if ($deliveryId == $delivery['ID']) {
                 $delivery['CHECKED'] = true;
-                break;
             }
+
+            $deliveries[] = $delivery;
         }
 
         return $deliveries;
     }
 
-    protected function setPayment()
-    {
-        $paymentCollection = $this->order->getPaymentCollection();
-        $payment = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
-        $payment->setField('SUM', $this->order->getPrice());
-        $payment->setField('CURRENCY', $this->order->getCurrency());
-        $payment->setField('PAY_SYSTEM_ID', $this->orderData['PAY_SYSTEM_ID']);
-    }
-
     protected function getPaySystems(): array
     {
-
         $paymentCollection = $this->order->getPaymentCollection();
-        $arPaySystemServices = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($paymentCollection[0]);
+        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($paymentCollection[0]);
+        $paySystemId = $paymentCollection[0]->getPaymentSystemId();
 
-        foreach ($arPaySystemServices as $paySystem) {
-            $paySystems[] = \Bitrix\Sale\PaySystem\Manager::getById($paySystem['ID']);
-        }
+        foreach ($restrictedPaySystems as $restrictedPaySystem) {
+            $paySystem = \Bitrix\Sale\PaySystem\Manager::getById($restrictedPaySystem['ID']);
 
-        $paySystemId = $this->orderData['PAY_SYSTEM_ID'] ?? $paySystems[0]['ID'];
-
-        foreach ($paySystems as &$paySystem) {
             if ($paySystemId == $paySystem['ID']) {
                 $paySystem['CHECKED'] = true;
-                break;
             }
+
+            $paySystems[] = $paySystem;
         }
 
         return $paySystems;
-
     }
 
     public function processOrder(): Result
@@ -221,16 +212,17 @@ class OrderHandler
         return $this->result;
     }
 
-    public static function createOrder(int $userId = null): Order
+    public function saveOrder(): \Bitrix\Sale\Result
     {
-        if (!$userId) {
-            global $USER;
-            $userId = $USER->GetID();
-        }
+        // todo $this->checkOrderData();
 
-        $siteId = \WC\Main\Tools::getSiteId();
+        $this->setPersonType();
+        $this->setProperties();
+        $this->setBasket();
+        $this->setShipment();
+        $this->setPayment();
 
-        return Order::create($siteId, $userId);
+        return $this->order->save();
     }
 
     protected function addOrder()
@@ -241,5 +233,17 @@ class OrderHandler
     protected function updateOrder()
     {
         // todo
+    }
+
+    public static function createOrder(int $userId = null): Order
+    {
+        if (!$userId) {
+            global $USER;
+            $userId = $USER->GetID();
+        }
+
+        $siteId = \WC\Main\Tools::getSiteId();
+
+        return Order::create($siteId, $userId);
     }
 }
