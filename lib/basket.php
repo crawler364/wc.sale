@@ -8,15 +8,6 @@ class Basket extends \Bitrix\Sale\Basket
 {
     public function getInfo(): array
     {
-        // $items
-        foreach ($this->getBasketItems() as $basketItem) {
-            $items[] = $basketItem->getInfo();
-        }
-
-        // todo $removedItems
-        $removedItems = [];
-
-        // $info
         $info['COUNT'] = (string)$this->count();
         $info['WEIGHT'] = (string)$this->getWeight();
         $info['WEIGHT_FORMATTED'] = \WC\Catalog\Tools::formatWeight($info['WEIGHT']);
@@ -29,7 +20,31 @@ class Basket extends \Bitrix\Sale\Basket
         $info['PRICE'] = (string)($this->getPrice());
         $info['PRICE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE']);
 
-        return ['INFO' => $info, 'ITEMS' => $items, 'REMOVED_ITEMS' => $removedItems];
+        return ['INFO' => $info, 'ITEMS' => $this->getItemsList(), 'REMOVED_ITEMS' => $this->getRemovedItemsList()];
+    }
+
+
+    /** @noinspection PhpUnnecessaryLocalVariableInspection
+     * @noinspection OneTimeUseVariablesInspection
+     */
+    public function getRemovedItemsList(): ?array
+    {
+        $removedItemsList = [];
+        // todo
+        return $removedItemsList;
+    }
+
+    public function getItemsList(): array
+    {
+        /** @var BasketItem $basketItem */
+
+        $itemsList = [];
+
+        foreach ($this->getBasketItems() as $basketItem) {
+            $itemsList[] = $basketItem->getInfo();
+        }
+
+        return $itemsList;
     }
 
     /**

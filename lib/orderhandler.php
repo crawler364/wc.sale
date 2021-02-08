@@ -109,7 +109,7 @@ class OrderHandler
     protected function getProductList(): array
     {
         $basket = $this->order->getBasket();
-        return $basket->getInfo()['ITEMS'];
+        return $basket->getItemsList();
     }
 
     protected function setShipment()
