@@ -2,8 +2,8 @@
 
 class WCSaleBasket extends CBitrixComponent
 {
-    /** @var \WC\Sale\BasketHandler */
-    private $basketHandlerClass = \WC\Sale\BasketHandler::class;
+    /** @var \WC\Core\Sale\BasketHandler */
+    private $basketHandlerClass = \WC\Core\Sale\BasketHandler::class;
 
     public function executeComponent()
     {

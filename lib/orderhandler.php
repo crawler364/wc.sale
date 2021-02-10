@@ -4,7 +4,7 @@
 namespace WC\Sale;
 
 
-use WC\Main\Result;
+use WC\Core\Bitrix\Main\Result;
 use Bitrix\Main\Context;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery\Restrictions\Manager;

@@ -6,7 +6,7 @@ namespace WC\Sale;
 
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
-use WC\Main\Result;
+use WC\Core\Bitrix\Main\Result;
 
 class BasketHandler
 {

@@ -2,13 +2,13 @@
 
 use Bitrix\Main\Engine\Response\AjaxJson;
 use Bitrix\Main\Request;
-use WC\Main\Result;
+use WC\Core\Bitrix\Main\Result;
 use Bitrix\Main\Loader;
 
 class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
 {
-    /** @var \WC\Sale\BasketHandler */
-    private $basketHandlerClass = \WC\Sale\BasketHandler::class;
+    /** @var \WC\Core\Sale\BasketHandler */
+    private $basketHandlerClass = \WC\Core\Sale\BasketHandler::class;
 
     public function __construct(Request $request = null)
     {

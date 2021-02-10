@@ -3,7 +3,7 @@
 use Bitrix\Main\Loader;
 
 Loader::includeModule('sale');
-Loader::includeModule('wc.main');
+Loader::includeModule('wc.core');
 
 WC\Core\Helpers\Sale::setRegistry(WC\Sale\Basket::class, 'ENTITY_BASKET');
 WC\Core\Helpers\Sale::setRegistry(WC\Sale\BasketItem::class, 'ENTITY_BASKET_ITEM');
