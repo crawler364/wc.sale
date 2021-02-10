@@ -1,14 +1,14 @@
 <?php
 
 
-namespace WC\Sale;
+namespace WC\Sale\Handlers;
 
 
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use WC\Core\Bitrix\Main\Result;
 
-class BasketHandler
+class Basket
 {
     /** @var BasketItem */
     protected $basketItem;
