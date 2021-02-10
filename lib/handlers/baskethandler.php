@@ -7,8 +7,10 @@ namespace WC\Sale\Handlers;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use WC\Core\Bitrix\Main\Result;
+use WC\Sale\BasketItem;
+use WC\Sale\Basket;
 
-class Basket
+class BasketHandler
 {
     /** @var BasketItem */
     protected $basketItem;
