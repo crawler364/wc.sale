@@ -241,7 +241,7 @@ class OrderHandler
             $userId = $USER->GetID();
         }
 
-        $siteId = \WC\Main\Tools::getSiteId();
+        $siteId = \WC\Core\Helpers\Main::getSiteId();
 
         return Order::create($siteId, $userId);
     }

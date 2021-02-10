@@ -116,7 +116,7 @@ class BasketHandler
             $fUserId = \Bitrix\Sale\Fuser::getId();
         }
 
-        $siteId = \WC\Main\Tools::getSiteId();
+        $siteId = \WC\Core\Helpers\Main::getSiteId();
 
         return Basket::loadItemsForFUser($fUserId, $siteId);
     }

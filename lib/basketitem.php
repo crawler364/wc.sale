@@ -20,21 +20,21 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $info['PRODUCT_ID'] = (string)$productId;
         $info['NAME'] = (string)$this->getField('NAME');
         $info['WEIGHT'] = (string)$this->getWeight();
-        $info['WEIGHT_FORMATTED'] = \WC\Catalog\Tools::formatWeight($info['WEIGHT']);
+        $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
         $info['QUANTITY'] = (string)$this->getQuantity();
         $info['MEASURE_NAME'] = (string)$this->getField('MEASURE_NAME');
         $info['PRICE'] = (string)$this->getPrice();
-        $info['PRICE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE']);
+        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE']);
         $info['PRICE_SUM'] = (string)($info['QUANTITY'] * $info['PRICE']);
-        $info['PRICE_SUM_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_SUM']);
+        $info['PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_SUM']);
         $info['PRICE_BASE'] = (string)$this->getField('BASE_PRICE');
-        $info['PRICE_BASE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_BASE']);
+        $info['PRICE_BASE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_BASE']);
         $info['PRICE_BASE_SUM'] = (string)($info['PRICE_BASE'] * $info['QUANTITY']);
-        $info['PRICE_BASE_SUM_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_BASE_SUM']);
+        $info['PRICE_BASE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_BASE_SUM']);
         $info['DISCOUNT'] = (string)$this->getDiscountPrice();
         $info['DISCOUNT_PERCENT'] = $this->getField('DISCOUNT_VALUE');
         $info['DISCOUNT_SUM'] = (string)($info['DISCOUNT'] * $info['QUANTITY']);
-        $info['DISCOUNT_SUM_FORMATTED'] = \WC\Currency\Tools::format($info['DISCOUNT_SUM']);
+        $info['DISCOUNT_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT_SUM']);
 
         return $info;
     }
@@ -88,7 +88,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
      */
     public function mathQuantity(string $action)
     {
-        $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
+        $ratio = \WC\Core\Helpers\Catalog::getProductRatio($this->getProductId());
 
         $quantity = $this->getQuantity() ?: 0;
 
@@ -113,7 +113,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
      */
     public function checkQuantity($quantity)
     {
-        $ratio = \WC\Catalog\Tools::getProductRatio($this->getProductId());
+        $ratio = \WC\Core\Helpers\Catalog::getProductRatio($this->getProductId());
 
         // todo Проверить остатки, установить количество по остаткам
 

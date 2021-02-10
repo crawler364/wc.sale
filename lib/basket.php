@@ -20,15 +20,15 @@ class Basket extends \Bitrix\Sale\Basket
         $info = [];
         $info['COUNT'] = (string)$this->count();
         $info['WEIGHT'] = (string)$this->getWeight();
-        $info['WEIGHT_FORMATTED'] = \WC\Catalog\Tools::formatWeight($info['WEIGHT']);
+        $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
         $info['VAT'] = (string)$this->getVatSum();
-        $info['VAT_FORMATTED'] = \WC\Currency\Tools::format($info['VAT']);
+        $info['VAT_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['VAT']);
         $info['PRICE_BASE'] = (string)$this->getBasePrice();
-        $info['PRICE_BASE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE_BASE']);
+        $info['PRICE_BASE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_BASE']);
         $info['DISCOUNT'] = (string)($this->getBasePrice() - (string)$this->getPrice());
-        $info['DISCOUNT_FORMATTED'] = \WC\Currency\Tools::format($info['DISCOUNT']);
+        $info['DISCOUNT_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT']);
         $info['PRICE'] = (string)($this->getPrice());
-        $info['PRICE_FORMATTED'] = \WC\Currency\Tools::format($info['PRICE']);
+        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE']);
 
         return $info;
     }
