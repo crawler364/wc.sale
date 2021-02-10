@@ -97,7 +97,7 @@ class wc_sale extends CModule
             'main' => '17.5.0',
             'iblock' => '15.0.0',
             'sale' => '15.0.0',
-            'wc.main' => '0.0.1',
+            'wc.core' => '0.0.1',
         ];
 
         if (class_exists(ModuleManager::class)) {
