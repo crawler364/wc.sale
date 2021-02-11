@@ -5,6 +5,7 @@ namespace WC\Sale;
 
 
 use WC\Core\Bitrix\Main\Result;
+use WC\Sale\Handlers\BasketHandler;
 use Bitrix\Main\Context;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery\Restrictions\Manager;
@@ -66,7 +67,7 @@ class OrderHandler
 
         $shipmentCollection = $this->order->getShipmentCollection();
 
-        if ($this->orderData['PAY_SYSTEM_ID']) {
+        if ($this->orderData['DELIVERY_ID']) {
             $deliveryId = $this->orderData['DELIVERY_ID'];
         } else {
             $shipment = \Bitrix\Sale\Shipment::create($shipmentCollection);
@@ -86,12 +87,12 @@ class OrderHandler
     protected function setPayment()
     {
         $paymentCollection = $this->order->getPaymentCollection();
+        $payment = \Bitrix\Sale\Payment::create($paymentCollection);
+        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
 
-        if ($this->orderData['PAY_SYSTEM_ID']) {
+        if ($this->orderData['PAY_SYSTEM_ID'] && $this->isPaySystemRestricted($restrictedPaySystems,$this->orderData['PAY_SYSTEM_ID'])) {
             $paySystemId = $this->orderData['PAY_SYSTEM_ID'];
         } else {
-            $payment = \Bitrix\Sale\Payment::create($paymentCollection);
-            $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
             $paySystemId = $restrictedPaySystems[array_keys($restrictedPaySystems)[0]]['ID'];
         }
 
@@ -186,15 +187,14 @@ class OrderHandler
         // todo $this->checkOrderData();
 
         $this->setPersonType();
-        $this->setProperties();
-        $this->setBasket();
-        $this->setShipment();
-        $this->setPayment();
-
         $personTypes = $this->getPersonTypes();
+        $this->setProperties();
         $properties = $this->getProperties();
+        $this->setBasket();
         $productList = $this->getProductList();
+        $this->setShipment();
         $deliveries = $this->getDeliveries();
+        $this->setPayment();
         $paySystems = $this->getPaySystems();
 
         $data = [
@@ -232,6 +232,12 @@ class OrderHandler
     protected function updateOrder()
     {
         // todo
+    }
+
+    protected function isPaySystemRestricted($restrictedPaySystems, $paySystemId){
+        return array_filter($restrictedPaySystems, static function ($c) use ($paySystemId){
+            return ($c['ID'] == $paySystemId);
+        });
     }
 
     public static function createOrder(int $userId = null): Order
