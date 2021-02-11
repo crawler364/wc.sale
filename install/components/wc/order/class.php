@@ -3,8 +3,8 @@
 
 class WCSaleOrder extends CBitrixComponent
 {
-    /** @var \WC\Sale\OrderHandler */
-    private $orderHandlerClass = \WC\Sale\OrderHandler::class;
+    /** @var \WC\Sale\Handlers\OrderHandler */
+    private $orderHandlerClass = \WC\Sale\Handlers\OrderHandler::class;
 
     public function executeComponent()
     {
