@@ -3,10 +3,15 @@
 use Bitrix\Main\Localization\Loc;
 
 ?>
+<div style="font-size: 20px; color: red">
+    <? foreach ($arResult['ERRORS'] as $error) {
+        echo $error;
+    } ?>
+</div>
 <form id="wc-order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
     <table class="person-type">
-        <? foreach ($arResult['PERSON_TYPES'] as $personType) { ?>
+        <? foreach ($arResult['DATA']['PERSON_TYPES'] as $personType) { ?>
             <tr>
                 <td>
                     <label>
@@ -21,7 +26,7 @@ use Bitrix\Main\Localization\Loc;
 
     <h2><?= Loc::getMessage('WC_ORDER_PROPERTIES_TITLE') ?></h2>
     <table>
-        <? foreach ($arResult['PROPERTIES'] as $property) { ?>
+        <? foreach ($arResult['DATA']['PROPERTIES'] as $property) { ?>
             <tr>
                 <td>
                     <label for="<?= $property['CODE'] ?>">
@@ -42,7 +47,7 @@ use Bitrix\Main\Localization\Loc;
 
     <h2><?= Loc::getMessage('WC_ORDER_DELIVERIES_TITLE') ?></h2>
     <table>
-        <? foreach ($arResult['DELIVERIES'] as $delivery) { ?>
+        <? foreach ($arResult['DATA']['DELIVERIES'] as $delivery) { ?>
             <tr>
                 <td>
                     <label>
@@ -57,7 +62,7 @@ use Bitrix\Main\Localization\Loc;
 
     <h2><?= Loc::getMessage('WC_ORDER_PAY_SYSTEMS_TITLE') ?>:</h2>
     <table>
-        <? foreach ($arResult['PAY_SYSTEMS'] as $paySystem) { ?>
+        <? foreach ($arResult['DATA']['PAY_SYSTEMS'] as $paySystem) { ?>
             <tr>
                 <td>
                     <label>
@@ -78,7 +83,7 @@ use Bitrix\Main\Localization\Loc;
             <td><?= Loc::getMessage('WC_ORDER_PRODUCT_LIST_COUNT') ?></td>
             <td><?= Loc::getMessage('WC_ORDER_PRODUCT_LIST_PRICE_SUM') ?></td>
         </tr>
-        <? foreach ($arResult['PRODUCT_LIST'] as $product) { ?>
+        <? foreach ($arResult['DATA']['PRODUCTS_LIST'] as $product) { ?>
             <tr>
                 <td><?= $product['NAME'] ?></td>
                 <td><?= $product['PRICE_FORMATTED'] ?></td>
@@ -95,27 +100,27 @@ use Bitrix\Main\Localization\Loc;
     <tbody>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_WEIGHT') ?></td>
-        <td data-basket-weight><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
+        <td data-basket-weight><?= $arResult['DATA']['INFO']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_COUNT') ?></td>
-        <td data-basket-count><?= $arResult['INFO']['COUNT'] ?></td>
+        <td data-basket-count><?= $arResult['DATA']['INFO']['COUNT'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_VAT') ?></td>
-        <td data-basket-vat><?= $arResult['INFO']['VAT_FORMATTED'] ?></td>
+        <td data-basket-vat><?= $arResult['DATA']['INFO']['VAT_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_PRICE_BASE') ?></td>
-        <td data-basket-price-base><?= $arResult['INFO']['PRICE_BASE_FORMATTED'] ?></td>
+        <td data-basket-price-base><?= $arResult['DATA']['INFO']['PRICE_BASE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?></td>
-        <td data-basket-discount><?= $arResult['INFO']['DISCOUNT_FORMATTED'] ?></td>
+        <td data-basket-discount><?= $arResult['DATA']['INFO']['DISCOUNT_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_PRICE') ?></td>
-        <td data-basket-price><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+        <td data-basket-price><?= $arResult['DATA']['INFO']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
     <tr>

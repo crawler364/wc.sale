@@ -1,10 +1,11 @@
 <?php
 
+use \WC\Sale\Handlers\OrderHandler;
 
 class WCSaleOrder extends CBitrixComponent
 {
-    /** @var \WC\Sale\Handlers\OrderHandler */
-    private $orderHandlerClass = \WC\Sale\Handlers\OrderHandler::class;
+    /** @var OrderHandler */
+    private $orderHandlerClass = OrderHandler::class;
 
     public function executeComponent()
     {
@@ -16,7 +17,8 @@ class WCSaleOrder extends CBitrixComponent
         $orderHandler = new $orderHandlerClass($order);
         $result = $orderHandler->processOrder();
 
-        $this->arResult = $result->getData();
+        $this->arResult['DATA'] = $result->getData();
+        $this->arResult['ERRORS'] = $result->getErrorMessages();
 
         $this->includeComponentTemplate();
     }

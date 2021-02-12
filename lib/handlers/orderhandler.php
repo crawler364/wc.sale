@@ -143,7 +143,8 @@ class OrderHandler
         }
 
         if ($deliveryId > 0) {
-            $shipment = $shipmentCollection->createItem(Delivery\Services\Manager::getObjectById($deliveryId));
+            $delivery = Delivery\Services\Manager::getObjectById($deliveryId);
+            $shipment = $shipmentCollection->createItem($delivery);
             $shipmentItemCollection = $shipment->getShipmentItemCollection();
             $basket = $this->order->getBasket();
 
@@ -184,27 +185,48 @@ class OrderHandler
 
     protected function setPayment()
     {
+        /**
+         * @var \Bitrix\Sale\PaymentCollection $paymentCollection
+         * @var \Bitrix\Sale\Payment $payment
+         * @var array $restrictedPaySystems
+         */
+
         $paymentCollection = $this->order->getPaymentCollection();
-        $payment = \Bitrix\Sale\Payment::create($paymentCollection);
-        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+        $restrictedPaySystems = $this->getRestrictedPaySystems($paymentCollection);
 
+        foreach ($restrictedPaySystems as $key => $restrictedPaySystem) {
+            if ($key == 0) {
+                $paySystemId = $restrictedPaySystem['ID'];
+            }
 
-        if ($this->orderData['PAY_SYSTEM_ID'] && $this->isPaySystemRestricted($restrictedPaySystems, $this->orderData['PAY_SYSTEM_ID'])) {
-            $paySystemId = $this->orderData['PAY_SYSTEM_ID'];
-        } else {
-            $paySystemId = $restrictedPaySystems[array_keys($restrictedPaySystems)[0]]['ID'];
+            if ($this->orderData['PAY_SYSTEM_ID'] && $this->orderData['PAY_SYSTEM_ID'] == $restrictedPaySystem['ID']) {
+                $paySystemId = $restrictedPaySystem['ID'];
+                break;
+            }
         }
 
-        $payment = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
-        $payment->setField('SUM', $this->order->getPrice());
-        $payment->setField('CURRENCY', $this->order->getCurrency());
+        if ($paySystemId > 0) {
+            $paySystem = \Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId);
+            $payment = $paymentCollection->createItem($paySystem);
+            $payment->setField('SUM', $this->order->getPrice());
+            $payment->setField('CURRENCY', $this->order->getCurrency());
+        } else {
+            $this->result->addError('WC_SALE_PAYMENT_ERROR');
+        }
     }
 
     protected function getPaySystems(): array
     {
+        /**
+         * @var \Bitrix\Sale\PaymentCollection $paymentCollection
+         * @var \Bitrix\Sale\Payment $payment
+         * @var array $restrictedPaySystems
+         */
+
+        $paySystems = [];
         $paymentCollection = $this->order->getPaymentCollection();
-        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($paymentCollection[0]);
-        $paySystemId = $paymentCollection[0]->getPaymentSystemId();
+        $restrictedPaySystems = $this->getRestrictedPaySystems($paymentCollection);
+        $paySystemId = $paymentCollection->getItemByIndex(0)->getPaymentSystemId();
 
         foreach ($restrictedPaySystems as $restrictedPaySystem) {
             $paySystem = \Bitrix\Sale\PaySystem\Manager::getById($restrictedPaySystem['ID']);
@@ -276,18 +298,24 @@ class OrderHandler
         // todo
     }
 
-    protected function isPaySystemRestricted($restrictedPaySystems, $paySystemId)
-    {
-        return array_filter($restrictedPaySystems, static function ($c) use ($paySystemId) {
-            return ($c['ID'] == $paySystemId);
-        });
-    }
-
     protected function getRestrictedDeliveries(\Bitrix\Sale\ShipmentCollection $shipmentCollection): array
     {
         $shipment = \Bitrix\Sale\Shipment::create($shipmentCollection);
-        $restrictedDeliveries = Delivery\Services\Manager::getRestrictedList($shipment, Delivery\Restrictions\Manager::MODE_CLIENT);
+        $restrictedDeliveries = Delivery\Services\Manager::getRestrictedList(
+            $shipment,
+            Delivery\Restrictions\Manager::MODE_CLIENT
+        );
         return array_values($restrictedDeliveries);
+    }
+
+    protected function getRestrictedPaySystems(\Bitrix\Sale\PaymentCollection $paymentCollection): array
+    {
+        $payment = \Bitrix\Sale\Payment::create($paymentCollection);
+        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions(
+            $payment,
+            \Bitrix\Sale\Services\PaySystem\Restrictions\Manager::MODE_CLIENT
+        );
+        return array_values($restrictedPaySystems);
     }
 
     public static function createOrder(int $userId = null): Order
