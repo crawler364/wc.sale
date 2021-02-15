@@ -1,27 +1,26 @@
 class WCSaleOrder {
     constructor(params) {
-
+        this.wcOrder = BX('wc-order');
     }
 
     init() {
         BX.ready(() => {
+
             BX.bindDelegate(
-                BX('wc-order'),
+                this.wcOrder,
                 'click',
                 {
                     attribute: {'data-action-refresh': ''}
                 },
-                this.testGetData.bind(this, BX('wc-order'))
+                this.testGetData.bind(this)
             );
 
             BX.bindDelegate(
                 document.body,
                 'submit',
                 BX('wc-order'),
-                this.saveOrderAction.bind(this, BX('wc-order'))
+                this.saveOrderAction.bind(this)
             );
-
-            BX.bind(BX('wc-order'), 'submit', this.saveOrderAction.bind(this));
         });
     }
 
@@ -41,14 +40,17 @@ class WCSaleOrder {
         });
     }
 
-    testGetData(order, e) {
+    testGetData(e) {
         BX.PreventDefault(e);
-
         OrderLoader.showWait();
+
+        let form = BX.findChild(e.currentTarget, {
+            'tag': 'form'
+        }, true, false);
 
         BX.ajax({
             url: '/local/components/wc/order/get.php',
-            data: BX.ajax.prepareForm(order),
+            data: BX.ajax.prepareForm(form),
             method: 'POST',
             dataType: 'html',
             timeout: 30,
@@ -59,7 +61,7 @@ class WCSaleOrder {
             start: true,
             cache: false,
             onsuccess: (data) => {
-                BX('wc-order').innerHTML = data;
+                BX.adjust(this.wcOrder, {html: data});
                 OrderLoader.closeWait();
             },
             onfailure: (data) => {

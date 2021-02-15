@@ -3,12 +3,13 @@
 use Bitrix\Main\Localization\Loc;
 
 ?>
+
 <div style="font-size: 20px; color: red">
     <? foreach ($arResult['ERRORS'] as $error) {
         echo $error;
     } ?>
 </div>
-<form id="wc-order" action="" method="post">
+<form action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
     <table class="person-type">
         <? foreach ($arResult['DATA']['PERSON_TYPES'] as $personType) { ?>
@@ -34,12 +35,44 @@ use Bitrix\Main\Localization\Loc;
                     </label>
                 </td>
                 <td>
-                    <? switch ($arProp['TYPE']) {
-                        case 'LOCATION':
-                        default: ?>
-                            <input id="<?= $property['CODE'] ?>" type="text" name="<?= $property['CODE'] ?>"
+                    <? switch ($property['TYPE']) {
+                        case 'Y/N': ?>
+                            <input type="checkbox" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
                                    value="<?= $property['VALUE'] ?>">
-                        <? } ?>
+                            <? break;
+                        case 'ENUM': ?>
+                            <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
+                                <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                    <option value="<?= $enumCode ?>"
+                                        <?= $property['VALUE'] == $enumCode ? 'selected' : '' ?>>
+                                        <?= $enumName ?>
+                                    </option>
+                                <? } ?>
+                            </select>
+                            <? break;
+                        case 'FILE': ?>
+                            <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
+                            <? break;
+                        case 'DATE':
+                            $APPLICATION->IncludeComponent(
+                                'bitrix:main.calendar',
+                                '',
+                                [
+                                    'SHOW_INPUT' => 'Y',
+                                    'INPUT_NAME' => $property['CODE'],
+                                    'INPUT_VALUE' => $property['VALUE'],
+                                    'SHOW_TIME' => 'Y',
+                                    'HIDE_TIMEBAR' => 'Y',
+                                ]
+                            );
+                            break;
+                        case 'LOCATION':
+                            break;
+                        default: ?>
+                            <input type="text" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
+                                   value="<?= $property['VALUE'] ?>">
+                        <?
+                    } ?>
                 </td>
             </tr>
         <? } ?>

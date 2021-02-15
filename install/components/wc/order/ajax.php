@@ -1,11 +1,12 @@
 <?php
 
 use Bitrix\Main\Loader;
+use WC\Sale\Handlers\OrderHandler;
 
 class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
-    /** @var \WC\Core\Sale\OrderHandler */
-    private $orderHandlerClass = \WC\Core\Sale\OrderHandler::class;
+    /** @var OrderHandler */
+    private $orderHandlerClass = OrderHandler::class;
 
     public function __construct(\Bitrix\Main\Request $request = null)
     {
@@ -28,7 +29,7 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 
     public function saveOrderAction($orderData)
     {
-        /** @var \WC\Core\Sale\OrderHandler $orderHandler */
+        /** @var OrderHandler $orderHandler */
 
         $order = $this->orderHandlerClass::createOrder();
         $orderHandler = new $this->orderHandlerClass($order, $orderData);

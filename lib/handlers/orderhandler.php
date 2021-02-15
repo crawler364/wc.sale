@@ -243,10 +243,6 @@ class OrderHandler
 
     public function processOrder(): Result
     {
-        if (!$this->result->isSuccess()) {
-            return $this->result;
-        }
-
         // todo $this->checkOrderData();
 
         $this->setPersonType();
