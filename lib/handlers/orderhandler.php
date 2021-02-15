@@ -271,7 +271,7 @@ class OrderHandler
         return $this->result;
     }
 
-    public function saveOrder(): \Bitrix\Sale\Result
+    public function saveOrder(): Result
     {
         // todo $this->checkOrderData();
 
@@ -281,7 +281,10 @@ class OrderHandler
         $this->setShipment();
         $this->setPayment();
 
-        return $this->order->save();
+        $result = $this->order->save();
+        $this->result->mergeResult($result);
+
+        return $this->result;
     }
 
     protected function addOrder()

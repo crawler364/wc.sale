@@ -2,6 +2,7 @@
 
 use Bitrix\Main\Loader;
 use WC\Sale\Handlers\OrderHandler;
+use WC\Core\Bitrix\Main\Result;
 
 class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
@@ -30,10 +31,13 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
     public function saveOrderAction($orderData)
     {
         /** @var OrderHandler $orderHandler */
+        $this->result = new Result();
 
         $order = $this->orderHandlerClass::createOrder();
         $orderHandler = new $this->orderHandlerClass($order, $orderData);
-        $data = $orderHandler->saveOrder();
+        $this->result = $orderHandler->saveOrder();
+
+        return $this->result->prepareAjaxJson();
     }
 
     public function testAction($formData)

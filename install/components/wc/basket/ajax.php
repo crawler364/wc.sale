@@ -7,8 +7,8 @@ use Bitrix\Main\Loader;
 
 class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
 {
-    /** @var \WC\Core\Sale\BasketHandler */
-    private $basketHandlerClass = \WC\Core\Sale\BasketHandler::class;
+    /** @var \WC\Sale\Handlers\BasketHandler */
+    private $basketHandlerClass = \WC\Sale\Handlers\BasketHandler::class;
 
     public function __construct(Request $request = null)
     {

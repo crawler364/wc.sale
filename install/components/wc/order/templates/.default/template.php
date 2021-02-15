@@ -1,15 +1,16 @@
 <?php
+if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
+    die();
+}
 
 use Bitrix\Main\Localization\Loc;
-
 ?>
-
 <div style="font-size: 20px; color: red">
     <? foreach ($arResult['ERRORS'] as $error) {
         echo $error;
     } ?>
 </div>
-<form action="" method="post">
+<form id="wc-order-form" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
     <table class="person-type">
         <? foreach ($arResult['DATA']['PERSON_TYPES'] as $personType) { ?>
@@ -40,18 +41,33 @@ use Bitrix\Main\Localization\Loc;
                             <input type="checkbox" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
                                    value="<?= $property['VALUE'] ?>">
                             <? break;
-                        case 'ENUM': ?>
-                            <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
-                                <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
-                                    <option value="<?= $enumCode ?>"
-                                        <?= $property['VALUE'] == $enumCode ? 'selected' : '' ?>>
+                        case 'ENUM':
+                            switch ($property['MULTIELEMENT']) {
+                                case 'Y':
+                                    foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                        <input type="radio" id="<?= $property['CODE'] ?>"
+                                               name="<?= $property['CODE'] ?>" value="<?= $enumCode ?>"
+                                            <?= $property['VALUE'] == $enumCode ? 'checked' : '' ?>>
                                         <?= $enumName ?>
-                                    </option>
-                                <? } ?>
-                            </select>
-                            <? break;
+                                        <br>
+                                    <? }
+                                    break;
+                                case 'N': ?>
+                                    <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
+                                        <?
+                                        foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                            <option value="<?= $enumCode ?>"
+                                                <?= $property['VALUE'] == $enumCode ? 'selected' : '' ?>>
+                                                <?= $enumName ?>
+                                            </option>
+                                            <?
+                                        } ?>
+                                    </select>
+                                    <? break;
+                            }
+                            break;
                         case 'FILE': ?>
-                            <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
+                            <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>" value="" size="9999999">
                             <? break;
                         case 'DATE':
                             $APPLICATION->IncludeComponent(
