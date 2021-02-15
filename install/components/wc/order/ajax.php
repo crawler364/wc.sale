@@ -1,5 +1,6 @@
 <?php
 
+use Bitrix\Main\Context;
 use Bitrix\Main\Loader;
 use WC\Sale\Handlers\OrderHandler;
 use WC\Core\Bitrix\Main\Result;
@@ -28,9 +29,13 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
         ];
     }
 
-    public function saveOrderAction($orderData)
+    public function saveOrderAction(): \Bitrix\Main\Engine\Response\AjaxJson
     {
         /** @var OrderHandler $orderHandler */
+
+        $request = Context::getCurrent()->getRequest();
+        $orderData = $request->toArray();
+        $orderData['FILES'] = $request->getFileList();
         $this->result = new Result();
 
         $order = $this->orderHandlerClass::createOrder();
@@ -38,19 +43,5 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
         $this->result = $orderHandler->saveOrder();
 
         return $this->result->prepareAjaxJson();
-    }
-
-    public function testAction($formData)
-    {
-        global $APPLICATION;
-
-        $APPLICATION->IncludeComponent(
-            "wc:order",
-            ".default",
-            [
-                "COMPONENT_TEMPLATE" => ".default",
-            ],
-            false
-        );
     }
 }

@@ -27,13 +27,11 @@ class WCSaleOrder {
     saveOrderAction(e) {
         BX.PreventDefault(e);
 
-        console.log(BX.ajax.prepareForm(e.target).data);
+        let formData = new FormData(e.target);
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
             mode: 'ajax',
-            data: {
-                orderData: BX.ajax.prepareForm(e.target).data
-            }
+            data: formData,
         }).then((response) => {
             console.log(response);
         }, function (response) {
@@ -49,7 +47,6 @@ class WCSaleOrder {
         let form = BX.findChild(e.currentTarget, {
             'tag': 'form'
         }, true, false);
-
 
         BX.ajax({
             url: '/local/components/wc/order/get.php',

@@ -4,6 +4,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 }
 
 use Bitrix\Main\Localization\Loc;
+
 ?>
 <div style="font-size: 20px; color: red">
     <? foreach ($arResult['ERRORS'] as $error) {
@@ -67,7 +68,7 @@ use Bitrix\Main\Localization\Loc;
                             }
                             break;
                         case 'FILE': ?>
-                            <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>" value="" size="9999999">
+                            <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
                             <? break;
                         case 'DATE':
                             $APPLICATION->IncludeComponent(

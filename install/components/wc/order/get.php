@@ -5,6 +5,17 @@ Bitrix\Main\Loader::includeModule('wc.sale');
 
 ?>
 
+<?php
+$APPLICATION->IncludeComponent(
+    "wc:basket",
+    ".default",
+    [
+        "COMPONENT_TEMPLATE" => ".default",
+        "BASKET_HANDLER_CLASS" => \AF\Handlers\BasketHandler::class,
+    ],
+    false
+); ?>
+<br><br><br>
 <?
 $APPLICATION->IncludeComponent(
     "wc:order",
