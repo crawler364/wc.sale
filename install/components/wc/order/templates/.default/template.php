@@ -85,10 +85,16 @@ use Bitrix\Main\Localization\Loc;
                             break;
                         case 'LOCATION':
                             break;
-                        default: ?>
-                            <input type="text" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
-                                   value="<?= $property['VALUE'] ?>">
-                        <?
+                        default:
+                            if ($property['MULTIPLE']) {
+                                foreach ()
+
+                            } else {
+                                ?>
+                                <input type="text" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
+                                       value="<?= $property['VALUE'] ?>">
+                                <?
+                            }
                     } ?>
                 </td>
             </tr>

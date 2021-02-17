@@ -74,7 +74,7 @@ class OrderHandler
          * @var \Bitrix\Sale\PropertyValue $orderProperty
          */
 
-        $orderPropertyCollection = $this->order->getPropertyCollection();
+        $orderPropertyCollection = $this->order->getRestrictedProperties();
 
         foreach ($orderPropertyCollection as $orderProperty) {
             if ($orderProperty->isUtil()) {
@@ -83,6 +83,7 @@ class OrderHandler
 
             $property = $orderProperty->getProperty();
             $propertyValue = $this->orderData[$property['CODE']] ?? $property['DEFAULT_VALUE'];
+
             $orderProperty->setValue($propertyValue);
         }
     }
@@ -247,8 +248,6 @@ class OrderHandler
 
         $this->setPersonType();
         $personTypes = $this->getPersonTypes();
-        $this->setProperties();
-        $properties = $this->getProperties();
         $this->setBasket();
         $productsList = $this->getProductsList();
 
@@ -256,6 +255,9 @@ class OrderHandler
         $deliveries = $this->getDeliveries();
         $this->setPayment();
         $paySystems = $this->getPaySystems();
+
+        $this->setProperties();
+        $properties = $this->getProperties();
 
         $data = [
             'PERSON_TYPES' => $personTypes,
@@ -276,10 +278,10 @@ class OrderHandler
         // todo $this->checkOrderData();
 
         $this->setPersonType();
-        $this->setProperties();
         $this->setBasket();
         $this->setShipment();
         $this->setPayment();
+        $this->setProperties();
 
         $result = $this->order->save();
         $this->result->mergeResult($result);

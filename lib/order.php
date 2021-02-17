@@ -49,24 +49,4 @@ class Order extends \Bitrix\Sale\Order
 
         return $restrictedProperties;
     }
-
-    protected function checkRelatedProperty($property, $paySystemIdList, $deliveryIdList): bool
-    {
-        $paySystemCheck = null;
-        $deliveryCheck = null;
-
-        if (is_array($property['RELATION']) && !empty($property['RELATION'])) {
-            foreach ($property['RELATION'] as $relation) {
-                if (!$paySystemCheck && $relation['ENTITY_TYPE'] == 'P') {
-                    $paySystemCheck = in_array($relation['ENTITY_ID'], $paySystemIdList, true);
-                }
-
-                if (!$deliveryCheck && $relation['ENTITY_TYPE'] == 'D') {
-                    $deliveryCheck = in_array($relation['ENTITY_ID'], $deliveryIdList, true);
-                }
-            }
-        }
-
-        return ((is_null($paySystemCheck) || $paySystemCheck) && (is_null($deliveryCheck) || $deliveryCheck));
-    }
 }

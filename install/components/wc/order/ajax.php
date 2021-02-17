@@ -32,10 +32,21 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
     public function saveOrderAction(): \Bitrix\Main\Engine\Response\AjaxJson
     {
         /** @var OrderHandler $orderHandler */
+        /** @var \Bitrix\Main\Type\ParameterDictionary $files */
 
         $request = Context::getCurrent()->getRequest();
         $orderData = $request->toArray();
-        $orderData['FILES'] = $request->getFileList();
+
+        $properties = $request->getFileList();
+        foreach ($properties as $propertyCode => $propertyParams) {
+            foreach ($propertyParams as $paramName => $propertyValues){
+                foreach ($propertyValues as $index => $propertyValue){
+                    $orderData[$propertyCode][$index]['ID'] = '';
+                    $orderData[$propertyCode][$index][$paramName] = $propertyValue;
+                }
+            }
+        }
+
         $this->result = new Result();
 
         $order = $this->orderHandlerClass::createOrder();
