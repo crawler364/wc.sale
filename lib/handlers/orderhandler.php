@@ -18,6 +18,7 @@ class OrderHandler
     protected $order;
     /** @var BasketHandler */
     protected $basketHandler = BasketHandler::class;
+    public $propertiesDefaultValue = true;
 
     public function __construct(Order $order, array $orderData = null)
     {
@@ -25,7 +26,7 @@ class OrderHandler
 
         $this->result = new Result();
         $this->order = $order;
-        $this->orderData = $orderData ?? Context::getCurrent()->getRequest()->get('data');
+        $this->orderData = $orderData ?? Context::getCurrent()->getRequest()->toArray();
     }
 
     protected function setPersonType()
@@ -217,7 +218,14 @@ class OrderHandler
             }
 
             $property = $orderProperty->getProperty();
-            $propertyValue = $this->orderData[$property['CODE']] ?? $property['DEFAULT_VALUE'];
+
+            if ($this->orderData[$property['CODE']]) {
+                $propertyValue = $this->orderData[$property['CODE']];
+            } elseif ($property['DEFAULT_VALUE'] && $this->propertiesDefaultValue) {
+                $propertyValue = $property['DEFAULT_VALUE'];
+            } else {
+                $propertyValue = $property['MULTIPLE'] == 'Y' ? [''] : '';
+            }
 
             $orderProperty->setValue($propertyValue);
         }
@@ -329,5 +337,9 @@ class OrderHandler
         $siteId = \WC\Core\Helpers\Main::getSiteId();
 
         return Order::create($siteId, $userId);
+    }
+
+    final public function getFilesPropertiesFromRequest($request)
+    {
     }
 }

@@ -48,18 +48,16 @@ class WCSaleOrder {
             'tag': 'form'
         }, true, false);
 
+        let formData = new FormData(form);
+
         BX.ajax({
             url: '/local/components/wc/order/get.php',
-            data: BX.ajax.prepareForm(form),
+            data: formData,
             method: 'POST',
             dataType: 'html',
             timeout: 30,
-            async: true,
-            processData: true,
-            scriptsRunFirst: true,
-            emulateOnload: true,
-            start: true,
             cache: false,
+            preparePost: false,
             onsuccess: (data) => {
                 BX.adjust(this.wcOrder, {html: data});
                 OrderLoader.closeWait();

@@ -22,6 +22,7 @@ $APPLICATION->IncludeComponent(
     ".default",
     [
         "COMPONENT_TEMPLATE" => ".default",
+        "PROPERTIES_DEFAULT_VALUE" => false,
     ],
     false
 ); ?>

@@ -52,12 +52,11 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
             }
         }
 
-        $this->result = new Result();
-
         $order = $this->orderHandlerClass::createOrder();
         $orderHandler = new $this->orderHandlerClass($order, $orderData);
-        $this->result = $orderHandler->saveOrder();
+        $orderHandler->propertiesDefaultValue = false;
+        $result = $orderHandler->saveOrder();
 
-        return $this->result->prepareAjaxJson();
+        return $result->prepareAjaxJson();
     }
 }

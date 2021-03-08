@@ -15,6 +15,11 @@ class WCSaleOrder extends CBitrixComponent
 
         $order = $orderHandlerClass::createOrder();
         $orderHandler = new $orderHandlerClass($order);
+
+        if (isset($this->arParams['PROPERTIES_DEFAULT_VALUE'])) {
+            $orderHandler->propertiesDefaultValue = $this->arParams['PROPERTIES_DEFAULT_VALUE'];
+        }
+
         $result = $orderHandler->processOrder();
 
         $this->arResult['DATA'] = $result->getData();

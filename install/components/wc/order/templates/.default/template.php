@@ -45,17 +45,17 @@ use Bitrix\Main\Localization\Loc;
                                         <? foreach ($property['VALUE'] as $key => $value) { ?>
                                             <tr>
                                                 <td>
+                                                    <input type="hidden" name="<?= $property['CODE'] . "[$key]" ?>"
+                                                           value="N">
                                                     <label>
-                                                        <input type="hidden" name="<?= $property['CODE'] . "[$key]" ?>"
-                                                               value="N">
                                                         <input type="checkbox"
                                                                name="<?= $property['CODE'] . "[$key]" ?>"
-                                                               value="Y" <?= $property['VALUE'] == 'Y' ? 'checked' : '' ?>>
+                                                               value="Y" <?= $value == 'Y' ? 'checked' : '' ?>>
                                                     </label>
                                                 </td>
                                             </tr>
                                         <? } ?>
-                                        <? // todo add input button
+                                        <? // todo add input button ?
                                         ?>
                                     </table>
                                     <? break;
@@ -71,23 +71,53 @@ use Bitrix\Main\Localization\Loc;
                                 case 'Y':
                                     switch ($property['MULTIPLE']) {
                                         case 'Y': ?>
-
+                                            <table>
+                                                <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                                    <tr>
+                                                        <td>
+                                                            <label>
+                                                                <input type="checkbox" name="<?= $property['CODE'] ?>[]"
+                                                                       value="<?= $enumCode ?>"
+                                                                    <?= in_array($enumCode, $property['VALUE'], true) ? 'checked' : '' ?>>
+                                                                <?= $enumName ?>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                <? } ?>
+                                            </table>
                                             <? break;
                                         case 'N':
-                                            foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
-                                                <input type="radio" id="<?= $property['CODE'] ?>"
-                                                       name="<?= $property['CODE'] ?>" value="<?= $enumCode ?>"
-                                                    <?= $property['VALUE'] == $enumCode ? 'checked' : '' ?>>
-                                                <?= $enumName ?>
-                                                <br>
-                                            <? }
-                                            break;
+                                            ?>
+                                            <table>
+                                                <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                                    <tr>
+                                                        <td>
+                                                            <label>
+                                                                <input type="radio" name="<?= $property['CODE'] ?>"
+                                                                       value="<?= $enumCode ?>"
+                                                                    <?= $property['VALUE'] == $enumCode ? 'checked' : '' ?>>
+                                                                <?= $enumName ?>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                <? } ?>
+                                            </table>
+                                            <? break;
                                     }
                                     break;
                                 case 'N':
                                     switch ($property['MULTIPLE']) {
                                         case 'Y': ?>
-
+                                            <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>[]"
+                                                    multiple>
+                                                <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                                    <option value="<?= $enumCode ?>"
+                                                        <?= in_array($enumCode, $property['VALUE'], true) ? 'selected' : '' ?>>
+                                                        <?= $enumName ?>
+                                                    </option>
+                                                    <?
+                                                } ?>
+                                            </select>
                                             <? break;
                                         case 'N': ?>
                                             <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
