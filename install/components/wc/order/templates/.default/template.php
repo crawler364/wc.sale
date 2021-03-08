@@ -38,62 +38,126 @@ use Bitrix\Main\Localization\Loc;
                 </td>
                 <td>
                     <? switch ($property['TYPE']) {
-                        case 'Y/N': ?>
-                            <input type="checkbox" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
-                                   value="<?= $property['VALUE'] ?>">
-                            <? break;
-                        case 'ENUM':
-                            switch ($property['MULTIELEMENT']) {
-                                case 'Y':
-                                    foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
-                                        <input type="radio" id="<?= $property['CODE'] ?>"
-                                               name="<?= $property['CODE'] ?>" value="<?= $enumCode ?>"
-                                            <?= $property['VALUE'] == $enumCode ? 'checked' : '' ?>>
-                                        <?= $enumName ?>
-                                        <br>
-                                    <? }
-                                    break;
+                        case 'Y/N':
+                            switch ($property['MULTIPLE']) {
+                                case 'Y': ?>
+                                    <table>
+                                        <? foreach ($property['VALUE'] as $key => $value) { ?>
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <input type="hidden" name="<?= $property['CODE'] . "[$key]" ?>"
+                                                               value="N">
+                                                        <input type="checkbox"
+                                                               name="<?= $property['CODE'] . "[$key]" ?>"
+                                                               value="Y" <?= $property['VALUE'] == 'Y' ? 'checked' : '' ?>>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        <? } ?>
+                                        <? // todo add input button
+                                        ?>
+                                    </table>
+                                    <? break;
                                 case 'N': ?>
-                                    <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
-                                        <?
-                                        foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
-                                            <option value="<?= $enumCode ?>"
-                                                <?= $property['VALUE'] == $enumCode ? 'selected' : '' ?>>
-                                                <?= $enumName ?>
-                                            </option>
-                                            <?
-                                        } ?>
-                                    </select>
+                                    <input type="hidden" name="<?= $property['CODE'] ?>" value="N">
+                                    <input type="checkbox" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
+                                           value="Y" <?= $property['VALUE'] == 'Y' ? 'checked' : '' ?>>
                                     <? break;
                             }
                             break;
-                        case 'FILE': ?>
-                            <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
-                            <? break;
+                        case 'ENUM':
+                            switch ($property['MULTIELEMENT']) { // Показывать как список элементов
+                                case 'Y':
+                                    switch ($property['MULTIPLE']) {
+                                        case 'Y': ?>
+
+                                            <? break;
+                                        case 'N':
+                                            foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                                <input type="radio" id="<?= $property['CODE'] ?>"
+                                                       name="<?= $property['CODE'] ?>" value="<?= $enumCode ?>"
+                                                    <?= $property['VALUE'] == $enumCode ? 'checked' : '' ?>>
+                                                <?= $enumName ?>
+                                                <br>
+                                            <? }
+                                            break;
+                                    }
+                                    break;
+                                case 'N':
+                                    switch ($property['MULTIPLE']) {
+                                        case 'Y': ?>
+
+                                            <? break;
+                                        case 'N': ?>
+                                            <select id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
+                                                <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
+                                                    <option value="<?= $enumCode ?>"
+                                                        <?= $property['VALUE'] == $enumCode ? 'selected' : '' ?>>
+                                                        <?= $enumName ?>
+                                                    </option>
+                                                    <?
+                                                } ?>
+                                            </select>
+                                            <? break;
+                                    }
+                                    break;
+                            }
+                            break;
+                        case 'FILE':
+                            switch ($property['MULTIPLE']) {
+                                case 'Y': ?>
+
+                                    <? break;
+                                case 'N': ?>
+                                    <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
+                                    <? break;
+                            }
+                            break;
                         case 'DATE':
-                            $APPLICATION->IncludeComponent(
-                                'bitrix:main.calendar',
-                                '',
-                                [
-                                    'SHOW_INPUT' => 'Y',
-                                    'INPUT_NAME' => $property['CODE'],
-                                    'INPUT_VALUE' => $property['VALUE'],
-                                    'SHOW_TIME' => 'Y',
-                                    'HIDE_TIMEBAR' => 'Y',
-                                ]
-                            );
+                            switch ($property['MULTIPLE']) {
+                                case 'Y': ?>
+
+                                    <? break;
+                                case 'N':
+                                    $APPLICATION->IncludeComponent(
+                                        'bitrix:main.calendar',
+                                        '',
+                                        [
+                                            'SHOW_INPUT' => 'Y',
+                                            'INPUT_NAME' => $property['CODE'],
+                                            'INPUT_VALUE' => $property['VALUE'],
+                                            'SHOW_TIME' => 'Y',
+                                            'HIDE_TIMEBAR' => 'Y',
+                                        ]
+                                    );
+                                    break;
+                            }
                             break;
                         case 'LOCATION':
                             break;
                         default:
-                            if ($property['MULTIPLE']) {
-                                foreach ()
-
-                            } else {
-                                ?>
-                                <input type="text" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
-                                       value="<?= $property['VALUE'] ?>">
-                                <?
+                            switch ($property['MULTIPLE']) {
+                                case 'Y': ?>
+                                    <table>
+                                        <? foreach ($property['VALUE'] as $key => $value) { ?>
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <input type="text" name="<?= $property['CODE'] . "[$key]" ?>"
+                                                               value="<?= $value ?>">
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        <? } ?>
+                                        <? // todo add input button
+                                        ?>
+                                    </table>
+                                    <? break;
+                                case 'N': ?>
+                                    <input type="text" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>"
+                                           value="<?= $property['VALUE'] ?>">
+                                    <? break;
                             }
                     } ?>
                 </td>

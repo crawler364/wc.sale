@@ -67,46 +67,6 @@ class OrderHandler
         return $personTypes;
     }
 
-    protected function setProperties()
-    {
-        /**
-         * @var \Bitrix\Sale\PropertyValueCollection $orderPropertyCollection
-         * @var \Bitrix\Sale\PropertyValue $orderProperty
-         */
-
-        $orderPropertyCollection = $this->order->getRestrictedProperties();
-
-        foreach ($orderPropertyCollection as $orderProperty) {
-            if ($orderProperty->isUtil()) {
-                continue;
-            }
-
-            $property = $orderProperty->getProperty();
-            $propertyValue = $this->orderData[$property['CODE']] ?? $property['DEFAULT_VALUE'];
-
-            $orderProperty->setValue($propertyValue);
-        }
-    }
-
-    protected function getProperties(): array
-    {
-        /**
-         * @var array $orderProperties
-         * @var \Bitrix\Sale\PropertyValue $orderProperty
-         */
-
-        $orderProperties = $this->order->getRestrictedProperties();
-        $properties = [];
-
-        foreach ($orderProperties as $orderProperty) {
-            $property = $orderProperty->getProperty();
-            $property['VALUE'] = $orderProperty->getValue();
-            $properties[] = $property;
-        }
-
-        return $properties;
-    }
-
     protected function setBasket()
     {
         $basket = $this->basketHandler::getBasket($this->order->getUserId());
@@ -240,6 +200,46 @@ class OrderHandler
         }
 
         return $paySystems;
+    }
+
+    protected function setProperties()
+    {
+        /**
+         * @var \Bitrix\Sale\PropertyValueCollection $orderPropertyCollection
+         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         */
+
+        $orderPropertyCollection = $this->order->getRestrictedProperties();
+
+        foreach ($orderPropertyCollection as $orderProperty) {
+            if ($orderProperty->isUtil()) {
+                continue;
+            }
+
+            $property = $orderProperty->getProperty();
+            $propertyValue = $this->orderData[$property['CODE']] ?? $property['DEFAULT_VALUE'];
+
+            $orderProperty->setValue($propertyValue);
+        }
+    }
+
+    protected function getProperties(): array
+    {
+        /**
+         * @var array $orderProperties
+         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         */
+
+        $orderProperties = $this->order->getRestrictedProperties();
+        $properties = [];
+
+        foreach ($orderProperties as $orderProperty) {
+            $property = $orderProperty->getProperty();
+            $property['VALUE'] = $orderProperty->getValue();
+            $properties[] = $property;
+        }
+
+        return $properties;
     }
 
     public function processOrder(): Result

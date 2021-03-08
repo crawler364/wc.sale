@@ -39,10 +39,15 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 
         $properties = $request->getFileList();
         foreach ($properties as $propertyCode => $propertyParams) {
-            foreach ($propertyParams as $paramName => $propertyValues){
-                foreach ($propertyValues as $index => $propertyValue){
+            foreach ($propertyParams as $paramName => $propertyValues) {
+                if (is_array($propertyValues)) {
+                    foreach ($propertyValues as $index => $propertyValue) {
+                        $orderData[$propertyCode][$index]['ID'] = '';
+                        $orderData[$propertyCode][$index][$paramName] = $propertyValue;
+                    }
+                } else {
                     $orderData[$propertyCode][$index]['ID'] = '';
-                    $orderData[$propertyCode][$index][$paramName] = $propertyValue;
+                    $orderData[$propertyCode][$index][$paramName] = $propertyValues;
                 }
             }
         }
