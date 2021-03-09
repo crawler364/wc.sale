@@ -9,6 +9,7 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
     /** @var OrderHandler */
     private $orderHandlerClass = OrderHandler::class;
+    private $propertiesDefaultValue = false;
 
     public function __construct(\Bitrix\Main\Request $request = null)
     {
@@ -21,9 +22,6 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
     {
         return [
             'saveOrder' => [
-                'prefilters' => [], 'postfilters' => [],
-            ],
-            'test' => [
                 'prefilters' => [], 'postfilters' => [],
             ],
         ];
@@ -54,7 +52,7 @@ class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 
         $order = $this->orderHandlerClass::createOrder();
         $orderHandler = new $this->orderHandlerClass($order, $orderData);
-        $orderHandler->propertiesDefaultValue = false;
+        $orderHandler->propertiesDefaultValue = $this->propertiesDefaultValue;
         $result = $orderHandler->saveOrder();
 
         return $result->prepareAjaxJson();

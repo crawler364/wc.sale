@@ -27,6 +27,36 @@ use Bitrix\Main\Localization\Loc;
         <? } ?>
     </table>
 
+    <h2><?= Loc::getMessage('WC_ORDER_DELIVERIES_TITLE') ?></h2>
+    <table>
+        <? foreach ($arResult['DATA']['DELIVERIES'] as $delivery) { ?>
+            <tr>
+                <td>
+                    <label>
+                        <input type="radio" name="DELIVERY_ID" value="<?= $delivery['ID'] ?>"
+                            <?= $delivery['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
+                        <?= $delivery['NAME'] ?>
+                    </label>
+                </td>
+            </tr>
+        <? } ?>
+    </table>
+
+    <h2><?= Loc::getMessage('WC_ORDER_PAY_SYSTEMS_TITLE') ?>:</h2>
+    <table>
+        <? foreach ($arResult['DATA']['PAY_SYSTEMS'] as $paySystem) { ?>
+            <tr>
+                <td>
+                    <label>
+                        <input type="radio" name="PAY_SYSTEM_ID" value="<?= $paySystem['ID'] ?>"
+                            <?= $paySystem['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
+                        <?= $paySystem['NAME'] ?>
+                    </label>
+                </td>
+            </tr>
+        <? } ?>
+    </table>
+
     <h2><?= Loc::getMessage('WC_ORDER_PROPERTIES_TITLE') ?></h2>
     <table>
         <? foreach ($arResult['DATA']['PROPERTIES'] as $property) { ?>
@@ -55,8 +85,7 @@ use Bitrix\Main\Localization\Loc;
                                                 </td>
                                             </tr>
                                         <? } ?>
-                                        <? // todo add input button ?
-                                        ?>
+                                        <? // todo add input button ? ?>
                                     </table>
                                     <? break;
                                 case 'N': ?>
@@ -86,8 +115,7 @@ use Bitrix\Main\Localization\Loc;
                                                 <? } ?>
                                             </table>
                                             <? break;
-                                        case 'N':
-                                            ?>
+                                        case 'N': ?>
                                             <table>
                                                 <? foreach ($property['OPTIONS'] as $enumCode => $enumName) { ?>
                                                     <tr>
@@ -137,7 +165,18 @@ use Bitrix\Main\Localization\Loc;
                         case 'FILE':
                             switch ($property['MULTIPLE']) {
                                 case 'Y': ?>
-
+                                    <table>
+                                        <? foreach ($property['VALUE'] as $key => $value) { ?>
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <input type="file" name="<?= $property['CODE'] ?>[]">
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        <? } ?>
+                                    </table>
+                                    <? // todo add input button ?>
                                     <? break;
                                 case 'N': ?>
                                     <input type="file" id="<?= $property['CODE'] ?>" name="<?= $property['CODE'] ?>">
@@ -147,7 +186,28 @@ use Bitrix\Main\Localization\Loc;
                         case 'DATE':
                             switch ($property['MULTIPLE']) {
                                 case 'Y': ?>
-
+                                    <table>
+                                        <? foreach ($property['VALUE'] as $key => $value) { ?>
+                                            <tr>
+                                                <td>
+                                                    <label>
+                                                        <? $APPLICATION->IncludeComponent(
+                                                            'bitrix:main.calendar',
+                                                            '',
+                                                            [
+                                                                'SHOW_INPUT' => 'Y',
+                                                                'INPUT_NAME' => "{$property['CODE']}[$key]",
+                                                                'INPUT_VALUE' => $value,
+                                                                'SHOW_TIME' => 'Y',
+                                                                'HIDE_TIMEBAR' => 'Y',
+                                                            ]
+                                                        ); ?>
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        <? } ?>
+                                        <? // todo add input button ?>
+                                    </table>
                                     <? break;
                                 case 'N':
                                     $APPLICATION->IncludeComponent(
@@ -180,8 +240,7 @@ use Bitrix\Main\Localization\Loc;
                                                 </td>
                                             </tr>
                                         <? } ?>
-                                        <? // todo add input button
-                                        ?>
+                                        <? // todo add input button ?>
                                     </table>
                                     <? break;
                                 case 'N': ?>
@@ -190,36 +249,6 @@ use Bitrix\Main\Localization\Loc;
                                     <? break;
                             }
                     } ?>
-                </td>
-            </tr>
-        <? } ?>
-    </table>
-
-    <h2><?= Loc::getMessage('WC_ORDER_DELIVERIES_TITLE') ?></h2>
-    <table>
-        <? foreach ($arResult['DATA']['DELIVERIES'] as $delivery) { ?>
-            <tr>
-                <td>
-                    <label>
-                        <input type="radio" name="DELIVERY_ID" value="<?= $delivery['ID'] ?>"
-                            <?= $delivery['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
-                        <?= $delivery['NAME'] ?>
-                    </label>
-                </td>
-            </tr>
-        <? } ?>
-    </table>
-
-    <h2><?= Loc::getMessage('WC_ORDER_PAY_SYSTEMS_TITLE') ?>:</h2>
-    <table>
-        <? foreach ($arResult['DATA']['PAY_SYSTEMS'] as $paySystem) { ?>
-            <tr>
-                <td>
-                    <label>
-                        <input type="radio" name="PAY_SYSTEM_ID" value="<?= $paySystem['ID'] ?>"
-                            <?= $paySystem['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
-                        <?= $paySystem['NAME'] ?>
-                    </label>
                 </td>
             </tr>
         <? } ?>
