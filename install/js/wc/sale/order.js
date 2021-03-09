@@ -17,6 +17,16 @@ class WCSaleOrder {
 
             BX.bindDelegate(
                 this.wcOrder,
+                'blur',
+                {
+                    'tag': 'input',
+                    'attribute': {'NAME': 'PLACE'}
+                },
+                this.testGetData.bind(this)
+            );
+
+            BX.bindDelegate(
+                this.wcOrder,
                 'submit',
                 BX('wc-order-form'),
                 this.saveOrderAction.bind(this)
@@ -41,9 +51,11 @@ class WCSaleOrder {
     }
 
     testGetData(e) {
+
+        console.log(e.currentTarget);
+
         BX.PreventDefault(e);
         OrderLoader.showWait();
-
         let form = BX.findChild(e.currentTarget, {
             'tag': 'form'
         }, true, false);

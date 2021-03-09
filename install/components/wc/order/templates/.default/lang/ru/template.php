@@ -1,4 +1,5 @@
 <?php
+$MESS['WC_ORDER_LOCATION'] = 'Местоположение';
 $MESS['WC_ORDER_PERSON_TYPE'] = 'Тип плательщика';
 $MESS['WC_ORDER_PROPERTIES_TITLE'] = 'Свойства заказа';
 $MESS['WC_ORDER_SUBMIT_BUTTON'] = 'Оформить заказ';

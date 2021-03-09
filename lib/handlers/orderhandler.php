@@ -80,6 +80,55 @@ class OrderHandler
         return $basket->getItemsList();
     }
 
+    protected function setLocation()
+    {
+        /**
+         * @var array $orderPropertyCollection
+         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         */
+
+        $orderPropertyCollection = $this->order->getRestrictedProperties();
+
+        foreach ($orderPropertyCollection as $orderProperty) {
+            if ($orderProperty->getType() == 'LOCATION') {
+                $property = $orderProperty->getProperty();
+
+                if ($this->orderData[$property['CODE']]) {
+                    $propertyValue = $this->orderData[$property['CODE']];
+                } elseif ($property['DEFAULT_VALUE'] && $this->propertiesDefaultValue) {
+                    $propertyValue = $property['DEFAULT_VALUE'];
+                } else {
+                    $propertyValue = '';
+                }
+                
+                $orderProperty->setValue($propertyValue);
+                break;
+            }
+        }
+    }
+
+    protected function getLocation(): array
+    {
+        /**
+         * @var array $orderProperties
+         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         */
+
+        //todo ->getDeliveryLocation();
+        $orderProperties = $this->order->getRestrictedProperties();
+        $property = [];
+
+        foreach ($orderProperties as $orderProperty) {
+            if ($orderProperty->getType() == 'LOCATION') {
+                $property = $orderProperty->getProperty();
+                $property['VALUE'] = $orderProperty->getValue();
+                break;
+            }
+        }
+
+        return $property;
+    }
+
     protected function setShipment()
     {
         /**
@@ -206,14 +255,14 @@ class OrderHandler
     protected function setProperties()
     {
         /**
-         * @var \Bitrix\Sale\PropertyValueCollection $orderPropertyCollection
+         * @var array $orderPropertyCollection
          * @var \Bitrix\Sale\PropertyValue $orderProperty
          */
 
         $orderPropertyCollection = $this->order->getRestrictedProperties();
 
         foreach ($orderPropertyCollection as $orderProperty) {
-            if ($orderProperty->isUtil()) {
+            if ($orderProperty->isUtil() || $orderProperty->getType() == 'LOCATION') {
                 continue;
             }
 
@@ -242,6 +291,10 @@ class OrderHandler
         $properties = [];
 
         foreach ($orderProperties as $orderProperty) {
+            if ($orderProperty->isUtil() || $orderProperty->getType() == 'LOCATION') {
+                continue;
+            }
+
             $property = $orderProperty->getProperty();
             $property['VALUE'] = $orderProperty->getValue();
             $properties[] = $property;
@@ -259,6 +312,8 @@ class OrderHandler
         $this->setBasket();
         $productsList = $this->getProductsList();
 
+        $this->setLocation();
+        $location = $this->getLocation();
         $this->setShipment();
         $deliveries = $this->getDeliveries();
         $this->setPayment();
@@ -268,6 +323,7 @@ class OrderHandler
         $properties = $this->getProperties();
 
         $data = [
+            'LOCATION' => $location,
             'PERSON_TYPES' => $personTypes,
             'PROPERTIES' => $properties,
             'DELIVERIES' => $deliveries,
@@ -287,6 +343,7 @@ class OrderHandler
 
         $this->setPersonType();
         $this->setBasket();
+        $this->setLocation();
         $this->setShipment();
         $this->setPayment();
         $this->setProperties();

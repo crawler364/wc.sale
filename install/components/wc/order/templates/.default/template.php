@@ -12,6 +12,31 @@ use Bitrix\Main\Localization\Loc;
     } ?>
 </div>
 <form id="wc-order-form" action="" method="post">
+    <h2 data-action-refresh><?= Loc::getMessage('WC_ORDER_LOCATION') ?></h2>
+    <div data-location>
+        <label for="<?= $arResult['DATA']['LOCATION']['CODE'] ?>"></label>
+        <? $APPLICATION->IncludeComponent(
+            "bitrix:sale.location.selector.search",
+            "",
+            [
+                "COMPONENT_TEMPLATE" => ".default",
+                "ID" => "",
+                "CODE" => $arResult['DATA']['LOCATION']['VALUE'],
+                "INPUT_NAME" => $arResult['DATA']['LOCATION']['CODE'],
+                "PROVIDE_LINK_BY" => "code",
+                "JSCONTROL_GLOBAL_ID" => "",
+                "JS_CALLBACK" => "",
+                "FILTER_BY_SITE" => "Y",
+                "SHOW_DEFAULT_LOCATIONS" => "Y",
+                "CACHE_TYPE" => "A",
+                "CACHE_TIME" => "36000000",
+                "FILTER_SITE_ID" => "s1",
+                "INITIALIZE_BY_GLOBAL_EVENT" => "",
+                "SUPPRESS_ERRORS" => "N",
+            ]
+        ); ?>
+    </div>
+
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
     <table class="person-type">
         <? foreach ($arResult['DATA']['PERSON_TYPES'] as $personType) { ?>
@@ -223,8 +248,6 @@ use Bitrix\Main\Localization\Loc;
                                     );
                                     break;
                             }
-                            break;
-                        case 'LOCATION':
                             break;
                         default:
                             switch ($property['MULTIPLE']) {
