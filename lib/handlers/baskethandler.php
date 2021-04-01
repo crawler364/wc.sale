@@ -4,9 +4,14 @@
 namespace WC\Sale\Handlers;
 
 
+use Bitrix\Catalog\ProductTable;
+use Bitrix\Main\ArgumentTypeException;
+use Bitrix\Catalog\Product\CatalogProvider;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
+use WC\Core\Helpers\Main;
 use WC\Sale\BasketItem;
 use WC\Sale\Basket;
 
@@ -16,8 +21,8 @@ class BasketHandler
     protected $basketItem;
     /** @var Basket */
     protected $basket;
-    /** @var \CCatalogProductProvider */
-    protected $productProvider = \CCatalogProductProvider::class;
+    /** @var CatalogProvider */
+    protected $productProvider = CatalogProvider::class;
 
     public function __construct($object)
     {
@@ -30,13 +35,13 @@ class BasketHandler
         } elseif ($object instanceof Basket) {
             $this->basket = $object;
         } else {
-            throw new \Bitrix\Main\ArgumentTypeException($object);
+            throw new ArgumentTypeException($object);
         }
     }
 
     public function processBasketItem($action, $quantity = null): Result
     {
-        if ($action != 'set') {
+        if ($action !== 'set') {
             $quantity = $this->basketItem->mathQuantity($action);
         }
 
@@ -65,15 +70,15 @@ class BasketHandler
 
         if ($this->result->isSuccess()) {
             $this->result->setData([
-                'ITEM' => $this->basketItem->getInfo(),
-                'BASKET_DATA' => $this->basket->getData(),
+                'BASKET_ITEM' => $this->basketItem->getInfo(),
+                'BASKET' => $this->basket->getData(),
             ]);
         }
 
         return $this->result;
     }
 
-    protected function addBasketItemFields()
+    protected function addBasketItemFields(): void
     {
         $this->basketItem->setField('PRODUCT_PROVIDER_CLASS', $this->productProvider);
 
@@ -87,22 +92,18 @@ class BasketHandler
         $this->basketItem->setPropertyArticle();
     }
 
-    protected function updateBasketItemFields()
+    protected function updateBasketItemFields(): void
     {
         $this->basketItem->setField('QUANTITY', $this->quantity);
     }
 
-    /**
-     * @param $productId
-     * @param Basket|null $basket
-     * @return BasketItem|null
-     */
     public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
     {
         Loader::includeModule('catalog');
+
         $basket = $basket ?: self::getBasket();
         if (!$basketItem = $basket->getItemBy(['PRODUCT_ID' => $productId])) {
-            if (\Bitrix\Catalog\ProductTable::getById($productId)->fetch()) {
+            if (ProductTable::getById($productId)->fetch()) {
                 $basketItem = $basket->createItem('catalog', $productId);
             }
         }
@@ -113,13 +114,14 @@ class BasketHandler
     public static function getBasket(int $userId = null): Basket
     {
         if ($userId) {
-            $fUserId = \Bitrix\Sale\Fuser::getIdByUserId($userId);
+            $fUserId = Fuser::getIdByUserId($userId);
         } else {
-            $fUserId = \Bitrix\Sale\Fuser::getId();
+            $fUserId = Fuser::getId();
         }
 
-        $siteId = \WC\Core\Helpers\Main::getSiteId();
+        $siteId = Main::getSiteId();
 
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return Basket::loadItemsForFUser($fUserId, $siteId);
     }
 }

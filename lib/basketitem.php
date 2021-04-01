@@ -4,6 +4,7 @@
 namespace WC\Sale;
 
 
+use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 
@@ -11,35 +12,27 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 {
     public function getInfo(): array
     {
-        Loader::includeModule('iblock');
+        $info = $this->getFieldValues();
 
-        $productId = $this->getProductId();
-
-        $info['ELEMENT'] = static::getIblockElementInfo($productId);
-
-        $info['PRODUCT_ID'] = (string)$productId;
-        $info['NAME'] = (string)$this->getField('NAME');
-        $info['WEIGHT'] = (string)$this->getWeight();
-        $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
-        $info['QUANTITY'] = (string)$this->getQuantity();
-        $info['MEASURE_NAME'] = (string)$this->getField('MEASURE_NAME');
-        $info['PRICE'] = (string)$this->getPrice();
-        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE']);
+        $info['QUANTITY'] = $this->getQuantity();
         $info['PRICE_SUM'] = (string)($info['QUANTITY'] * $info['PRICE']);
-        $info['PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_SUM']);
-        $info['PRICE_BASE'] = (string)$this->getField('BASE_PRICE');
-        $info['PRICE_BASE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_BASE']);
-        $info['PRICE_BASE_SUM'] = (string)($info['PRICE_BASE'] * $info['QUANTITY']);
-        $info['PRICE_BASE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_BASE_SUM']);
-        $info['DISCOUNT'] = (string)$this->getDiscountPrice();
-        $info['DISCOUNT_PERCENT'] = $this->getField('DISCOUNT_VALUE');
-        $info['DISCOUNT_SUM'] = (string)($info['DISCOUNT'] * $info['QUANTITY']);
-        $info['DISCOUNT_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT_SUM']);
+        $info['BASE_PRICE_SUM'] = (string)($info['BASE_PRICE'] * $info['QUANTITY']);
+        $info['DISCOUNT_PRICE_SUM'] = (string)($info['DISCOUNT_PRICE'] * $info['QUANTITY']); // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
+
+        $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
+        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE'], $info['CURRENCY']);
+        $info['PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_SUM'], $info['CURRENCY']);
+        $info['BASE_PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['BASE_PRICE'], $info['CURRENCY']);
+        $info['BASE_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['BASE_PRICE_SUM'], $info['CURRENCY']);
+        $info['DISCOUNT_PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT_PRICE'], $info['CURRENCY']);
+        $info['DISCOUNT_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
+
+        $info['ELEMENT'] = static::getIblockElementInfo($info['PRODUCT_ID']);
 
         return $info;
     }
 
-    public function setProperty($name, $code, $value)
+    public function setProperty($name, $code, $value): void
     {
         $propertyCollection = $this->getPropertyCollection();
         if (!$propertyCollection->getItemByIndex($code)) { // todo исправить, так работать не будет. Настройка свойств для добавления в корзину
@@ -52,7 +45,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         }
     }
 
-    public function setPriceName()
+    public function setPriceName(): void
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
         $priceTypeId = $this->getField('PRICE_TYPE_ID');
@@ -62,7 +55,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $this->setField('NOTES', serialize($notes));
     }
 
-    public function setPropertyArticle()
+    public function setPropertyArticle(): void
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
         $this->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
@@ -78,6 +71,8 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 
     public static function getIblockElementInfo($productId): array
     {
+        Loader::includeModule('iblock');
+
         // todo
         return [];
     }
@@ -85,6 +80,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     /**
      * @param string $action
      * @return float|int
+     * @throws ArgumentNullException
      */
     public function mathQuantity(string $action)
     {
@@ -110,6 +106,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     /**
      * @param float|int $quantity
      * @return float|int
+     * @throws ArgumentNullException
      */
     public function checkQuantity($quantity)
     {

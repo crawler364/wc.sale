@@ -4,11 +4,12 @@ use Bitrix\Main\Engine\Response\AjaxJson;
 use Bitrix\Main\Request;
 use WC\Core\Bitrix\Main\Result;
 use Bitrix\Main\Loader;
+use WC\Sale\Handlers\BasketHandler;
 
 class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
 {
-    /** @var \WC\Sale\Handlers\BasketHandler */
-    private $basketHandlerClass = \WC\Sale\Handlers\BasketHandler::class;
+    /** @var BasketHandler */
+    private $basketHandlerClass = BasketHandler::class;
 
     public function __construct(Request $request = null)
     {
@@ -28,26 +29,18 @@ class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
 
     public function processAction(string $basketAction, array $product, $basketHandlerClass = null): AjaxJson
     {
-        $this->result = new Result();
+        $result = new Result();
 
         $basketHandlerClass = $basketHandlerClass ?: $this->basketHandlerClass;
 
         if (!$basketItem = $basketHandlerClass::getBasketItem($product['id'])) {
-            $this->result->addError('WC_UNDEFINED_PRODUCT');
+            $result->addError('WC_UNDEFINED_PRODUCT');
         } else {
             $basketHandler = new $basketHandlerClass($basketItem);
             $basketHandler->processBasketItem($basketAction, $product['quantity']);
-            $this->result = $basketHandler->saveBasket();
+            $result = $basketHandler->saveBasket();
         }
 
-        if ($this->result->isSuccess()) {
-            $basket = $basketHandlerClass::getBasket();
-            $this->result->setData([
-                'BASKET_ITEM' => $basketItem->getInfo(),
-                'BASKET' => $basket->getData(),
-            ]);
-        }
-
-        return $this->result->prepareAjaxJson();
+        return $result->prepareAjaxJson();
     }
 }
