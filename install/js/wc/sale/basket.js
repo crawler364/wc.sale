@@ -7,18 +7,13 @@ class WCSaleBasket {
         BX.ready(() => {
             BX.bindDelegate(
                 document.body, 'change',
-                {
-                    tag: 'input',
-                    attribute: 'data-action-basket-item'
-                },
+                {tag: 'input', attribute: 'data-action-basket-item'},
                 this.processAction.bind(this)
             );
 
             BX.bindDelegate(
                 document.body, 'click',
-                {
-                    attribute: 'data-action-basket-item'
-                },
+                {attribute: 'data-action-basket-item'},
                 this.processAction.bind(this)
             );
         });
@@ -122,22 +117,22 @@ class WCSaleBasket {
     setBasketContainersDom(basketContainersDom, basket) {
         basketContainersDom.forEach((basketContainerDom) => {
             if (basketContainerDom.nodes.weight) {
-                BX.adjust(basketContainerDom.nodes.weight, {text: basket.info.weightFormatted});
+                BX.adjust(basketContainerDom.nodes.weight, {html: basket.info.weightFormatted});
             }
             if (basketContainerDom.nodes.count) {
-                BX.adjust(basketContainerDom.nodes.count, {text: basket.info.count});
+                BX.adjust(basketContainerDom.nodes.count, {html: basket.info.count});
             }
             if (basketContainerDom.nodes.vat) {
-                BX.adjust(basketContainerDom.nodes.vat, {text: basket.info.vatFormatted});
+                BX.adjust(basketContainerDom.nodes.vat, {html: basket.info.vatFormatted});
             }
             if (basketContainerDom.nodes.priceBase) {
-                BX.adjust(basketContainerDom.nodes.priceBase, {text: basket.info.priceBaseFormatted});
+                BX.adjust(basketContainerDom.nodes.priceBase, {html: basket.info.priceBaseFormatted});
             }
             if (basketContainerDom.nodes.discount) {
-                BX.adjust(basketContainerDom.nodes.discount, {text: basket.info.discountFormatted});
+                BX.adjust(basketContainerDom.nodes.discount, {html: basket.info.discountFormatted});
             }
             if (basketContainerDom.nodes.price) {
-                BX.adjust(basketContainerDom.nodes.price, {text: basket.info.priceFormatted});
+                BX.adjust(basketContainerDom.nodes.price, {html: basket.info.priceFormatted});
             }
         });
     }
@@ -148,13 +143,13 @@ class WCSaleBasket {
                 basketItemContainerDom.nodes.input.value = basketItem.quantity;
             }
             if (basketItemContainerDom.nodes.priceSum) {
-                BX.adjust(basketItemContainerDom.nodes.priceSum, {text: basketItem.priceSumFormatted});
+                BX.adjust(basketItemContainerDom.nodes.priceSum, {html: basketItem.priceSumFormatted});
             }
             if (basketItemContainerDom.nodes.priceBaseSum) {
-                BX.adjust(basketItemContainerDom.nodes.priceBaseSum, {text: basketItem.priceBaseSumFormatted});
+                BX.adjust(basketItemContainerDom.nodes.priceBaseSum, {html: basketItem.priceBaseSumFormatted});
             }
             if (basketItemContainerDom.nodes.discountSum) {
-                BX.adjust(basketItemContainerDom.nodes.discountSum, {text: basketItem.discountSumFormatted});
+                BX.adjust(basketItemContainerDom.nodes.discountSum, {html: basketItem.discountSumFormatted});
             }
         });
     }
