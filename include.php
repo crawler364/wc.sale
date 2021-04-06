@@ -3,11 +3,11 @@
 use Bitrix\Main\Loader;
 
 Loader::includeModule('sale');
-Loader::includeModule('wc.core');
-
-WC\Core\Helpers\Sale::setRegistry(WC\Sale\Basket::class, 'ENTITY_BASKET');
-WC\Core\Helpers\Sale::setRegistry(WC\Sale\BasketItem::class, 'ENTITY_BASKET_ITEM');
-WC\Core\Helpers\Sale::setRegistry(WC\Sale\Order::class, 'ENTITY_ORDER');
+if (Loader::includeModule('wc.core')){
+    WC\Core\Helpers\Sale::setRegistry(WC\Sale\Basket::class, 'ENTITY_BASKET');
+    WC\Core\Helpers\Sale::setRegistry(WC\Sale\BasketItem::class, 'ENTITY_BASKET_ITEM');
+    WC\Core\Helpers\Sale::setRegistry(WC\Sale\Order::class, 'ENTITY_ORDER');
+}
 
 $kernelDir = Bitrix\Main\IO\Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
 
