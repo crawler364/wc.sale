@@ -4,9 +4,11 @@
 namespace WC\Sale;
 
 
+use Bitrix\Catalog\GroupTable;
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
+use WC\Core\Helpers\Catalog;
 
 class BasketItem extends \Bitrix\Sale\BasketItem
 {
@@ -19,13 +21,13 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $info['BASE_PRICE_SUM'] = (string)($info['BASE_PRICE'] * $info['QUANTITY']);
         $info['DISCOUNT_PRICE_SUM'] = (string)($info['DISCOUNT_PRICE'] * $info['QUANTITY']); // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
 
-        $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
-        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['PRICE'], $info['CURRENCY']);
-        $info['PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['PRICE_SUM'], $info['CURRENCY']);
-        $info['BASE_PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['BASE_PRICE'], $info['CURRENCY']);
-        $info['BASE_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['BASE_PRICE_SUM'], $info['CURRENCY']);
-        $info['DISCOUNT_PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['DISCOUNT_PRICE'], $info['CURRENCY']);
-        $info['DISCOUNT_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
+        $info['WEIGHT_FORMATTED'] = Catalog::formatWeight($info['WEIGHT']);
+        $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE'], $info['CURRENCY']);
+        $info['PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['PRICE_SUM'], $info['CURRENCY']);
+        $info['BASE_PRICE_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE'], $info['CURRENCY']);
+        $info['BASE_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE_SUM'], $info['CURRENCY']);
+        $info['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE'], $info['CURRENCY']);
+        $info['DISCOUNT_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
 
         $info['ELEMENT'] = static::getIblockElementInfo($info['PRODUCT_ID']);
 
@@ -49,7 +51,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
         $priceTypeId = $this->getField('PRICE_TYPE_ID');
-        $price = $priceTypeId ? \Bitrix\Catalog\GroupTable::getById($priceTypeId)->fetch() : null;
+        $price = $priceTypeId ? GroupTable::getById($priceTypeId)->fetch() : null;
         $notes['PRICE_NAME'] = $price['NAME'];
 
         $this->setField('NOTES', serialize($notes));
@@ -84,7 +86,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
      */
     public function mathQuantity(string $action)
     {
-        $ratio = \WC\Core\Helpers\Catalog::getProductRatio($this->getProductId());
+        $ratio = Catalog::getProductRatio($this->getProductId());
 
         $quantity = $this->getQuantity() ?: 0;
 
@@ -110,7 +112,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
      */
     public function checkQuantity($quantity)
     {
-        $ratio = \WC\Core\Helpers\Catalog::getProductRatio($this->getProductId());
+        $ratio = Catalog::getProductRatio($this->getProductId());
 
         // todo Проверить остатки, установить количество по остаткам
 

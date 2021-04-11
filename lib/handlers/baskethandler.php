@@ -23,6 +23,8 @@ class BasketHandler
     protected $basket;
     /** @var CatalogProvider */
     protected $productProvider = CatalogProvider::class;
+    private Result $result;
+    private $quantity;
 
     public function __construct($object)
     {
@@ -48,7 +50,7 @@ class BasketHandler
         $this->quantity = $this->basketItem->checkQuantity($quantity);
 
         if ($this->quantity > 0) {
-            if ($this->basketItem->getId() == null) {
+            if ($this->basketItem->getId() === null) {
                 $this->addBasketItemFields();
             } else {
                 $this->updateBasketItemFields();
