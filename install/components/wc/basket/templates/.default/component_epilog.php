@@ -1,4 +1,7 @@
 <?php
+if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
+    die();
+}
 
 if (!defined('WC_SALE_BASKET_DOM_HANDLER')) {
     define('WC_SALE_BASKET_DOM_HANDLER', TRUE);

@@ -20,12 +20,12 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $info['DISCOUNT_PRICE_SUM'] = (string)($info['DISCOUNT_PRICE'] * $info['QUANTITY']); // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
 
         $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
-        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE'], $info['CURRENCY']);
-        $info['PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['PRICE_SUM'], $info['CURRENCY']);
-        $info['BASE_PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['BASE_PRICE'], $info['CURRENCY']);
-        $info['BASE_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['BASE_PRICE_SUM'], $info['CURRENCY']);
-        $info['DISCOUNT_PRICE_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT_PRICE'], $info['CURRENCY']);
-        $info['DISCOUNT_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Currency::format($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
+        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['PRICE'], $info['CURRENCY']);
+        $info['PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['PRICE_SUM'], $info['CURRENCY']);
+        $info['BASE_PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['BASE_PRICE'], $info['CURRENCY']);
+        $info['BASE_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['BASE_PRICE_SUM'], $info['CURRENCY']);
+        $info['DISCOUNT_PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['DISCOUNT_PRICE'], $info['CURRENCY']);
+        $info['DISCOUNT_PRICE_SUM_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
 
         $info['ELEMENT'] = static::getIblockElementInfo($info['PRODUCT_ID']);
 
