@@ -31,8 +31,8 @@ use \Bitrix\Main\Localization\Loc;
             <td><?= $item['ELEMENT']['PROPERTY_ARTICLE_VALUE'] ?></td>
             <td><?= $item['NAME'] ?></td>
             <td>
-                <? if ($item['DISCOUNT']) { ?>
-                    <div class="line-through"><?= $item['PRICE_BASE_FORMATTED'] ?></div>
+                <? if ($item['DISCOUNT_PRICE']) { ?>
+                    <div class="line-through"><?= $item['BASE_PRICE_FORMATTED'] ?></div>
                 <? } ?>
                 <div><?= $item['PRICE_FORMATTED'] ?></div>
             </td>
@@ -52,15 +52,15 @@ use \Bitrix\Main\Localization\Loc;
                 </table>
             </td>
             <td>
-                <? if ($item['DISCOUNT_SUM']) { ?>
+                <? if ($item['DISCOUNT_PRICE_SUM']) { ?>
                     <div class="line-through"
-                         data-basket-item-price-base-sum><?= $item['PRICE_BASE_SUM_FORMATTED'] ?>
+                         data-basket-item-base-price-sum><?= $item['BASE_PRICE_SUM_FORMATTED'] ?>
                     </div>
                 <? } ?>
                 <div data-basket-item-price-sum><?= $item['PRICE_SUM_FORMATTED'] ?></div>
-                <? if ($item['DISCOUNT_SUM']) { ?>
-                    <div><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?>
-                        <span data-basket-item-discount-sum><?= $item['DISCOUNT_SUM_FORMATTED'] ?></span>
+                <? if ($item['DISCOUNT_PRICE_SUM']) { ?>
+                    <div><?= Loc::getMessage('WC_BASKET_DISCOUNT_PRICE') ?>
+                        <span data-basket-item-discount-price-sum><?= $item['DISCOUNT_PRICE_SUM_FORMATTED'] ?></span>
                     </div>
                 <? } ?>
             </td>
@@ -84,12 +84,12 @@ use \Bitrix\Main\Localization\Loc;
         <td data-basket-vat><?= $arResult['INFO']['VAT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_PRICE_BASE') ?></td>
-        <td data-basket-price-base><?= $arResult['INFO']['PRICE_BASE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_BASKET_BASE_PRICE') ?></td>
+        <td data-basket-base-price><?= $arResult['INFO']['BASE_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?></td>
-        <td data-basket-discount><?= $arResult['INFO']['DISCOUNT_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_BASKET_DISCOUNT_PRICE') ?></td>
+        <td data-basket-discount-price><?= $arResult['INFO']['DISCOUNT_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_PRICE') ?></td>

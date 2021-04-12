@@ -13,8 +13,9 @@ class WCSaleBasket extends CBitrixComponent
 
         $basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
         $basket = $basketHandlerClass::getBasket();
+        $basketHandler = new $basketHandlerClass($basket);
 
-        $this->arResult = $basket->getData();
+        $this->arResult = $basketHandler->getBasketData();
 
         $this->includeComponentTemplate();
     }

@@ -40,11 +40,11 @@ class WCSaleBasket {
                 vat: BX.findChild(basketContainer, {
                     'attribute': {'data-basket-vat': ''}
                 }, true, false),
-                priceBase: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-price-base': ''}
+                basePrice: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-base-price': ''}
                 }, true, false),
-                discount: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-discount': ''}
+                discountPrice: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-discount-price': ''}
                 }, true, false),
                 price: BX.findChild(basketContainer, {
                     'attribute': {'data-basket-price': ''}
@@ -97,11 +97,11 @@ class WCSaleBasket {
                 priceSum: BX.findChild(basketItemContainer, {
                     'attribute': {'data-basket-item-price-sum': ''}
                 }, true, false),
-                priceBaseSum: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item-price-base-sum': ''}
+                basePriceSum: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item-base-price-sum': ''}
                 }, true, false),
-                discountSum: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item-discount-sum': ''}
+                discountPriceSum: BX.findChild(basketItemContainer, {
+                    'attribute': {'data-basket-item-discount-price-sum': ''}
                 }, true, false),
                 restoreButton: BX.findChild(basketItemContainer, {
                     'attribute': {'data-basket-item-restore-button': ''}
@@ -125,11 +125,11 @@ class WCSaleBasket {
             if (basketContainerDom.nodes.vat) {
                 BX.adjust(basketContainerDom.nodes.vat, {html: basket.info.vatFormatted});
             }
-            if (basketContainerDom.nodes.priceBase) {
-                BX.adjust(basketContainerDom.nodes.priceBase, {html: basket.info.priceBaseFormatted});
+            if (basketContainerDom.nodes.basePrice) {
+                BX.adjust(basketContainerDom.nodes.basePrice, {html: basket.info.basePriceFormatted});
             }
-            if (basketContainerDom.nodes.discount) {
-                BX.adjust(basketContainerDom.nodes.discount, {html: basket.info.discountFormatted});
+            if (basketContainerDom.nodes.discountPrice) {
+                BX.adjust(basketContainerDom.nodes.discountPrice, {html: basket.info.discountPriceFormatted});
             }
             if (basketContainerDom.nodes.price) {
                 BX.adjust(basketContainerDom.nodes.price, {html: basket.info.priceFormatted});
@@ -145,11 +145,11 @@ class WCSaleBasket {
             if (basketItemContainerDom.nodes.priceSum) {
                 BX.adjust(basketItemContainerDom.nodes.priceSum, {html: basketItem.priceSumFormatted});
             }
-            if (basketItemContainerDom.nodes.priceBaseSum) {
-                BX.adjust(basketItemContainerDom.nodes.priceBaseSum, {html: basketItem.priceBaseSumFormatted});
+            if (basketItemContainerDom.nodes.basePriceSum) {
+                BX.adjust(basketItemContainerDom.nodes.basePriceSum, {html: basketItem.basePriceSumFormatted});
             }
-            if (basketItemContainerDom.nodes.discountSum) {
-                BX.adjust(basketItemContainerDom.nodes.discountSum, {html: basketItem.discountSumFormatted});
+            if (basketItemContainerDom.nodes.discountPriceSum) {
+                BX.adjust(basketItemContainerDom.nodes.discountPriceSum, {html: basketItem.discountPriceSumFormatted});
             }
         });
     }
@@ -185,6 +185,7 @@ class WCSaleBasket {
             mode: 'ajax',
             data: data
         }).then((response) => {
+            console.log(response)
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
