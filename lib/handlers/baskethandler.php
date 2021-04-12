@@ -33,12 +33,24 @@ class BasketHandler
 
         if ($object instanceof BasketItem) {
             $this->basketItem = $object;
-            $this->basket = $object->getCollection();
+            $this->basket = $object->getBasket();
         } elseif ($object instanceof Basket) {
             $this->basket = $object;
         } else {
             throw new ArgumentTypeException($object);
         }
+
+        $order = OrderHandler::createOrder();
+        $order->appendBasket($this->basket);
+    }
+
+    public function getBasketData(): array
+    {
+        return [
+            'INFO' => $this->basket->getInfo(),
+            'ITEMS' => $this->basket->getItemsList(),
+            'REMOVED_ITEMS' => $this->basket->getRemovedItemsList(),
+        ];
     }
 
     public function processBasketItem($action, $quantity = null): Result
@@ -50,10 +62,10 @@ class BasketHandler
         $this->quantity = $this->basketItem->checkQuantity($quantity);
 
         if ($this->quantity > 0) {
-            if ($this->basketItem->getId() === null) {
-                $this->addBasketItemFields();
-            } else {
+            if ($this->basketItem->getId() > 0) {
                 $this->updateBasketItemFields();
+            } else {
+                $this->addBasketItemFields();
             }
         } else {
             $this->basketItem->delete();
@@ -73,7 +85,7 @@ class BasketHandler
         if ($this->result->isSuccess()) {
             $this->result->setData([
                 'BASKET_ITEM' => $this->basketItem->getInfo(),
-                'BASKET' => $this->basket->getData(),
+                'BASKET' => $this->getBasketData(),
             ]);
         }
 

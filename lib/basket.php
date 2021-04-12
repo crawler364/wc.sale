@@ -4,8 +4,13 @@
 namespace WC\Sale;
 
 
+use WC\Core\Helpers\Catalog;
+
 class Basket extends \Bitrix\Sale\Basket
 {
+    /**
+     * @deprecated
+     */
     public function getData(): array
     {
         return [
@@ -20,22 +25,19 @@ class Basket extends \Bitrix\Sale\Basket
         $info = [];
         $info['COUNT'] = (string)$this->count();
         $info['WEIGHT'] = (string)$this->getWeight();
-        $info['WEIGHT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatWeight($info['WEIGHT']);
+        $info['WEIGHT_FORMATTED'] = Catalog::formatWeight($info['WEIGHT']);
         $info['VAT'] = (string)$this->getVatSum();
-        $info['VAT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['VAT']);
-        $info['PRICE_BASE'] = (string)$this->getBasePrice();
-        $info['PRICE_BASE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['PRICE_BASE']);
-        $info['DISCOUNT'] = (string)($this->getBasePrice() - (string)$this->getPrice());
-        $info['DISCOUNT_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['DISCOUNT']);
+        $info['VAT_FORMATTED'] = Catalog::formatPrice($info['VAT']);
+        $info['BASE_PRICE'] = (string)$this->getBasePrice();
+        $info['BASE_PRICE_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE']);
+        $info['DISCOUNT_PRICE'] = (string)($this->getBasePrice() - (string)$this->getPrice());
+        $info['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE']);
         $info['PRICE'] = (string)($this->getPrice());
-        $info['PRICE_FORMATTED'] = \WC\Core\Helpers\Catalog::formatPrice($info['PRICE']);
+        $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE']);
 
         return $info;
     }
 
-    /** @noinspection PhpUnnecessaryLocalVariableInspection
-     * @noinspection OneTimeUseVariablesInspection
-     */
     public function getRemovedItemsList(): ?array
     {
         $removedItemsList = [];
