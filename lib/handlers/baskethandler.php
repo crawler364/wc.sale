@@ -39,18 +39,6 @@ class BasketHandler
         } else {
             throw new ArgumentTypeException($object);
         }
-
-        $order = OrderHandler::createOrder();
-        $order->appendBasket($this->basket);
-    }
-
-    public function getBasketData(): array
-    {
-        return [
-            'INFO' => $this->basket->getInfo(),
-            'ITEMS' => $this->basket->getItemsList(),
-            'REMOVED_ITEMS' => $this->basket->getRemovedItemsList(),
-        ];
     }
 
     public function processBasketItem($action, $quantity = null): Result
@@ -85,7 +73,7 @@ class BasketHandler
         if ($this->result->isSuccess()) {
             $this->result->setData([
                 'BASKET_ITEM' => $this->basketItem->getInfo(),
-                'BASKET' => $this->getBasketData(),
+                'BASKET' => $this->basket->getData(),
             ]);
         }
 
@@ -132,10 +120,12 @@ class BasketHandler
         } else {
             $fUserId = Fuser::getId();
         }
-
         $siteId = Main::getSiteId();
+        $basket = Basket::loadItemsForFUser($fUserId, $siteId);
+        $order = OrderHandler::createOrder();
+        $order->appendBasket($basket);
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return Basket::loadItemsForFUser($fUserId, $siteId);
+        return $basket;
     }
 }

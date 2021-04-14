@@ -8,9 +8,6 @@ use WC\Core\Helpers\Catalog;
 
 class Basket extends \Bitrix\Sale\Basket
 {
-    /**
-     * @deprecated
-     */
     public function getData(): array
     {
         return [
