@@ -17,9 +17,9 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $info = $this->getFieldValues();
 
         $info['QUANTITY'] = $this->getQuantity();
-        $info['BASE_PRICE_SUM'] = (string)($info['BASE_PRICE'] * $info['QUANTITY']);
-        $info['PRICE_SUM'] = (string)($info['PRICE'] * $info['QUANTITY']);
-        $info['DISCOUNT_PRICE_SUM'] = (string)($info['DISCOUNT_PRICE'] * $info['QUANTITY']);  // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
+        $info['BASE_PRICE_SUM'] = $info['BASE_PRICE'] * $info['QUANTITY'];
+        $info['PRICE_SUM'] = $info['PRICE'] * $info['QUANTITY'];
+        $info['DISCOUNT_PRICE_SUM'] = $info['DISCOUNT_PRICE'] * $info['QUANTITY'];  // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
 
         $info['WEIGHT_FORMATTED'] = Catalog::formatWeight($info['WEIGHT']);
         $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE'], $info['CURRENCY']);

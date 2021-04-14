@@ -20,16 +20,17 @@ class Basket extends \Bitrix\Sale\Basket
     public function getInfo(): array
     {
         $info = [];
-        $info['COUNT'] = (string)$this->count();
-        $info['WEIGHT'] = (string)$this->getWeight();
+        $info['COUNT'] = $this->count();
+        $info['WEIGHT'] = $this->getWeight();
+        $info['VAT'] = $this->getVatSum();
+        $info['BASE_PRICE'] = $this->getBasePrice();
+        $info['DISCOUNT_PRICE'] = $this->getDiscount();
+        $info['PRICE'] = $this->getPrice();
+
         $info['WEIGHT_FORMATTED'] = Catalog::formatWeight($info['WEIGHT']);
-        $info['VAT'] = (string)$this->getVatSum();
         $info['VAT_FORMATTED'] = Catalog::formatPrice($info['VAT']);
-        $info['BASE_PRICE'] = (string)$this->getBasePrice();
         $info['BASE_PRICE_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE']);
-        $info['DISCOUNT_PRICE'] = (string)($this->getBasePrice() - (string)$this->getPrice());
         $info['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE']);
-        $info['PRICE'] = (string)($this->getPrice());
         $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE']);
 
         return $info;
@@ -65,17 +66,17 @@ class Basket extends \Bitrix\Sale\Basket
             $key = array_keys($param)[0];
             switch ($key) {
                 case 'PRODUCT_ID':
-                    if ($param[$key] == $item->getProductId()) {
+                    if ($param[$key] === $item->getProductId()) {
                         return $item;
                     }
                     break;
                 case 'PRODUCT_XML_ID':
-                    if ($param[$key] == $item->getField('PRODUCT_XML_ID')) {
+                    if ($param[$key] === $item->getField('PRODUCT_XML_ID')) {
                         return $item;
                     }
                     break;
                 case 'SORT':
-                    if ($param[$key] == $item->getField('SORT')) {
+                    if ($param[$key] === $item->getField('SORT')) {
                         return $item;
                     }
                     break;
@@ -83,5 +84,10 @@ class Basket extends \Bitrix\Sale\Basket
         }
 
         return null;
+    }
+
+    public function getDiscount()
+    {
+        return $this->getBasePrice() - $this->getPrice();
     }
 }
