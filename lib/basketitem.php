@@ -47,20 +47,24 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         }
     }
 
-    public function setPriceName(): void
-    {
-        $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
-        $priceTypeId = $this->getField('PRICE_TYPE_ID');
-        $price = $priceTypeId ? GroupTable::getById($priceTypeId)->fetch() : null;
-        $notes['PRICE_NAME'] = $price['NAME'];
-
-        $this->setField('NOTES', serialize($notes));
-    }
-
     public function setPropertyArticle(): void
     {
         $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
         $this->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
+    }
+
+    public function setNotes($field): void
+    {
+        $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
+
+        switch ($field) {
+            case 'PRICE_CODE':
+                $priceTypeId = $this->getField('PRICE_TYPE_ID');
+                $notes[$field] = $priceTypeId > 0 ? GroupTable::getById($priceTypeId)->fetch()['NAME'] : null;
+                break;
+        }
+
+        $this->setField('NOTES', serialize($notes));
     }
 
     public function prepareBasketItemFields(): array
