@@ -33,12 +33,13 @@ class WCSaleBasketAjaxController extends Controller
         $result = new Result();
 
         $basketHandlerClass = $parameters['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
+        $basket = $basketHandlerClass::getBasket();
 
-        if (!$basketItem = $basketHandlerClass::getBasketItem($product['id'])) {
+        if (!$basketItem = $basket->getItemBy(['PRODUCT_ID' => $product['id']])) {
             $result->addError('WC_UNDEFINED_PRODUCT');
         } else {
-            $basketHandler = new $basketHandlerClass($basketItem);
-            $basketHandler->processBasketItem($basketAction, $product['quantity']);
+            $basketHandler = new $basketHandlerClass($basket);
+            $basketHandler->processBasketItem($basketItem, $basketAction, $product['quantity']);
             $result = $basketHandler->saveBasket();
         }
 

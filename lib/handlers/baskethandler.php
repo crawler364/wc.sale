@@ -5,7 +5,6 @@ namespace WC\Sale\Handlers;
 
 
 use Bitrix\Catalog\ProductTable;
-use Bitrix\Main\ArgumentTypeException;
 use Bitrix\Catalog\Product\CatalogProvider;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
@@ -26,23 +25,18 @@ class BasketHandler
     private Result $result;
     private $quantity;
 
-    public function __construct($object)
+    public function __construct(Basket $basket)
     {
         $this->result = new Result();
         Loc::loadMessages(__FILE__);
 
-        if ($object instanceof BasketItem) {
-            $this->basketItem = $object;
-            $this->basket = $object->getBasket();
-        } elseif ($object instanceof Basket) {
-            $this->basket = $object;
-        } else {
-            throw new ArgumentTypeException($object);
-        }
+        $this->basket = $basket;
     }
 
-    public function processBasketItem($action, $quantity = null): Result
+    public function processBasketItem(BasketItem $basketItem, $action, $quantity = null): Result
     {
+        $this->basketItem = $basketItem;
+
         if ($action !== 'set') {
             $quantity = $this->basketItem->mathQuantity($action);
         }
@@ -95,7 +89,7 @@ class BasketHandler
         $this->basketItem->setProperty('test','test','test');
     }
 
-    public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
+    public static function getBasketItemByProductId($productId, Basket $basket = null): ?BasketItem
     {
         Loader::includeModule('catalog');
 
