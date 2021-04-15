@@ -1,6 +1,7 @@
 class WCSaleBasket {
     constructor(params) {
-        this.basketHandlerClass = params.basketHandlerClass;
+        this.parameters = params.parameters;
+        this.signedParameters = params.signedParameters;
     }
 
     init() {
@@ -178,12 +179,13 @@ class WCSaleBasket {
                 id: this.productId,
                 quantity: this.action === 'set' ? this.quantity : '',
             },
-            basketHandlerClass: this.basketHandlerClass
+            parameters: this.parameters
         };
 
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'ajax',
-            data: data
+            data: data,
+            signedParameters: this.signedParameters
         }).then((response) => {
             console.log(response)
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {

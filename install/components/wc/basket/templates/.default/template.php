@@ -4,6 +4,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 }
 
 use \Bitrix\Main\Localization\Loc;
+
 ?>
 <table class="wc-basket-items-container">
     <thead>
@@ -104,7 +105,11 @@ use \Bitrix\Main\Localization\Loc;
 <script type="text/javascript">
     if (!window.hasOwnProperty('WCSaleBasket')) {
         window.WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
-            'basketHandlerClass' => $arParams['BASKET_HANDLER_CLASS'],
+            'parameters' => [
+                'BASKET_HANDLER_CLASS' => $arParams['BASKET_HANDLER_CLASS'],
+                'PROPERTIES' => $arParams['PROPERTIES'],
+            ],
+            'signedParameters' => $this->getComponent()->getSignedParameters(),
         ])?>);
         window.WCSaleBasket.init();
     }

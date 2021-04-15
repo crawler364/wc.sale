@@ -1,12 +1,13 @@
 <?php
 
+use Bitrix\Main\Engine\Controller;
 use Bitrix\Main\Engine\Response\AjaxJson;
 use Bitrix\Main\Request;
-use WC\Core\Bitrix\Main\Result;
 use Bitrix\Main\Loader;
+use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\BasketHandler;
 
-class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
+class WCSaleBasketAjaxController extends Controller
 {
     /** @var BasketHandler */
     private $basketHandlerClass = BasketHandler::class;
@@ -27,11 +28,11 @@ class WCSaleBasketAjaxController extends \Bitrix\Main\Engine\Controller
         ];
     }
 
-    public function processAction(string $basketAction, array $product, $basketHandlerClass = null): AjaxJson
+    public function processAction(string $basketAction, array $product, array $parameters = []): AjaxJson
     {
         $result = new Result();
 
-        $basketHandlerClass = $basketHandlerClass ?: $this->basketHandlerClass;
+        $basketHandlerClass = $parameters['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
 
         if (!$basketItem = $basketHandlerClass::getBasketItem($product['id'])) {
             $result->addError('WC_UNDEFINED_PRODUCT');

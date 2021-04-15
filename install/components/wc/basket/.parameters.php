@@ -11,5 +11,11 @@ $arComponentParameters = [
             'TYPE' => 'STRING',
             'PARENT' => 'BASE',
         ],
+        'PROPERTIES' => [
+            'NAME' => GetMessage('WC_BASKET_PROPERTIES'),
+            'TYPE' => 'STRING',
+            'PARENT' => 'BASE',
+            'MULTIPLE' => 'Y',
+        ],
     ],
 ];
