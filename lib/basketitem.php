@@ -7,7 +7,7 @@ namespace WC\Sale;
 use Bitrix\Catalog\GroupTable;
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\Loader;
-use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\BasketPropertyItem;
 use WC\Core\Helpers\Catalog;
 
 class BasketItem extends \Bitrix\Sale\BasketItem
@@ -36,21 +36,20 @@ class BasketItem extends \Bitrix\Sale\BasketItem
 
     public function setProperty($name, $code, $value): void
     {
-        $propertyCollection = $this->getPropertyCollection();
-        if (!$propertyCollection->getItemByIndex($code)) { // todo исправить, так работать не будет. Настройка свойств для добавления в корзину
-            $basketItemProperty = $propertyCollection->createItem();
-            $basketItemProperty->setFields([
+        /** @var BasketPropertiesCollection $propertyCollection */
+        /** @var BasketPropertyItem $property */
+
+        if ($propertyCollection = $this->getPropertyCollection()) {
+            if (!$property = $propertyCollection->getItemByCode($code)){
+                $property = $propertyCollection->createItem();
+            }
+
+            $property->setFields([
                 'NAME' => $name,
                 'CODE' => $code,
                 'VALUE' => $value,
             ]);
         }
-    }
-
-    public function setPropertyArticle(): void
-    {
-        $notes = unserialize($this->getField('NOTES'), ['allowed_classes' => true]);
-        $this->setProperty(Loc::getMessage('WC_SALE_ARTICLE'), 'ARTICLE', $notes['ARTICLE']);
     }
 
     public function setNotes($field): void

@@ -83,20 +83,16 @@ class BasketHandler
     protected function addBasketItemFields(): void
     {
         $this->basketItem->setField('PRODUCT_PROVIDER_CLASS', $this->productProvider);
-
         $this->basketItem->setField('QUANTITY', $this->quantity);
 
         $fields = $this->basketItem->prepareBasketItemFields();
         $this->basketItem->setFields($fields);
-
-        $this->basketItem->setNotes('PRICE_CODE');
-
-        $this->basketItem->setPropertyArticle();
     }
 
     protected function updateBasketItemFields(): void
     {
         $this->basketItem->setField('QUANTITY', $this->quantity);
+        $this->basketItem->setProperty('test','test','test');
     }
 
     public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
