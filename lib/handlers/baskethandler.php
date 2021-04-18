@@ -96,8 +96,20 @@ class BasketHandler
         if ($element = $res->fetchObject()) {
             foreach ($element->collectValues() as $propertyValue) {
                 if ($propertyValue->entity instanceof \Bitrix\Main\ORM\Entity) {
-                    $property = \Bitrix\Iblock\PropertyTable::getById($propertyValue->getIblockPropertyId())->fetchObject();
-                    $this->basketItem->setProperty($property->getName(), $property->getCode(), $propertyValue->getValue());
+                    $property = \Bitrix\Iblock\PropertyTable::getByPrimary($propertyValue->getIblockPropertyId())->fetchObject();
+
+                    switch ($property->getPropertyType()) {
+                        case 'L':
+                            $value = \Bitrix\Iblock\PropertyEnumerationTable::getByPrimary(['ID' => $propertyValue->getValue(),
+                                'PROPERTY_ID' => $propertyValue->getIblockPropertyId(),
+                            ])->fetchObject()->getValue();
+                            break;
+                        case 'S':
+                        default:
+                            $value = $propertyValue->getValue();
+                    }
+
+                    $this->basketItem->setProperty($property->getName(), $property->getCode(), $value);
                 }
             }
         }
