@@ -80,34 +80,32 @@ class BasketHandler
     {
         $this->basketItem->setField('PRODUCT_PROVIDER_CLASS', $this->productProvider);
         $this->basketItem->setField('QUANTITY', $this->quantity);
+
+        Loader::includeModule('iblock');
+        $iBlockId = \CIBlockElement::GetIBlockByID($this->basketItem->getProductId());
+        $iBlockEntityClass = \Bitrix\Iblock\Iblock::wakeUp($iBlockId)->getEntityDataClass();
+
+        $this->parameters['PROPERTIES'] = array_filter($this->parameters['PROPERTIES'], static function ($c) {
+            return $c;
+        });
+
+        $res = $iBlockEntityClass::getByPrimary($this->basketItem->getProductId(), [
+            'select' => $this->parameters['PROPERTIES'],
+        ]);
+
+        if ($element = $res->fetchObject()) {
+            foreach ($element->collectValues() as $propertyValue) {
+                if ($propertyValue->entity instanceof \Bitrix\Main\ORM\Entity) {
+                    $property = \Bitrix\Iblock\PropertyTable::getById($propertyValue->getIblockPropertyId())->fetchObject();
+                    $this->basketItem->setProperty($property->getName(), $property->getCode(), $propertyValue->getValue());
+                }
+            }
+        }
     }
 
     protected function updateBasketItemFields(): void
     {
         $this->basketItem->setField('QUANTITY', $this->quantity);
-
-        Loader::includeModule('iblock');
-        $iBlockId = \CIBlockElement::GetIBlockByID($this->basketItem->getProductId());
-        $iBlockClass = \Bitrix\Iblock\Iblock::wakeUp($iBlockId)->getEntityDataClass();
-
-        unset($this->parameters['PROPERTIES'][1]);
-
-        /** @var \Bitrix\Iblock\Elements\EO_ElementCatalogoffers $element */
-        $element = $iBlockClass::getByPrimary($this->basketItem->getProductId(), [
-            'select' => $this->parameters['PROPERTIES'],
-        ])->fetchObject();
-
-
-        /** @var \Bitrix\Iblock\Elements\EO_IblockProperty20 $propertyValue */
-        foreach ($element->collectValues() as $propertyValue) {
-            if ($propertyValue instanceof \Bitrix\Iblock\Elements\EO_IblockProperty20) {
-                $property = \Bitrix\Iblock\PropertyTable::getById($propertyValue->getIblockPropertyId())->fetchObject();
-                $this->basketItem->setProperty($property->getName(), $property->getCode(), $propertyValue->getValue());
-            }
-
-        }
-
-
     }
 
     public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
