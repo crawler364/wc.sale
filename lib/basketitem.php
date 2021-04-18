@@ -29,7 +29,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $info['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE'], $info['CURRENCY']);
         $info['DISCOUNT_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
 
-        $info['ELEMENT'] = static::getIblockElementInfo($info['PRODUCT_ID']);
+        $info['IBLOCK_ELEMENT'] = $this->getIblockElementInfo();
 
         return $info;
     }
@@ -66,18 +66,8 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         $this->setField('NOTES', serialize($notes));
     }
 
-    public function prepareBasketItemFields(): array
+    public function getIblockElementInfo(): array
     {
-        // todo универсальный вариант под торговые предложения и товары
-        return [
-
-        ];
-    }
-
-    public static function getIblockElementInfo($productId): array
-    {
-        Loader::includeModule('iblock');
-
         // todo
         return [];
     }
