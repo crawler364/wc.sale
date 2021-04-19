@@ -90,38 +90,32 @@ class BasketHandler
 
     protected function setBasketItemProperties(): void
     {
+        /** @var \Bitrix\Iblock\Property|\Bitrix\Main\ORM\Objectify\EntityObject|null $property */
+        /** @var  \Bitrix\Iblock\EO_ElementProperty|\Bitrix\Main\ORM\Objectify\EntityObject|null $value */
+
         Loader::includeModule('iblock');
         $iBlockId = \CIBlockElement::GetIBlockByID($this->basketItem->getProductId());
-        $iBlockEntityClass = \Bitrix\Iblock\Iblock::wakeUp($iBlockId)->getEntityDataClass();
 
-        $this->parameters['PROPERTIES'] = array_filter($this->parameters['PROPERTIES'], static function ($c) {
-            return $c;
-        });
-
-        $res = $iBlockEntityClass::getByPrimary($this->basketItem->getProductId(), [
-            'select' => $this->parameters['PROPERTIES'],
-        ]);
-
-        if ($element = $res->fetchObject()) {
-            foreach ($element->collectValues() as $propertyValue) {
-                if ($propertyValue->entity instanceof \Bitrix\Main\ORM\Entity) {
-                    $property = \Bitrix\Iblock\PropertyTable::getByPrimary($propertyValue->getIblockPropertyId())->fetchObject();
-
-                    switch ($property->getPropertyType()) {
-                        case 'L':
-                            $value = \Bitrix\Iblock\PropertyEnumerationTable::getByPrimary([
-                                'ID' => $propertyValue->getValue(),
-                                'PROPERTY_ID' => $propertyValue->getIblockPropertyId(),
-                            ])->fetchObject()->getValue();
-                            break;
-                        case 'S':
-                        default:
-                            $value = $propertyValue->getValue();
-                    }
-
-                    $this->basketItem->setProperty($property->getName(), $property->getCode(), $value);
-                }
+        foreach ($this->parameters['PROPERTIES'] as $propertyCode) {
+            if (!$property = \Bitrix\Iblock\PropertyTable::getList([
+                'filter' => ['IBLOCK_ID' => $iBlockId, 'CODE' => $propertyCode],
+            ])->fetchObject()) {
+                continue;
             }
+
+            if (!$value = \Bitrix\Iblock\ElementPropertyTable::getList([
+                'select' => ['VALUE', 'ENUM'],
+                'filter' => [
+                    'IBLOCK_PROPERTY_ID' => $property->getId(),
+                    'IBLOCK_ELEMENT_ID' => $this->basketItem->getProductId()
+                ],
+            ])->fetchObject()) {
+                continue;
+            }
+
+            $value = $property->getPropertyType() === 'L' ? $value->getEnum()->getValue() : $value->getValue();
+
+            $this->basketItem->setProperty($property->getName(), $property->getCode(), $value);
         }
     }
 
