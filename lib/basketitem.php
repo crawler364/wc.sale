@@ -6,7 +6,6 @@ namespace WC\Sale;
 
 use Bitrix\Catalog\GroupTable;
 use Bitrix\Main\ArgumentNullException;
-use Bitrix\Main\Loader;
 use Bitrix\Sale\BasketPropertyItem;
 use WC\Core\Helpers\Catalog;
 

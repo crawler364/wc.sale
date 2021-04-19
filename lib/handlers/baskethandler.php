@@ -47,9 +47,9 @@ class BasketHandler
 
         if ($this->quantity > 0) {
             if ($this->basketItem->getId() > 0) {
-                $this->updateBasketItemFields();
+                $this->updateBasketItem();
             } else {
-                $this->addBasketItemFields();
+                $this->addBasketItem();
             }
         } else {
             $this->basketItem->delete();
@@ -76,11 +76,20 @@ class BasketHandler
         return $this->result;
     }
 
-    protected function addBasketItemFields(): void
+    protected function addBasketItem(): void
     {
         $this->basketItem->setField('PRODUCT_PROVIDER_CLASS', $this->productProvider);
         $this->basketItem->setField('QUANTITY', $this->quantity);
+        $this->setBasketItemProperties();
+    }
 
+    protected function updateBasketItem(): void
+    {
+        $this->basketItem->setField('QUANTITY', $this->quantity);
+    }
+
+    protected function setBasketItemProperties(): void
+    {
         Loader::includeModule('iblock');
         $iBlockId = \CIBlockElement::GetIBlockByID($this->basketItem->getProductId());
         $iBlockEntityClass = \Bitrix\Iblock\Iblock::wakeUp($iBlockId)->getEntityDataClass();
@@ -100,7 +109,8 @@ class BasketHandler
 
                     switch ($property->getPropertyType()) {
                         case 'L':
-                            $value = \Bitrix\Iblock\PropertyEnumerationTable::getByPrimary(['ID' => $propertyValue->getValue(),
+                            $value = \Bitrix\Iblock\PropertyEnumerationTable::getByPrimary([
+                                'ID' => $propertyValue->getValue(),
                                 'PROPERTY_ID' => $propertyValue->getIblockPropertyId(),
                             ])->fetchObject()->getValue();
                             break;
@@ -113,11 +123,6 @@ class BasketHandler
                 }
             }
         }
-    }
-
-    protected function updateBasketItemFields(): void
-    {
-        $this->basketItem->setField('QUANTITY', $this->quantity);
     }
 
     public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
