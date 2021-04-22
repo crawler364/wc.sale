@@ -6,6 +6,8 @@ namespace WC\Sale\Handlers;
 
 use Bitrix\Catalog\ProductTable;
 use Bitrix\Catalog\Product\CatalogProvider;
+use Bitrix\Iblock\ElementTable;
+use Bitrix\Iblock\PropertyTable;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Fuser;
@@ -94,11 +96,15 @@ class BasketHandler
         /** @var  \Bitrix\Iblock\EO_ElementProperty|\Bitrix\Main\ORM\Objectify\EntityObject|null $value */
 
         Loader::includeModule('iblock');
-        $iBlockId = \CIBlockElement::GetIBlockByID($this->basketItem->getProductId());
+        $iBlockId = ElementTable::getList([
+            'select' => ['IBLOCK_ID'],
+            'filter' => ['=ID' => $this->basketItem->getProductId()],
+            'cache' => ['ttl' => 604800],
+        ])->fetch()['IBLOCK_ID'];
 
         foreach ($this->parameters['PROPERTIES'] as $propertyCode) {
-            if (!$property = \Bitrix\Iblock\PropertyTable::getList([
-                'filter' => ['IBLOCK_ID' => $iBlockId, 'CODE' => $propertyCode],
+            if (!$property = PropertyTable::getList([
+                'filter' => ['=IBLOCK_ID' => $iBlockId, '=CODE' => $propertyCode],
             ])->fetchObject()) {
                 continue;
             }
@@ -106,8 +112,8 @@ class BasketHandler
             if (!$value = \Bitrix\Iblock\ElementPropertyTable::getList([
                 'select' => ['VALUE', 'ENUM'],
                 'filter' => [
-                    'IBLOCK_PROPERTY_ID' => $property->getId(),
-                    'IBLOCK_ELEMENT_ID' => $this->basketItem->getProductId()
+                    '=IBLOCK_PROPERTY_ID' => $property->getId(),
+                    '=IBLOCK_ELEMENT_ID' => $this->basketItem->getProductId(),
                 ],
             ])->fetchObject()) {
                 continue;
