@@ -96,7 +96,7 @@ class BasketHandler
         $element = ElementTable::getList([
             'select' => ['IBLOCK_ID', 'IBLOCK_VERSION' => 'IBLOCK.VERSION'],
             'filter' => ['=ID' => $this->basketItem->getProductId()],
-            'cache' => ['ttl' => 604800],
+            'cache' => ['ttl' => 604800, "cache_joins" => true],
         ])->fetch();
 
         if ($element['IBLOCK_VERSION'] === '2') {
@@ -107,6 +107,7 @@ class BasketHandler
             if (!$property = PropertyTable::getList([
                 'select' => ['ID', 'NAME', 'PROPERTY_TYPE'],
                 'filter' => ['=IBLOCK_ID' => $element['IBLOCK_ID'], '=CODE' => $propertyCode],
+                'cache' => ['ttl' => 86400],
             ])->fetch()) {
                 continue;
             }
@@ -123,6 +124,7 @@ class BasketHandler
                 if (!$obPropertyValue = $propertyEntity::getList([
                     'select' => $select,
                     'filter' => ['=IBLOCK_ELEMENT_ID' => $this->basketItem->getProductId()],
+                    'cache' => ['ttl' => 3600, "cache_joins" => true],
                 ])->fetchObject()) {
                     continue;
                 }
@@ -139,6 +141,7 @@ class BasketHandler
                         '=IBLOCK_PROPERTY_ID' => $property['ID'],
                         '=IBLOCK_ELEMENT_ID' => $this->basketItem->getProductId(),
                     ],
+                    'cache' => ['ttl' => 3600, "cache_joins" => true],
                 ])->fetchObject()) {
                     continue;
                 }
