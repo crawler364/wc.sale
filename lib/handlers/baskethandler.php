@@ -92,6 +92,40 @@ class BasketHandler
 
     protected function setBasketItemProperties(): void
     {
+        $cache = \Bitrix\Main\Data\Cache::createInstance();
+        $productId = $this->basketItem->getProductId();
+        $element = \Bitrix\Iblock\ElementTable::getByPrimary($productId, [
+            'select' => ['IBLOCK_ID'], 'cache' => ['ttl' => 604800]
+        ])->fetchObject();
+        $iBlockId = $element->getIblockId();
+
+
+        foreach ($this->parameters['PROPERTIES'] as $propertyCode) {
+            $cacheId = md5("$iBlockId.$productId.$propertyCode.");
+
+            if ($cache->initCache(3600, $cacheId)) {
+                $result = $cache->getVars();
+            } elseif ($cache->startDataCache()) {
+                $result = [];
+                \CIBlockElement::GetPropertyValuesArray(
+                    $result,
+                    $iBlockId,
+                    ['ID' => $productId],
+                    $propertyFilter = ['CODE' => $propertyCode],
+                    $options = []
+                );
+
+                $cache->endDataCache($result);
+            }
+
+            if ($property = $result[$productId][$propertyCode]) {
+                $this->basketItem->setProperty($property['NAME'], $property['CODE'], $property['VALUE']);
+            }
+        }
+    }
+
+    protected function setBasketItemPropertiesD7(): void
+    {
         Loader::includeModule('iblock');
         $element = ElementTable::getList([
             'select' => ['IBLOCK_ID', 'IBLOCK_VERSION' => 'IBLOCK.VERSION'],
@@ -121,7 +155,7 @@ class BasketHandler
                     $select[] = $propertyEnumKey;
                 }
 
-                if (!$obPropertyValue = $propertyEntity::getList([
+                if (!$elementProperty = $propertyEntity::getList([
                     'select' => $select,
                     'filter' => ['=IBLOCK_ELEMENT_ID' => $this->basketItem->getProductId()],
                     'cache' => ['ttl' => 3600, "cache_joins" => true],
@@ -129,13 +163,13 @@ class BasketHandler
                     continue;
                 }
 
-                if ($property['PROPERTY_TYPE'] === 'L' && $propertyEnum = $obPropertyValue->get($propertyEnumKey)) {
+                if ($property['PROPERTY_TYPE'] === 'L' && $propertyEnum = $elementProperty->get($propertyEnumKey)) {
                     $value = $propertyEnum->getValue();
                 } else {
-                    $value = $obPropertyValue->get($propertyKey);
+                    $value = $elementProperty->get($propertyKey);
                 }
             } else {
-                if (!$obPropertyValue = \Bitrix\Iblock\ElementPropertyTable::getList([
+                if (!$elementProperty = \Bitrix\Iblock\ElementPropertyTable::getList([
                     'select' => ['VALUE', 'ENUM.VALUE'],
                     'filter' => [
                         '=IBLOCK_PROPERTY_ID' => $property['ID'],
@@ -146,10 +180,10 @@ class BasketHandler
                     continue;
                 }
 
-                if ($property['PROPERTY_TYPE'] === 'L' && $propertyEnum = $obPropertyValue->getEnum()) {
+                if ($property['PROPERTY_TYPE'] === 'L' && $propertyEnum = $elementProperty->getEnum()) {
                     $value = $propertyEnum->getValue();
                 } else {
-                    $value = $obPropertyValue->getValue();
+                    $value = $elementProperty->getValue();
                 }
             }
 
