@@ -12,7 +12,7 @@ class WCSaleBasket extends CBitrixComponent
 
     protected function checkModules(): bool
     {
-        if (Loader::includeModule('wc.core')) {
+        if (!Loader::includeModule('wc.core')) {
             throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
         }
 
