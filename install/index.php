@@ -1,9 +1,12 @@
 <?
+/** @noinspection AccessModifierPresentedInspection */
 
 use Bitrix\Main\ModuleManager;
 use Bitrix\Main;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\IO\Directory;
+
+Loc::loadMessages(__FILE__);
 
 class wc_sale extends CModule
 {
@@ -16,7 +19,6 @@ class wc_sale extends CModule
 
     public function __construct()
     {
-        Loc::loadMessages(__FILE__);
         include __DIR__ . '/version.php';
 
         if (is_array($arModuleVersion) && array_key_exists("VERSION", $arModuleVersion)) {
@@ -29,11 +31,10 @@ class wc_sale extends CModule
         $this->PARTNER_NAME = Loc::getMessage('WC_SALE_PARTNER_NAME');
         $this->PARTNER_URI = Loc::getMessage('WC_SALE_PARTNER_URI');
 
-        $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
-        $this->kernelDir = $_SERVER['DOCUMENT_ROOT'] . $kernelDir;
+        $this->kernelDir = $this->getKernelDir();
     }
 
-    function DoInstall()
+    function DoInstall(): bool
     {
         global $APPLICATION;
         $result = true;
@@ -55,7 +56,7 @@ class wc_sale extends CModule
         return $result;
     }
 
-    function DoUninstall()
+    function DoUninstall(): void
     {
         if (Main\Loader::includeModule($this->MODULE_ID)) {
             $this->UnInstallEvents();
@@ -75,7 +76,7 @@ class wc_sale extends CModule
         // todo \WC\IBlock\UniqueSymbolCode
     }
 
-    function InstallFiles()
+    public function InstallFiles(): void
     {
         CopyDirFiles(__DIR__ . '/components', $this->kernelDir . "/components", true, true);
         CopyDirFiles(__DIR__ . '/js', $this->kernelDir . "/js", true, true);
@@ -83,10 +84,11 @@ class wc_sale extends CModule
 
     function UnInstallFiles()
     {
+        //todo
         //Directory::deleteDirectory($this->kernelDir . '/components/wc/order');
     }
 
-    private function checkRequirements()
+    private function checkRequirements(): void
     {
         $requirePhp = '7.1';
         if (CheckVersion(PHP_VERSION, $requirePhp) === false) {
@@ -111,5 +113,11 @@ class wc_sale extends CModule
                 }
             }
         }
+    }
+
+    private function getKernelDir(): string
+    {
+        $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
+        return $_SERVER['DOCUMENT_ROOT'] . $kernelDir;
     }
 }
