@@ -3,7 +3,6 @@
 use Bitrix\Main\Context;
 use Bitrix\Main\Loader;
 use WC\Sale\Handlers\OrderHandler;
-use WC\Core\Bitrix\Main\Result;
 
 class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
 {

@@ -11,7 +11,7 @@ $APPLICATION->IncludeComponent(
     ".default",
     [
         "COMPONENT_TEMPLATE" => ".default",
-        "BASKET_HANDLER_CLASS" => \AF\Handlers\BasketHandler::class,
+        "BASKET_HANDLER_CLASS" => '',
     ],
     false
 ); ?>
