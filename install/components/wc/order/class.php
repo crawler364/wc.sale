@@ -1,5 +1,8 @@
 <?php
 
+use Bitrix\Main\Loader;
+use Bitrix\Main\LoaderException;
+use Bitrix\Main\Localization\Loc;
 use \WC\Sale\Handlers\OrderHandler;
 
 class WCSaleOrder extends CBitrixComponent
@@ -9,14 +12,12 @@ class WCSaleOrder extends CBitrixComponent
 
     protected function checkModules(): bool
     {
-        if (!\Bitrix\Main\Loader::includeModule('wc.core')) {
-            ShowError(\Bitrix\Main\Localization\Loc::getMessage('WC_ORDER_MODULE_CORE_NOT_INCLUDED'));
-            return false;
+        if (!Loader::includeModule('wc.core')) {
+            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_CORE_NOT_INCLUDED'));
         }
 
-        if (!\Bitrix\Main\Loader::includeModule('wc.sale')) {
-            ShowError(\Bitrix\Main\Localization\Loc::getMessage('WC_ORDER_MODULE_SALE_NOT_INCLUDED'));
-            return false;
+        if (!Loader::includeModule('wc.sale')) {
+            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_SALE_NOT_INCLUDED'));
         }
 
         return true;
@@ -24,24 +25,24 @@ class WCSaleOrder extends CBitrixComponent
 
     public function executeComponent()
     {
-        if ($this->checkModules()) {
-            \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
+        $this->checkModules();
 
-            $orderHandlerClass = $this->arParams['ORDER_HANDLER_CLASS'] ?: $this->orderHandlerClass;
+        \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
 
-            $order = $orderHandlerClass::createOrder();
-            $orderHandler = new $orderHandlerClass($order);
+        $orderHandlerClass = $this->arParams['ORDER_HANDLER_CLASS'] ?: $this->orderHandlerClass;
 
-            if (isset($this->arParams['PROPERTIES_DEFAULT_VALUE'])) {
-                $orderHandler->propertiesDefaultValue = $this->arParams['PROPERTIES_DEFAULT_VALUE'];
-            }
+        $order = $orderHandlerClass::createOrder();
+        $orderHandler = new $orderHandlerClass($order);
 
-            $result = $orderHandler->processOrder();
-
-            $this->arResult['DATA'] = $result->getData();
-            $this->arResult['ERRORS'] = $result->getErrorMessages();
-
-            $this->includeComponentTemplate();
+        if (isset($this->arParams['PROPERTIES_DEFAULT_VALUE'])) {
+            $orderHandler->propertiesDefaultValue = $this->arParams['PROPERTIES_DEFAULT_VALUE'];
         }
+
+        $result = $orderHandler->processOrder();
+
+        $this->arResult['DATA'] = $result->getData();
+        $this->arResult['ERRORS'] = $result->getErrorMessages();
+
+        $this->includeComponentTemplate();
     }
 }

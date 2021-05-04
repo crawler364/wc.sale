@@ -1,5 +1,8 @@
 <?php
 
+use Bitrix\Main\Loader;
+use Bitrix\Main\LoaderException;
+use Bitrix\Main\Localization\Loc;
 use WC\Sale\Handlers\BasketHandler;
 
 class WCSaleBasket extends CBitrixComponent
@@ -9,14 +12,12 @@ class WCSaleBasket extends CBitrixComponent
 
     protected function checkModules(): bool
     {
-        if (!\Bitrix\Main\Loader::includeModule('wc.core')) {
-            ShowError(\Bitrix\Main\Localization\Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
-            return false;
+        if (Loader::includeModule('wc.core')) {
+            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
         }
 
-        if (!\Bitrix\Main\Loader::includeModule('wc.sale')) {
-            ShowError(\Bitrix\Main\Localization\Loc::getMessage('WC_BASKET_MODULE_SALE_NOT_INCLUDED'));
-            return false;
+        if (!Loader::includeModule('wc.sale')) {
+            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
         }
 
         return true;
@@ -24,15 +25,15 @@ class WCSaleBasket extends CBitrixComponent
 
     public function executeComponent()
     {
-        if ($this->checkModules()) {
-            CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
+        $this->checkModules();
 
-            $basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
-            $basket = $basketHandlerClass::getBasket();
+        CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
 
-            $this->arResult = $basket->getData();
+        $basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
+        $basket = $basketHandlerClass::getBasket();
 
-            $this->includeComponentTemplate();
-        }
+        $this->arResult = $basket->getData();
+
+        $this->includeComponentTemplate();
     }
 }
