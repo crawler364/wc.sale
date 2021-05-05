@@ -1,11 +1,15 @@
 <?php
 
+
+namespace WC\Sale\Components;
+
+
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use \WC\Sale\Handlers\OrderHandler;
 
-class WCSaleOrder extends CBitrixComponent
+class Order extends \CBitrixComponent
 {
     /** @var OrderHandler */
     private $orderHandlerClass = OrderHandler::class;

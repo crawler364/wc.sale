@@ -1,11 +1,15 @@
 <?php
 
+
+namespace WC\Sale\Components;
+
+
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use WC\Sale\Handlers\BasketHandler;
 
-class WCSaleBasket extends CBitrixComponent
+class Basket extends \CBitrixComponent
 {
     /** @var BasketHandler */
     private $basketHandlerClass = BasketHandler::class;

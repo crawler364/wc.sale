@@ -1,5 +1,9 @@
 <?php
 
+
+namespace WC\Sale\Components;
+
+
 use Bitrix\Main\Engine\Controller;
 use Bitrix\Main\Engine\Response\AjaxJson;
 use Bitrix\Main\Request;
@@ -7,7 +11,7 @@ use Bitrix\Main\Loader;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\BasketHandler;
 
-class WCSaleBasketAjaxController extends Controller
+class BasketAjaxController extends Controller
 {
     /** @var BasketHandler */
     private $basketHandlerClass = BasketHandler::class;

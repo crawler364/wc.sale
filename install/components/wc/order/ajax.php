@@ -1,10 +1,14 @@
 <?php
 
+
+namespace WC\Sale\Components;
+
+
 use Bitrix\Main\Context;
 use Bitrix\Main\Loader;
 use WC\Sale\Handlers\OrderHandler;
 
-class WCSaleOrderAjaxController extends \Bitrix\Main\Engine\Controller
+class OrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
     /** @var OrderHandler */
     private $orderHandlerClass = OrderHandler::class;
