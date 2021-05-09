@@ -92,6 +92,7 @@ class BasketHandler
 
     protected function setBasketItemProperties(): void
     {
+        // 0.00035500526428222656
         $cache = \Bitrix\Main\Data\Cache::createInstance();
         $productId = $this->basketItem->getProductId();
         $element = \Bitrix\Iblock\ElementTable::getByPrimary($productId, [
@@ -126,7 +127,7 @@ class BasketHandler
 
     protected function setBasketItemPropertiesD7(): void
     {
-        Loader::includeModule('iblock');
+        // 0.001798868179321289
         $element = ElementTable::getList([
             'select' => ['IBLOCK_ID', 'IBLOCK_VERSION' => 'IBLOCK.VERSION'],
             'filter' => ['=ID' => $this->basketItem->getProductId()],
