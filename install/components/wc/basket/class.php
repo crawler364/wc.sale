@@ -31,7 +31,7 @@ class Basket extends \CBitrixComponent
     {
         $this->checkModules();
 
-        CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
+        \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
 
         $basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
         $basket = $basketHandlerClass::getBasket();
