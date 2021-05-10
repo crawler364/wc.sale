@@ -16,23 +16,20 @@ use WC\Core\Helpers\Main;
 use WC\Sale\BasketItem;
 use WC\Sale\Basket;
 
+Loc::loadMessages(__FILE__);
+
 class BasketHandler
 {
-    /** @var BasketItem */
-    protected $basketItem;
-    /** @var Basket */
     protected $basket;
-    /** @var CatalogProvider */
+    protected $basketItem;
     protected $productProvider = CatalogProvider::class;
-    private Result $result;
+    private $result;
     private $quantity;
-    private array $parameters;
+    private $parameters;
 
     public function __construct(Basket $basket, array $parameters = [])
     {
         $this->result = new Result();
-        Loc::loadMessages(__FILE__);
-
         $this->basket = $basket;
         $this->parameters = $parameters;
     }
@@ -97,7 +94,7 @@ class BasketHandler
         $cache = \Bitrix\Main\Data\Cache::createInstance();
         $productId = $this->basketItem->getProductId();
         $element = \Bitrix\Iblock\ElementTable::getByPrimary($productId, [
-            'select' => ['IBLOCK_ID'], 'cache' => ['ttl' => 604800]
+            'select' => ['IBLOCK_ID'], 'cache' => ['ttl' => 604800],
         ])->fetchObject();
         $iBlockId = $element->getIblockId();
 
@@ -194,7 +191,12 @@ class BasketHandler
         }
     }
 
-    public static function getBasketItem($productId, Basket $basket = null): ?BasketItem
+    /**
+     * @param $productId
+     * @param Basket|\Bitrix\Sale\BasketBase|null $basket
+     * @return BasketItem|\Bitrix\Sale\BasketItemBase
+     */
+    public static function getBasketItem($productId, Basket $basket = null)
     {
         Loader::includeModule('catalog');
 
@@ -204,23 +206,26 @@ class BasketHandler
             $basketItem = $basket->createItem('catalog', $productId);
         }
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $basketItem;
     }
 
-    public static function getBasket(int $userId = null): Basket
+    /**
+     * @param int|null $userId
+     * @return Basket|\Bitrix\Sale\BasketBase
+     */
+    public static function getBasket(int $userId = null)
     {
         if ($userId) {
             $fUserId = Fuser::getIdByUserId($userId);
         } else {
             $fUserId = Fuser::getId();
         }
+
         $siteId = Main::getSiteId();
         $basket = Basket::loadItemsForFUser($fUserId, $siteId);
         $order = OrderHandler::createOrder();
         $order->appendBasket($basket);
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $basket;
     }
 }

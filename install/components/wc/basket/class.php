@@ -11,10 +11,18 @@ use WC\Sale\Handlers\BasketHandler;
 
 class Basket extends \CBitrixComponent
 {
-    /** @var BasketHandler */
     private $basketHandlerClass = BasketHandler::class;
 
-    protected function checkModules(): bool
+    public function __construct($component = null)
+    {
+        $this->checkModules();
+        $this->basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
+        \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
+
+        parent::__construct($component);
+    }
+
+    private function checkModules(): bool
     {
         if (!Loader::includeModule('wc.core')) {
             throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
@@ -29,13 +37,7 @@ class Basket extends \CBitrixComponent
 
     public function executeComponent()
     {
-        $this->checkModules();
-
-        \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
-
-        $basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
-        $basket = $basketHandlerClass::getBasket();
-
+        $basket = $this->basketHandlerClass::getBasket();
         $this->arResult = $basket->getData();
 
         $this->includeComponentTemplate();

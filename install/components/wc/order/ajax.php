@@ -12,7 +12,7 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
     /** @var OrderHandler */
     private $orderHandlerClass = OrderHandler::class;
-    private $propertiesDefaultValue = false;
+    private $usePropertiesDefaultValue = false;
 
     public function __construct(\Bitrix\Main\Request $request = null)
     {
@@ -54,8 +54,10 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
         }
 
         $order = $this->orderHandlerClass::createOrder();
-        $orderHandler = new $this->orderHandlerClass($order, $orderData);
-        $orderHandler->propertiesDefaultValue = $this->propertiesDefaultValue;
+        $orderHandler = new $this->orderHandlerClass($order, [
+            'ORDER_DATA' => $orderData,
+            'USE_PROPERTIES_DEFAULT_VALUE' => $this->usePropertiesDefaultValue,
+        ]);
         $result = $orderHandler->saveOrder();
 
         return $result->prepareAjaxJson();

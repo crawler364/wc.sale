@@ -10,6 +10,8 @@ use Bitrix\Main\Context;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery;
 
+Loc::loadMessages(__FILE__);
+
 class OrderHandler
 {
     /** @var Result */
@@ -18,18 +20,23 @@ class OrderHandler
     protected $order;
     /** @var BasketHandler */
     protected $basketHandler = BasketHandler::class;
-    public $propertiesDefaultValue = true;
+    private $usePropertiesDefaultValue = true;
+    private $orderData;
 
-    public function __construct(Order $order, array $orderData = null)
+    public function __construct(Order $order, array $parameters = [])
     {
-        Loc::loadMessages(__FILE__);
-
         $this->result = new Result();
         $this->order = $order;
-        $this->orderData = $orderData ?? Context::getCurrent()->getRequest()->toArray();
+        $this->parseParameters($parameters);
     }
 
-    protected function setPersonType()
+    protected function parseParameters($parameters): void
+    {
+        $this->orderData = $parameters['ORDER_DATA'] ?? Context::getCurrent()->getRequest()->toArray();
+        $this->usePropertiesDefaultValue = $parameters['USE_PROPERTIES_DEFAULT_VALUE'] !== false;
+    }
+
+    protected function setPersonType(): void
     {
         if ($this->orderData['PERSON_TYPE_ID']) {
             $personTypeId = $this->orderData['PERSON_TYPE_ID'];
@@ -68,7 +75,7 @@ class OrderHandler
         return $personTypes;
     }
 
-    protected function setBasket()
+    protected function setBasket(): void
     {
         $basket = $this->basketHandler::getBasket($this->order->getUserId());
         $this->order->setBasket($basket);
@@ -76,11 +83,16 @@ class OrderHandler
 
     protected function getProductsList(): array
     {
-        $basket = $this->order->getBasket();
-        return $basket->getItemsList();
+        $productsList = [];
+
+        if ($basket = $this->order->getBasket()) {
+            $productsList = $basket->getItemsList();
+        }
+
+        return $productsList;
     }
 
-    protected function setLocation()
+    protected function setLocation(): void
     {
         /**
          * @var array $orderPropertyCollection
@@ -90,17 +102,17 @@ class OrderHandler
         $orderPropertyCollection = $this->order->getRestrictedProperties();
 
         foreach ($orderPropertyCollection as $orderProperty) {
-            if ($orderProperty->getType() == 'LOCATION') {
+            if ($orderProperty->getType() === 'LOCATION') {
                 $property = $orderProperty->getProperty();
 
                 if ($this->orderData[$property['CODE']]) {
                     $propertyValue = $this->orderData[$property['CODE']];
-                } elseif ($property['DEFAULT_VALUE'] && $this->propertiesDefaultValue) {
+                } elseif ($property['DEFAULT_VALUE'] && $this->usePropertiesDefaultValue) {
                     $propertyValue = $property['DEFAULT_VALUE'];
                 } else {
                     $propertyValue = '';
                 }
-                
+
                 $orderProperty->setValue($propertyValue);
                 break;
             }
@@ -119,7 +131,7 @@ class OrderHandler
         $property = [];
 
         foreach ($orderProperties as $orderProperty) {
-            if ($orderProperty->getType() == 'LOCATION') {
+            if ($orderProperty->getType() === 'LOCATION') {
                 $property = $orderProperty->getProperty();
                 $property['VALUE'] = $orderProperty->getValue();
                 break;
@@ -129,7 +141,7 @@ class OrderHandler
         return $property;
     }
 
-    protected function setShipment()
+    protected function setShipment(): void
     {
         /**
          * @var \Bitrix\Sale\ShipmentCollection $shipmentCollection
@@ -143,7 +155,7 @@ class OrderHandler
         $restrictedDeliveries = $this->getRestrictedDeliveries($shipmentCollection);
 
         foreach ($restrictedDeliveries as $key => $restrictedDelivery) {
-            if ($key == 0) {
+            if ($key === 0) {
                 $deliveryId = $restrictedDelivery['ID'];
             }
 
@@ -160,8 +172,9 @@ class OrderHandler
             $basket = $this->order->getBasket();
 
             foreach ($basket as $basketItem) {
-                $shipmentItem = $shipmentItemCollection->createItem($basketItem);
-                $shipmentItem->setQuantity($basketItem->getQuantity());
+                if ($shipmentItem = $shipmentItemCollection->createItem($basketItem)) {
+                    $shipmentItem->setQuantity($basketItem->getQuantity());
+                }
             }
         } else {
             $this->result->addError('WC_SALE_SHIPMENT_ERROR');
@@ -194,7 +207,7 @@ class OrderHandler
         return $deliveries;
     }
 
-    protected function setPayment()
+    protected function setPayment(): void
     {
         /**
          * @var \Bitrix\Sale\PaymentCollection $paymentCollection
@@ -206,7 +219,7 @@ class OrderHandler
         $restrictedPaySystems = $this->getRestrictedPaySystems($paymentCollection);
 
         foreach ($restrictedPaySystems as $key => $restrictedPaySystem) {
-            if ($key == 0) {
+            if ($key === 0) {
                 $paySystemId = $restrictedPaySystem['ID'];
             }
 
@@ -252,7 +265,7 @@ class OrderHandler
         return $paySystems;
     }
 
-    protected function setProperties()
+    protected function setProperties(): void
     {
         /**
          * @var array $orderPropertyCollection
@@ -262,7 +275,7 @@ class OrderHandler
         $orderPropertyCollection = $this->order->getRestrictedProperties();
 
         foreach ($orderPropertyCollection as $orderProperty) {
-            if ($orderProperty->isUtil() || $orderProperty->getType() == 'LOCATION') {
+            if ($orderProperty->isUtil() || $orderProperty->getType() === 'LOCATION') {
                 continue;
             }
 
@@ -270,10 +283,10 @@ class OrderHandler
 
             if ($this->orderData[$property['CODE']]) {
                 $propertyValue = $this->orderData[$property['CODE']];
-            } elseif ($property['DEFAULT_VALUE'] && $this->propertiesDefaultValue) {
+            } elseif ($property['DEFAULT_VALUE'] && $this->usePropertiesDefaultValue) {
                 $propertyValue = $property['DEFAULT_VALUE'];
             } else {
-                $propertyValue = $property['MULTIPLE'] == 'Y' ? [''] : '';
+                $propertyValue = $property['MULTIPLE'] === 'Y' ? [''] : '';
             }
 
             $orderProperty->setValue($propertyValue);
@@ -291,7 +304,7 @@ class OrderHandler
         $properties = [];
 
         foreach ($orderProperties as $orderProperty) {
-            if ($orderProperty->isUtil() || $orderProperty->getType() == 'LOCATION') {
+            if ($orderProperty->isUtil() || $orderProperty->getType() === 'LOCATION') {
                 continue;
             }
 
@@ -371,6 +384,7 @@ class OrderHandler
             $shipment,
             Delivery\Restrictions\Manager::MODE_CLIENT
         );
+
         return array_values($restrictedDeliveries);
     }
 
@@ -378,13 +392,17 @@ class OrderHandler
     {
         $payment = \Bitrix\Sale\Payment::create($paymentCollection);
         $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions(
-            $payment,
-            \Bitrix\Sale\Services\PaySystem\Restrictions\Manager::MODE_CLIENT
+            $payment
         );
+
         return array_values($restrictedPaySystems);
     }
 
-    public static function createOrder(int $userId = null): Order
+    /**
+     * @param int|null $userId
+     * @return Order|\Bitrix\Sale\Order
+     */
+    public static function createOrder(int $userId = null)
     {
         if ($userId == null) {
             global $USER;
