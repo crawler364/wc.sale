@@ -90,17 +90,15 @@ class wc_sale extends CModule
 
     private function checkRequirements(): void
     {
-        $requirePhp = '7.1';
+        $requirePhp = '7.4';
+        $requireModules = [
+            'main' => '20.200.300',
+            'wc.core' => '0.3.4',
+        ];
+
         if (CheckVersion(PHP_VERSION, $requirePhp) === false) {
             throw new Main\SystemException(Loc::getMessage('WC_SALE_INSTALL_REQUIRE_PHP', ['#VERSION#' => $requirePhp]));
         }
-
-        $requireModules = [
-            'main' => '17.5.0',
-            'iblock' => '15.0.0',
-            'sale' => '15.0.0',
-            'wc.core' => '0.0.1',
-        ];
 
         if (class_exists(ModuleManager::class)) {
             foreach ($requireModules as $moduleName => $moduleVersion) {
