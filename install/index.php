@@ -68,12 +68,12 @@ class wc_sale extends CModule
 
     function InstallEvents()
     {
-        // todo \WC\IBlock\UniqueSymbolCode
+        // todo UniqueSymbolCode
     }
 
     function UnInstallEvents()
     {
-        // todo \WC\IBlock\UniqueSymbolCode
+        // todo UniqueSymbolCode
     }
 
     public function InstallFiles(): void
@@ -84,8 +84,9 @@ class wc_sale extends CModule
 
     function UnInstallFiles()
     {
-        //todo
-        //Directory::deleteDirectory($this->kernelDir . '/components/wc/order');
+        Directory::deleteDirectory($this->kernelDir . '/components/wc/order');
+        Directory::deleteDirectory($this->kernelDir . '/components/wc/basket');
+        Directory::deleteDirectory($this->kernelDir . '/js/wc/sale');
     }
 
     private function checkRequirements(): void
