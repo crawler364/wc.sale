@@ -15,21 +15,21 @@ class Order extends \CBitrixComponent
 
     public function __construct($component = null)
     {
+        parent::__construct($component);
+
         $this->checkModules();
         $this->orderHandlerClass = $this->arParams['ORDER_HANDLER_CLASS'] ?: $this->orderHandlerClass;
         \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
-
-        parent::__construct($component);
     }
 
     private function checkModules(): bool
     {
         if (!Loader::includeModule('wc.core')) {
-            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_CORE_NOT_INCLUDED'));
+            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.core']));
         }
 
         if (!Loader::includeModule('wc.sale')) {
-            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_SALE_NOT_INCLUDED'));
+            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.sale']));
         }
 
         return true;

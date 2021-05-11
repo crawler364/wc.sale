@@ -15,21 +15,21 @@ class Basket extends \CBitrixComponent
 
     public function __construct($component = null)
     {
+        parent::__construct($component);
+
         $this->checkModules();
         $this->basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
         \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
-
-        parent::__construct($component);
     }
 
     private function checkModules(): bool
     {
         if (!Loader::includeModule('wc.core')) {
-            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
+            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.core']));
         }
 
         if (!Loader::includeModule('wc.sale')) {
-            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_CORE_NOT_INCLUDED'));
+            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.sale']));
         }
 
         return true;
