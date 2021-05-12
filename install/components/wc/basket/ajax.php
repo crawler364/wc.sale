@@ -13,16 +13,47 @@ use Bitrix\Main\Loader;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\BasketHandler;
 
+Loc::loadMessages(__FILE__);
+
 class BasketAjaxController extends Controller
 {
     /** @var BasketHandler */
-    private $basketHandlerClass = BasketHandler::class;
+    private $cBasketHandler = BasketHandler::class;
 
     public function __construct(Request $request = null)
     {
         parent::__construct($request);
 
         $this->checkModules();
+    }
+
+    public function configureActions(): array
+    {
+        return [
+            'process' => [
+                'prefilters' => [], 'postfilters' => [],
+            ],
+        ];
+    }
+
+    public function processAction(array $product, string $basketAction = '', array $parameters = []): AjaxJson
+    {
+        $cBasketHandler = $parameters['CLASS_BASKET_HANDLER'] ?: $this->cBasketHandler;
+
+        $basket = $cBasketHandler::getBasket();
+        $basketItem = $basket->getItemBy(['PRODUCT_ID' => $product['id']]) ??
+            $cBasketHandler::getBasketItem($product['id'], $basket);
+
+        if ($basketItem) {
+            $basketHandler = new $cBasketHandler($basket, $parameters);
+            $basketHandler->processBasketItem($basketItem, $basketAction, $product['quantity']);
+            $result = $basketHandler->saveBasket();
+        } else {
+            $result = new Result();
+            $result->addError('WC_BASKET_UNDEFINED_PRODUCT');
+        }
+
+        return $result->prepareAjaxJson();
     }
 
     private function checkModules(): bool
@@ -36,34 +67,5 @@ class BasketAjaxController extends Controller
         }
 
         return true;
-    }
-
-    public function configureActions(): array
-    {
-        return [
-            'process' => [
-                'prefilters' => [], 'postfilters' => [],
-            ],
-        ];
-    }
-
-    public function processAction(string $basketAction, array $product, array $parameters = []): AjaxJson
-    {
-        $result = new Result();
-
-        $basketHandlerClass = $parameters['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
-        $basket = $basketHandlerClass::getBasket();
-        $basketItem = $basket->getItemBy(['PRODUCT_ID' => $product['id']]) ??
-            $basketHandlerClass::getBasketItem($product['id'], $basket);
-
-        if (!$basketItem) {
-            $result->addError('WC_UNDEFINED_PRODUCT');
-        } else {
-            $basketHandler = new $basketHandlerClass($basket, $parameters);
-            $basketHandler->processBasketItem($basketItem, $basketAction, $product['quantity']);
-            $result = $basketHandler->saveBasket();
-        }
-
-        return $result->prepareAjaxJson();
     }
 }

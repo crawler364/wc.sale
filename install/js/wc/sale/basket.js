@@ -173,18 +173,9 @@ class WCSaleBasket {
             basketDomHandler.processStart();
         }
 
-        let data = {
-            basketAction: this.action,
-            product: {
-                id: this.productId,
-                quantity: this.action === 'set' ? this.quantity : '',
-            },
-            parameters: this.parameters
-        };
-
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'ajax',
-            data: data,
+            data: this.getData(),
             signedParameters: this.signedParameters
         }).then((response) => {
             console.log(response)
@@ -213,5 +204,22 @@ class WCSaleBasket {
                 basketDomHandler.processResponse(response);
             }
         });
+    }
+
+    getData() {
+        let data = {
+            product: {
+                id: this.productId,
+            },
+            parameters: this.parameters
+        };
+
+        if (this.action === 'set') {
+            data.product.quantity = this.quantity;
+        } else {
+            data.basketAction = this.action;
+        }
+
+        return data;
     }
 }

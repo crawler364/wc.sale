@@ -11,15 +11,23 @@ use WC\Sale\Handlers\BasketHandler;
 
 class Basket extends \CBitrixComponent
 {
-    private $basketHandlerClass = BasketHandler::class;
+    private $cBasketHandler = BasketHandler::class;
 
     public function __construct($component = null)
     {
         parent::__construct($component);
 
         $this->checkModules();
-        $this->basketHandlerClass = $this->arParams['BASKET_HANDLER_CLASS'] ?: $this->basketHandlerClass;
+        $this->cBasketHandler = $this->arParams['CLASS_BASKET_HANDLER'] ?: $this->cBasketHandler;
         \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
+    }
+
+    public function executeComponent()
+    {
+        $basket = $this->cBasketHandler::getBasket();
+        $this->arResult = $basket->getData();
+
+        $this->includeComponentTemplate();
     }
 
     private function checkModules(): bool
@@ -33,13 +41,5 @@ class Basket extends \CBitrixComponent
         }
 
         return true;
-    }
-
-    public function executeComponent()
-    {
-        $basket = $this->basketHandlerClass::getBasket();
-        $this->arResult = $basket->getData();
-
-        $this->includeComponentTemplate();
     }
 }

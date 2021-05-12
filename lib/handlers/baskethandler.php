@@ -20,7 +20,9 @@ Loc::loadMessages(__FILE__);
 
 class BasketHandler
 {
+    /** @var Basket $basketItem */
     protected $basket;
+    /** @var BasketItem $basketItem */
     protected $basketItem;
     protected $productProvider = CatalogProvider::class;
     private $result;
@@ -34,15 +36,45 @@ class BasketHandler
         $this->parameters = $parameters;
     }
 
+    /**
+     * @param $productId
+     * @param Basket|\Bitrix\Sale\BasketBase|null $basket
+     * @return BasketItem|\Bitrix\Sale\BasketItemBase
+     */
+    public static function getBasketItem($productId, Basket $basket = null)
+    {
+        Loader::includeModule('catalog');
+
+        $basket = $basket ?: self::getBasket();
+
+        if ($product = ProductTable::getByPrimary($productId, [
+            'select' => ['ID'],
+            'filter' => ['=IBLOCK_ELEMENT.ACTIVE' => 'Y'],
+        ])->fetch()) {
+            return $basket->createItem('catalog', $product['ID']);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param int|null $userId
+     * @return Basket|\Bitrix\Sale\BasketBase
+     */
+    public static function getBasket(int $userId = null)
+    {
+        $fUserId = $userId ? Fuser::getIdByUserId($userId) : Fuser::getId();
+        $basket = Basket::loadItemsForFUser($fUserId, Main::getSiteId());
+        $order = OrderHandler::createOrder();
+        $order->appendBasket($basket);
+
+        return $basket;
+    }
+
     public function processBasketItem(BasketItem $basketItem, $action, $quantity = null): Result
     {
         $this->basketItem = $basketItem;
-
-        if ($action !== 'set') {
-            $quantity = $this->basketItem->mathQuantity($action);
-        }
-
-        $this->quantity = $this->basketItem->checkQuantity($quantity);
+        $this->setBasketItemQuantity($action, $quantity);
 
         if ($this->quantity > 0) {
             if ($this->basketItem->getId() > 0) {
@@ -53,8 +85,6 @@ class BasketHandler
         } else {
             $this->basketItem->delete();
         }
-
-        // todo $this->result += данные по доставке?
 
         return $this->result;
     }
@@ -191,41 +221,12 @@ class BasketHandler
         }
     }
 
-    /**
-     * @param $productId
-     * @param Basket|\Bitrix\Sale\BasketBase|null $basket
-     * @return BasketItem|\Bitrix\Sale\BasketItemBase
-     */
-    public static function getBasketItem($productId, Basket $basket = null)
+    private function setBasketItemQuantity($action, $quantity = null): void
     {
-        Loader::includeModule('catalog');
-
-        $basket = $basket ?: self::getBasket();
-
-        if (ProductTable::getById($productId)->fetch()) {
-            $basketItem = $basket->createItem('catalog', $productId);
+        if (!$quantity) {
+            $quantity = $this->basketItem->mathQuantity($action);
         }
 
-        return $basketItem;
-    }
-
-    /**
-     * @param int|null $userId
-     * @return Basket|\Bitrix\Sale\BasketBase
-     */
-    public static function getBasket(int $userId = null)
-    {
-        if ($userId) {
-            $fUserId = Fuser::getIdByUserId($userId);
-        } else {
-            $fUserId = Fuser::getId();
-        }
-
-        $siteId = Main::getSiteId();
-        $basket = Basket::loadItemsForFUser($fUserId, $siteId);
-        $order = OrderHandler::createOrder();
-        $order->appendBasket($basket);
-
-        return $basket;
+        $this->quantity = $this->basketItem->checkQuantity($quantity);
     }
 }

@@ -39,7 +39,7 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         /** @var BasketPropertyItem $property */
 
         if ($propertyCollection = $this->getPropertyCollection()) {
-            if (!$property = $propertyCollection->getItemByCode($code)){
+            if (!$property = $propertyCollection->getItemByCode($code)) {
                 $property = $propertyCollection->createItem();
             }
 
