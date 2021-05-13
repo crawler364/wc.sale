@@ -4,11 +4,12 @@
 namespace WC\Sale\Handlers;
 
 
-use WC\Core\Bitrix\Main\Result;
-use WC\Sale\Order;
 use Bitrix\Main\Context;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery;
+use WC\Sale\Handlers\Basket\Handler as BasketHandler;
+use WC\Core\Bitrix\Main\Result;
+use WC\Sale\Order;
 
 Loc::loadMessages(__FILE__);
 
@@ -77,7 +78,7 @@ class OrderHandler
 
     protected function setBasket(): void
     {
-        $basket = $this->basketHandler::getBasket($this->order->getUserId());
+        $basket = $this->basketHandler::getBasket(\Bitrix\Sale\Fuser::getIdByUserId($this->order->getUserId()));
         $this->order->setBasket($basket);
     }
 
