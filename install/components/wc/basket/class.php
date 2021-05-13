@@ -7,7 +7,8 @@ namespace WC\Sale\Components;
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
-use WC\Sale\Handlers\BasketHandler;
+use Bitrix\Sale\Fuser;
+use WC\Sale\Handlers\Basket\Handler as BasketHandler;
 
 class Basket extends \CBitrixComponent
 {
@@ -24,7 +25,7 @@ class Basket extends \CBitrixComponent
 
     public function executeComponent()
     {
-        $basket = $this->cBasketHandler::getBasket();
+        $basket = $this->cBasketHandler::getBasket(Fuser::getId());
         $this->arResult = $basket->getData();
 
         $this->includeComponentTemplate();

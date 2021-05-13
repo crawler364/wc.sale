@@ -217,7 +217,7 @@ class WCSaleBasket {
         if (this.action === 'set') {
             data.product.quantity = this.quantity;
         } else {
-            data.basketAction = this.action;
+            data.product.action = this.action;
         }
 
         return data;

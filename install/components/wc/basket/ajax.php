@@ -10,8 +10,9 @@ use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Request;
 use Bitrix\Main\Loader;
+use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
-use WC\Sale\Handlers\BasketHandler;
+use WC\Sale\Handlers\Basket\Handler as BasketHandler;
 
 Loc::loadMessages(__FILE__);
 
@@ -36,17 +37,25 @@ class BasketAjaxController extends Controller
         ];
     }
 
-    public function processAction(array $product, string $basketAction = '', array $parameters = []): AjaxJson
+    /**
+     * @param array $product id, quantity, action
+     * @param array $parameters component params
+     * @return AjaxJson
+     */
+    public function processAction(array $product, array $parameters = []): AjaxJson
     {
         $cBasketHandler = $parameters['CLASS_BASKET_HANDLER'] ?: $this->cBasketHandler;
 
-        $basket = $cBasketHandler::getBasket();
+        $basket = $cBasketHandler::getBasket(Fuser::getId());
         $basketItem = $basket->getItemBy(['PRODUCT_ID' => $product['id']]) ??
-            $cBasketHandler::getBasketItem($product['id'], $basket);
+            $cBasketHandler::createBasketItem($product['id'], $basket);
 
         if ($basketItem) {
             $basketHandler = new $cBasketHandler($basket, $parameters);
-            $basketHandler->processBasketItem($basketItem, $basketAction, $product['quantity']);
+            $basketHandler->processBasketItem($basketItem, [
+                'ACTION' => $product['action'],
+                'QUANTITY' => $product['quantity'],
+            ]);
             $result = $basketHandler->saveBasket();
         } else {
             $result = new Result();
