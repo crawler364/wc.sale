@@ -8,12 +8,14 @@ use Bitrix\Main\Context;
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
-use WC\Sale\Handlers\OrderHandler;
+use WC\Sale\Handlers\Order\Handler as OrderHandler;
+
+Loc::loadMessages(__FILE__);
 
 class OrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
     /** @var OrderHandler */
-    private $orderHandlerClass = OrderHandler::class;
+    private $cOrderHandler = OrderHandler::class;
     private $usePropertiesDefaultValue = false;
 
     public function __construct(\Bitrix\Main\Request $request = null)
@@ -21,19 +23,6 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
         parent::__construct($request);
 
         $this->checkModules();
-    }
-
-    private function checkModules(): bool
-    {
-        if (!Loader::includeModule('wc.core')) {
-            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.core']));
-        }
-
-        if (!Loader::includeModule('wc.sale')) {
-            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.sale']));
-        }
-
-        return true;
     }
 
     public function configureActions(): array
@@ -68,13 +57,26 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
             }
         }
 
-        $order = $this->orderHandlerClass::createOrder();
-        $orderHandler = new $this->orderHandlerClass($order, [
+        $order = $this->cOrderHandler::createOrder();
+        $orderHandler = new $this->cOrderHandler($order, [
             'ORDER_DATA' => $orderData,
             'USE_PROPERTIES_DEFAULT_VALUE' => $this->usePropertiesDefaultValue,
         ]);
         $result = $orderHandler->saveOrder();
 
         return $result->prepareAjaxJson();
+    }
+
+    private function checkModules(): bool
+    {
+        if (!Loader::includeModule('wc.core')) {
+            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.core']));
+        }
+
+        if (!Loader::includeModule('wc.sale')) {
+            throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.sale']));
+        }
+
+        return true;
     }
 }

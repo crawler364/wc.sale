@@ -12,7 +12,7 @@ use WC\Core\Bitrix\Main\Result;
 use WC\Core\Helpers\Main;
 use WC\Sale\BasketItem;
 use WC\Sale\Basket;
-use WC\Sale\Handlers\OrderHandler;
+use WC\Sale\Handlers\Order\Handler as OrderHandler;
 
 Loc::loadMessages(__FILE__);
 

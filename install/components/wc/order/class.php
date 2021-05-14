@@ -7,19 +7,36 @@ namespace WC\Sale\Components;
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
-use \WC\Sale\Handlers\OrderHandler;
+use WC\Sale\Handlers\Order\Handler as OrderHandler;
+
+Loc::loadMessages(__FILE__);
 
 class Order extends \CBitrixComponent
 {
-    private $orderHandlerClass = OrderHandler::class;
+    /** @var OrderHandler $cOrderHandler */
+    private $cOrderHandler = OrderHandler::class;
 
     public function __construct($component = null)
     {
         parent::__construct($component);
 
         $this->checkModules();
-        $this->orderHandlerClass = $this->arParams['ORDER_HANDLER_CLASS'] ?: $this->orderHandlerClass;
+        $this->cOrderHandler = $this->arParams['ORDER_HANDLER_CLASS'] ?: $this->cOrderHandler;
         \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
+    }
+
+    public function executeComponent()
+    {
+        $order = $this->cOrderHandler::createOrder();
+        $orderHandler = new $this->cOrderHandler($order, [
+            'USE_PROPERTIES_DEFAULT_VALUE' => $this->arParams['USE_PROPERTIES_DEFAULT_VALUE'],
+        ]);
+        $result = $orderHandler->processOrder();
+
+        $this->arResult['DATA'] = $result->getData();
+        $this->arResult['ERRORS'] = $result->getErrorMessages();
+
+        $this->includeComponentTemplate();
     }
 
     private function checkModules(): bool
@@ -33,19 +50,5 @@ class Order extends \CBitrixComponent
         }
 
         return true;
-    }
-
-    public function executeComponent()
-    {
-        $order = $this->orderHandlerClass::createOrder();
-        $orderHandler = new $this->orderHandlerClass($order, [
-            'USE_PROPERTIES_DEFAULT_VALUE' => $this->arParams['USE_PROPERTIES_DEFAULT_VALUE'],
-        ]);
-        $result = $orderHandler->processOrder();
-
-        $this->arResult['DATA'] = $result->getData();
-        $this->arResult['ERRORS'] = $result->getErrorMessages();
-
-        $this->includeComponentTemplate();
     }
 }

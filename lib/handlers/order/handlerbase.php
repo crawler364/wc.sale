@@ -1,19 +1,20 @@
 <?php
 
 
-namespace WC\Sale\Handlers;
+namespace WC\Sale\Handlers\Order;
 
 
-use Bitrix\Main\Context;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery;
-use WC\Sale\Handlers\Basket\Handler as BasketHandler;
+use Bitrix\Main\Context;
+use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
+use WC\Sale\Handlers\Basket\Handler as BasketHandler;
 use WC\Sale\Order;
 
 Loc::loadMessages(__FILE__);
 
-class OrderHandler
+abstract class HandlerBase implements HandlerInterface
 {
     /** @var Result */
     protected $result;
@@ -21,14 +22,81 @@ class OrderHandler
     protected $order;
     /** @var BasketHandler */
     protected $basketHandler = BasketHandler::class;
-    private $usePropertiesDefaultValue = true;
-    private $orderData;
+    protected $usePropertiesDefaultValue = true;
+    protected $orderData;
 
     public function __construct(Order $order, array $parameters = [])
     {
         $this->result = new Result();
         $this->order = $order;
         $this->parseParameters($parameters);
+    }
+
+    /**
+     * @param int|null $userId
+     * @return Order|\Bitrix\Sale\Order
+     */
+    public static function createOrder(int $userId = null)
+    {
+        if ($userId == null) {
+            $fUserId = Fuser::getId();
+            $userId = Fuser::getUserIdById($fUserId);
+        }
+
+        $siteId = \WC\Core\Helpers\Main::getSiteId();
+
+        return Order::create($siteId, $userId);
+    }
+
+    public function processOrder(): Result
+    {
+        // todo $this->checkOrderData();
+
+        $this->setPersonType();
+        $personTypes = $this->getPersonTypes();
+        $this->setBasket();
+        $productsList = $this->getProductsList();
+
+        $this->setLocation();
+        $location = $this->getLocation();
+        $this->setShipment();
+        $deliveries = $this->getDeliveries();
+        $this->setPayment();
+        $paySystems = $this->getPaySystems();
+
+        $this->setProperties();
+        $properties = $this->getProperties();
+
+        $data = [
+            'LOCATION' => $location,
+            'PERSON_TYPES' => $personTypes,
+            'PROPERTIES' => $properties,
+            'DELIVERIES' => $deliveries,
+            'PAY_SYSTEMS' => $paySystems,
+            'PRODUCTS_LIST' => $productsList,
+            'INFO' => $this->order->getInfo(),
+        ];
+
+        $this->result->setData($data);
+
+        return $this->result;
+    }
+
+    public function saveOrder(): Result
+    {
+        // todo $this->checkOrderData();
+
+        $this->setPersonType();
+        $this->setBasket();
+        $this->setLocation();
+        $this->setShipment();
+        $this->setPayment();
+        $this->setProperties();
+
+        $result = $this->order->save();
+        $this->result->mergeResult($result);
+
+        return $this->result;
     }
 
     protected function parseParameters($parameters): void
@@ -78,7 +146,8 @@ class OrderHandler
 
     protected function setBasket(): void
     {
-        $basket = $this->basketHandler::getBasket(\Bitrix\Sale\Fuser::getIdByUserId($this->order->getUserId()));
+        $fUserId = $this->order->getFUserId();
+        $basket = $this->basketHandler::getBasket($fUserId);
         $this->order->setBasket($basket);
     }
 
@@ -317,57 +386,6 @@ class OrderHandler
         return $properties;
     }
 
-    public function processOrder(): Result
-    {
-        // todo $this->checkOrderData();
-
-        $this->setPersonType();
-        $personTypes = $this->getPersonTypes();
-        $this->setBasket();
-        $productsList = $this->getProductsList();
-
-        $this->setLocation();
-        $location = $this->getLocation();
-        $this->setShipment();
-        $deliveries = $this->getDeliveries();
-        $this->setPayment();
-        $paySystems = $this->getPaySystems();
-
-        $this->setProperties();
-        $properties = $this->getProperties();
-
-        $data = [
-            'LOCATION' => $location,
-            'PERSON_TYPES' => $personTypes,
-            'PROPERTIES' => $properties,
-            'DELIVERIES' => $deliveries,
-            'PAY_SYSTEMS' => $paySystems,
-            'PRODUCTS_LIST' => $productsList,
-            'INFO' => $this->order->getInfo(),
-        ];
-
-        $this->result->setData($data);
-
-        return $this->result;
-    }
-
-    public function saveOrder(): Result
-    {
-        // todo $this->checkOrderData();
-
-        $this->setPersonType();
-        $this->setBasket();
-        $this->setLocation();
-        $this->setShipment();
-        $this->setPayment();
-        $this->setProperties();
-
-        $result = $this->order->save();
-        $this->result->mergeResult($result);
-
-        return $this->result;
-    }
-
     protected function addOrder()
     {
         // todo
@@ -399,23 +417,4 @@ class OrderHandler
         return array_values($restrictedPaySystems);
     }
 
-    /**
-     * @param int|null $userId
-     * @return Order|\Bitrix\Sale\Order
-     */
-    public static function createOrder(int $userId = null)
-    {
-        if ($userId == null) {
-            global $USER;
-            $userId = $USER->GetID();
-        }
-
-        $siteId = \WC\Core\Helpers\Main::getSiteId();
-
-        return Order::create($siteId, $userId);
-    }
-
-    final public function getFilesPropertiesFromRequest($request)
-    {
-    }
 }

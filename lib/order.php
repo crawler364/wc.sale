@@ -4,6 +4,8 @@
 namespace WC\Sale;
 
 
+use Bitrix\Sale\Fuser;
+
 class Order extends \Bitrix\Sale\Order
 {
     public function getInfo(): array
@@ -48,5 +50,17 @@ class Order extends \Bitrix\Sale\Order
         }
 
         return $restrictedProperties;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getFUserId(): ?int
+    {
+        if ($userId = $this->getUserId()) {
+            return Fuser::getIdByUserId($userId);
+        }
+
+        return null;
     }
 }

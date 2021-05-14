@@ -10,8 +10,11 @@ use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Fuser;
 use WC\Sale\Handlers\Basket\Handler as BasketHandler;
 
+Loc::loadMessages(__FILE__);
+
 class Basket extends \CBitrixComponent
 {
+    /** @var BasketHandler $cBasketHandler */
     private $cBasketHandler = BasketHandler::class;
 
     public function __construct($component = null)
