@@ -44,6 +44,9 @@ class WCSaleOrder {
             data: formData,
         }).then((response) => {
             console.log(response);
+            if (response.status === 'success') {
+                window.location.replace(window.location);
+            }
         }, function (response) {
             console.log(response);
             // todo обработка ошибок
