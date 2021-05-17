@@ -333,6 +333,7 @@ use Bitrix\Main\Localization\Loc;
 <script type="text/javascript">
     if (!window.hasOwnProperty('WCSaleOrder')) {
         window.WCSaleOrder = new WCSaleOrder(<?=Bitrix\Main\Web\Json::encode([
+            'ajaxId' => $arParams['AJAX_ID'],
         ])?>);
         window.WCSaleOrder.init();
     }

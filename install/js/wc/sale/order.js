@@ -1,40 +1,34 @@
 class WCSaleOrder {
     constructor(params) {
-        this.wcOrder = BX('wc-order');
+        this.wcOrder = BX(`comp_${params.ajaxId}`);
     }
 
     init() {
         BX.ready(() => {
-
             BX.bindDelegate(
                 this.wcOrder,
                 'click',
-                {
-                    attribute: {'data-action-refresh': ''}
-                },
-                this.testGetData.bind(this)
+                {attribute: {'data-action-refresh': ''}},
+                this.refreshOrder.bind(this)
             );
 
             BX.bindDelegate(
                 this.wcOrder,
                 'blur',
-                {
-                    'tag': 'input',
-                    'attribute': {'NAME': 'PLACE'}
-                },
-                this.testGetData.bind(this)
+                {'tag': 'input', 'attribute': {'NAME': 'PLACE'}},
+                this.refreshOrder.bind(this)
             );
 
             BX.bindDelegate(
                 this.wcOrder,
                 'submit',
                 BX('wc-order-form'),
-                this.saveOrderAction.bind(this)
+                this.saveOrder.bind(this)
             );
         });
     }
 
-    saveOrderAction(e) {
+    saveOrder(e) {
         BX.PreventDefault(e);
         OrderLoader.showWait();
 
@@ -56,20 +50,17 @@ class WCSaleOrder {
         });
     }
 
-    testGetData(e) {
-
-        console.log(e.currentTarget);
-
+    refreshOrder(e) {
         BX.PreventDefault(e);
         OrderLoader.showWait();
+
         let form = BX.findChild(e.currentTarget, {
             'tag': 'form'
         }, true, false);
-
         let formData = new FormData(form);
 
         BX.ajax({
-            url: '/local/components/wc/order/get.php',
+            url: '#',
             data: formData,
             method: 'POST',
             dataType: 'html',

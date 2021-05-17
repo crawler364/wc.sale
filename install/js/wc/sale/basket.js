@@ -7,13 +7,15 @@ class WCSaleBasket {
     init() {
         BX.ready(() => {
             BX.bindDelegate(
-                document.body, 'change',
+                document.body,
+                'change',
                 {tag: 'input', attribute: 'data-action-basket-item'},
                 this.processAction.bind(this)
             );
 
             BX.bindDelegate(
-                document.body, 'click',
+                document.body,
+                'click',
                 {attribute: 'data-action-basket-item'},
                 this.processAction.bind(this)
             );
