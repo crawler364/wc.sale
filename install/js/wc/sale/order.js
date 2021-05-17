@@ -36,6 +36,7 @@ class WCSaleOrder {
 
     saveOrderAction(e) {
         BX.PreventDefault(e);
+        OrderLoader.showWait();
 
         let formData = new FormData(e.target);
 
@@ -44,11 +45,13 @@ class WCSaleOrder {
             data: formData,
         }).then((response) => {
             console.log(response);
+            OrderLoader.closeWait();
             if (response.status === 'success') {
                 window.location.replace(window.location);
             }
         }, function (response) {
             console.log(response);
+            OrderLoader.closeWait();
             // todo обработка ошибок
         });
     }

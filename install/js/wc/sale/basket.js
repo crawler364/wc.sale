@@ -38,8 +38,8 @@ class WCSaleBasket {
                 count: BX.findChild(basketContainer, {
                     'attribute': {'data-basket-count': ''}
                 }, true, false),
-                vat: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-vat': ''}
+                vatSum: BX.findChild(basketContainer, {
+                    'attribute': {'data-basket-vat-sum': ''}
                 }, true, false),
                 basePrice: BX.findChild(basketContainer, {
                     'attribute': {'data-basket-base-price': ''}
@@ -123,8 +123,8 @@ class WCSaleBasket {
             if (basketContainerDom.nodes.count) {
                 BX.adjust(basketContainerDom.nodes.count, {html: basket.info.count});
             }
-            if (basketContainerDom.nodes.vat) {
-                BX.adjust(basketContainerDom.nodes.vat, {html: basket.info.vatFormatted});
+            if (basketContainerDom.nodes.vatSum) {
+                BX.adjust(basketContainerDom.nodes.vatSum, {html: basket.info.vatSumFormatted});
             }
             if (basketContainerDom.nodes.basePrice) {
                 BX.adjust(basketContainerDom.nodes.basePrice, {html: basket.info.basePriceFormatted});

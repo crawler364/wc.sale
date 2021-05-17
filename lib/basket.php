@@ -19,16 +19,10 @@ class Basket extends \Bitrix\Sale\Basket
 
     public function getInfo(): array
     {
-        $info = [];
-        $info['COUNT'] = $this->count();
-        $info['WEIGHT'] = $this->getWeight();
-        $info['VAT'] = $this->getVatSum();
-        $info['BASE_PRICE'] = $this->getBasePrice();
-        $info['DISCOUNT_PRICE'] = $this->getDiscount();
-        $info['PRICE'] = $this->getPrice();
+        $info = $this->getFieldValues();
 
         $info['WEIGHT_FORMATTED'] = Catalog::formatWeight($info['WEIGHT']);
-        $info['VAT_FORMATTED'] = Catalog::formatPrice($info['VAT']);
+        $info['VAT_SUM_FORMATTED'] = Catalog::formatPrice($info['VAT_SUM']);
         $info['BASE_PRICE_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE']);
         $info['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE']);
         $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE']);
@@ -38,9 +32,8 @@ class Basket extends \Bitrix\Sale\Basket
 
     public function getRemovedItemsList(): ?array
     {
-        $removedItemsList = [];
         // todo
-        return $removedItemsList;
+        return [];
     }
 
     public function getItemsList(): array
@@ -89,5 +82,17 @@ class Basket extends \Bitrix\Sale\Basket
     public function getDiscount()
     {
         return $this->getBasePrice() - $this->getPrice();
+    }
+
+    public function getFieldValues(): array
+    {
+        return [
+            'COUNT' => $this->count(),
+            'WEIGHT' => $this->getWeight(),
+            'VAT_SUM' => $this->getVatSum(),
+            'BASE_PRICE' => $this->getBasePrice(),
+            'DISCOUNT_PRICE' => $this->getDiscount(),
+            'PRICE' => $this->getPrice(),
+        ];
     }
 }
