@@ -18,14 +18,15 @@ Loc::loadMessages(__FILE__);
 
 class BasketAjaxController extends Controller
 {
-    /** @var BasketHandler */
-    private $cBasketHandler = BasketHandler::class;
+    /** @var BasketHandler $cBasketHandler */
+    private $cBasketHandler;
+    private $arParams;
 
     public function __construct(Request $request = null)
     {
         parent::__construct($request);
 
-        $this->checkModules();
+        $this->checkModules(['wc.core', 'wc.sale']);
     }
 
     public function configureActions(): array
@@ -44,14 +45,17 @@ class BasketAjaxController extends Controller
      */
     public function processAction(array $product, array $parameters = []): AjaxJson
     {
-        $cBasketHandler = $parameters['CLASS_BASKET_HANDLER'] ?: $this->cBasketHandler;
+        /** @var Result $result */
 
-        $basket = $cBasketHandler::getBasket(Fuser::getId());
+        $this->setArParams($parameters);
+        $this->setCBasketHandler();
+
+        $basket = $this->cBasketHandler::getBasket(Fuser::getId());
         $basketItem = $basket->getItemBy(['PRODUCT_ID' => $product['id']]) ??
-            $cBasketHandler::createBasketItem($product['id'], $basket);
+            $this->cBasketHandler::createBasketItem($product['id'], $basket);
 
         if ($basketItem) {
-            $basketHandler = new $cBasketHandler($basket, $parameters);
+            $basketHandler = new $this->cBasketHandler($basket, $this->arParams);
             $basketHandler->processBasketItem($basketItem, [
                 'ACTION' => $product['action'],
                 'QUANTITY' => $product['quantity'],
@@ -65,16 +69,28 @@ class BasketAjaxController extends Controller
         return $result->prepareAjaxJson();
     }
 
-    private function checkModules(): bool
+    private function checkModules(array $modules): void
     {
-        if (!Loader::includeModule('wc.core')) {
-            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.core']));
+        foreach ($modules as $module) {
+            if (!Loader::includeModule($module)) {
+                throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_NOT_INCLUDED', ['#REPLACE#' => $module]));
+            }
         }
+    }
 
-        if (!Loader::includeModule('wc.sale')) {
-            throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_NOT_INCLUDED', ['#REPLACE#' => 'wc.sale']));
+    private function setArParams($parameters): void
+    {
+        $this->arParams = $parameters;
+    }
+
+    private function setCBasketHandler(): void
+    {
+        if (class_exists($this->arParams['BASKET_HANDLER_CLASS'])) {
+            $this->cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
+        } elseif (class_exists(BasketHandler::class)) {
+            $this->cBasketHandler = BasketHandler::class;
+        } else {
+            throw new SystemException(Loc::getMessage('WC_BASKET_HANDLER_CLASS_NOT_EXISTS'));
         }
-
-        return true;
     }
 }

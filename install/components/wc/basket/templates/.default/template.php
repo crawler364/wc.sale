@@ -81,8 +81,8 @@ use \Bitrix\Main\Localization\Loc;
         <td data-basket-count><?= $arResult['INFO']['COUNT'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_VAT') ?></td>
-        <td data-basket-vat-sum><?= $arResult['INFO']['VAT_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_BASKET_VAT_SUM') ?></td>
+        <td data-basket-vat-sum><?= $arResult['INFO']['VAT_SUM_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_BASE_PRICE') ?></td>

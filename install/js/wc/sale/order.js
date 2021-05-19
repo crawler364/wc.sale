@@ -15,7 +15,7 @@ class WCSaleOrder {
             BX.bindDelegate(
                 this.wcOrder,
                 'blur',
-                {'tag': 'input', 'attribute': {'NAME': 'PLACE'}},
+                {'tag': 'input', 'attribute': {'name': 'LOCATION'}}, // todo NAME
                 this.refreshOrder.bind(this)
             );
 
@@ -60,7 +60,7 @@ class WCSaleOrder {
         let formData = new FormData(form);
 
         BX.ajax({
-            url: '#',
+            url: '?AJAX_MODE=Y',
             data: formData,
             method: 'POST',
             dataType: 'html',

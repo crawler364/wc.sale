@@ -24,6 +24,7 @@ $arComponentParameters = [
             'TYPE' => 'CHECKBOX',
             'VALUE' => 'Y',
             "DEFAULT" => "Y",
+            "HIDDEN" => 'Y',
         ],
         'AJAX_OPTION_JUMP' => [
             'NAME' => GetMessage('WC_ORDER_AJAX_OPTION_JUMP'),
