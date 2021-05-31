@@ -12,7 +12,7 @@ class Handler extends HandlerBase
 {
     protected function setBasketItemQuantity(array $product): void
     {
-        $quantity = $product['QUANTITY'] ?? $this->basketItem->mathQuantity($product['ACTION']);
+        $quantity = is_numeric($product['QUANTITY']) ? $product['QUANTITY'] : $this->basketItem->mathQuantity($product['ACTION']);
         $this->quantity = $this->basketItem->checkQuantity($quantity);
     }
 }

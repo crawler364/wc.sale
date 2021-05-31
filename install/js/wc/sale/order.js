@@ -1,26 +1,28 @@
 class WCSaleOrder {
     constructor(params) {
-        this.wcOrder = BX(`comp_${params.ajaxId}`);
+        this.parameters = params.parameters;
+        this.signedParameters = params.signedParameters;
+        this.orderContainer = BX(`comp_${this.parameters.ajaxId}`);
     }
 
     init() {
         BX.ready(() => {
             BX.bindDelegate(
-                this.wcOrder,
+                this.orderContainer,
                 'click',
                 {attribute: {'data-action-refresh': ''}},
                 this.refreshOrder.bind(this)
             );
 
             BX.bindDelegate(
-                this.wcOrder,
+                this.orderContainer,
                 'blur',
                 {'tag': 'input', 'attribute': {'name': 'LOCATION'}}, // todo NAME
                 this.refreshOrder.bind(this)
             );
 
             BX.bindDelegate(
-                this.wcOrder,
+                this.orderContainer,
                 'submit',
                 BX('wc-order-form'),
                 this.saveOrder.bind(this)
@@ -37,6 +39,7 @@ class WCSaleOrder {
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
             mode: 'ajax',
             data: formData,
+            signedParameters: this.signedParameters,
         }).then((response) => {
             console.log(response);
             OrderLoader.closeWait();
@@ -60,7 +63,7 @@ class WCSaleOrder {
         let formData = new FormData(form);
 
         BX.ajax({
-            url: '?AJAX_MODE=Y',
+            url: '?AJAX=Y',
             data: formData,
             method: 'POST',
             dataType: 'html',
@@ -68,7 +71,7 @@ class WCSaleOrder {
             cache: false,
             preparePost: false,
             onsuccess: (data) => {
-                BX.adjust(this.wcOrder, {html: data});
+                BX.adjust(this.orderContainer, {html: data});
                 OrderLoader.closeWait();
             },
             onfailure: (data) => {

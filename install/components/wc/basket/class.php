@@ -14,9 +14,6 @@ Loc::loadMessages(__FILE__);
 
 class Basket extends \CBitrixComponent
 {
-    /** @var BasketHandler $cBasketHandler */
-    private $cBasketHandler;
-
     public function __construct($component = null)
     {
         parent::__construct($component);
@@ -25,11 +22,21 @@ class Basket extends \CBitrixComponent
         \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
     }
 
+    protected function listKeysSignedParameters(): array
+    {
+        return [
+            'ORDER_HANDLER_CLASS',
+            'PROPERTIES',
+        ];
+    }
+
     public function executeComponent()
     {
-        $this->setCBasketHandler();
+        /** @var BasketHandler $cBasketHandler */
 
-        $basket = $this->cBasketHandler::getBasket(Fuser::getId());
+        $cBasketHandler = $this->getCBasketHandler();
+
+        $basket = $cBasketHandler::getBasket(Fuser::getId());
         $this->arResult = $basket->getData();
 
         $this->includeComponentTemplate();
@@ -44,14 +51,16 @@ class Basket extends \CBitrixComponent
         }
     }
 
-    private function setCBasketHandler(): void
+    private function getCBasketHandler(): string
     {
         if (class_exists($this->arParams['BASKET_HANDLER_CLASS'])) {
-            $this->cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
+            $cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
         } elseif (class_exists(BasketHandler::class)) {
-            $this->cBasketHandler = BasketHandler::class;
+            $cBasketHandler = BasketHandler::class;
         } else {
             throw new SystemException(Loc::getMessage('WC_BASKET_HANDLER_CLASS_NOT_EXISTS'));
         }
+
+        return $cBasketHandler;
     }
 }

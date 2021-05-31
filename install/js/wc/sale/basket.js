@@ -72,9 +72,11 @@ class WCSaleBasket {
 
         this.productId = currentBasketItemContainer.getAttribute('data-basket-item-id');
         this.action = target.getAttribute('data-action-basket-item');
-        this.quantity = BX.findChild(currentBasketItemContainer, {
-            'attribute': {'data-action-basket-item': 'set'}
-        }, true, false).value;
+        if (this.action === 'set') {
+            this.quantity = BX.findChild(currentBasketItemContainer, {
+                'attribute': {'data-action-basket-item': 'set'}
+            }, true, false).value;
+        }
 
         basketItemContainers = BX.findChildren(document.body, {
             'attribute': {'data-basket-item-container': '', 'data-basket-item-id': this.productId}
@@ -174,13 +176,18 @@ class WCSaleBasket {
         if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processStart === 'function') {
             basketDomHandler.processStart();
         }
-
+        
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'ajax',
-            data: this.getData(),
+            data: {
+                product: {
+                    id: this.productId,
+                    quantity: this.quantity,
+                    action: this.action
+                }
+            },
             signedParameters: this.signedParameters
         }).then((response) => {
-            console.log(response)
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
@@ -206,22 +213,5 @@ class WCSaleBasket {
                 basketDomHandler.processResponse(response);
             }
         });
-    }
-
-    getData() {
-        let data = {
-            product: {
-                id: this.productId,
-            },
-            parameters: this.parameters
-        };
-
-        if (this.action === 'set') {
-            data.product.quantity = this.quantity;
-        } else {
-            data.product.action = this.action;
-        }
-
-        return data;
     }
 }

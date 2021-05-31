@@ -4,6 +4,7 @@
 namespace WC\Sale\Components;
 
 
+use Bitrix\Main\Engine\Action;
 use Bitrix\Main\Engine\Controller;
 use Bitrix\Main\Engine\Response\AjaxJson;
 use Bitrix\Main\LoaderException;
@@ -18,9 +19,8 @@ Loc::loadMessages(__FILE__);
 
 class BasketAjaxController extends Controller
 {
-    /** @var BasketHandler $cBasketHandler */
-    private $cBasketHandler;
     private $arParams;
+    private $arResult;
 
     public function __construct(Request $request = null)
     {
@@ -38,27 +38,39 @@ class BasketAjaxController extends Controller
         ];
     }
 
-    /**
-     * @param array $product id, quantity, action
-     * @param array $parameters component params
-     * @return AjaxJson
-     */
-    public function processAction(array $product, array $parameters = []): AjaxJson
+    protected function prepareParams(): bool
     {
-        /** @var Result $result */
+        $this->arParams = $this->getUnsignedParameters();
 
-        $this->setArParams($parameters);
-        $this->setCBasketHandler();
+        return parent::prepareParams();
+    }
 
-        $basket = $this->cBasketHandler::getBasket(Fuser::getId());
-        $basketItem = $basket->getItemBy(['PRODUCT_ID' => $product['id']]) ??
-            $this->cBasketHandler::createBasketItem($product['id'], $basket);
+    protected function processBeforeAction(Action $action): bool
+    {
+        $this->arResult = $this->request->toArray();
+
+        return parent::processBeforeAction($action);
+    }
+
+    public function processAction(): AjaxJson
+    {
+        /**
+         * @var Result $result
+         * @var BasketHandler $cBasketHandler
+         * @var BasketHandler $basketHandler
+         */
+
+        $cBasketHandler = $this->getCBasketHandler();
+
+        $basket = $cBasketHandler::getBasket(Fuser::getId());
+        $basketItem = $basket->getItemBy(['PRODUCT_ID' => $this->arResult['product']['id']]) ??
+            $cBasketHandler::createBasketItem($this->arResult['product']['id'], $basket);
 
         if ($basketItem) {
-            $basketHandler = new $this->cBasketHandler($basket, $this->arParams);
+            $basketHandler = new $cBasketHandler($basket, $this->arParams);
             $basketHandler->processBasketItem($basketItem, [
-                'ACTION' => $product['action'],
-                'QUANTITY' => $product['quantity'],
+                'ACTION' => $this->arResult['product']['action'],
+                'QUANTITY' => $this->arResult['product']['quantity'],
             ]);
             $result = $basketHandler->saveBasket();
         } else {
@@ -78,19 +90,16 @@ class BasketAjaxController extends Controller
         }
     }
 
-    private function setArParams($parameters): void
-    {
-        $this->arParams = $parameters;
-    }
-
-    private function setCBasketHandler(): void
+    private function getCBasketHandler(): string
     {
         if (class_exists($this->arParams['BASKET_HANDLER_CLASS'])) {
-            $this->cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
+            $cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
         } elseif (class_exists(BasketHandler::class)) {
-            $this->cBasketHandler = BasketHandler::class;
+            $cBasketHandler = BasketHandler::class;
         } else {
             throw new SystemException(Loc::getMessage('WC_BASKET_HANDLER_CLASS_NOT_EXISTS'));
         }
+
+        return $cBasketHandler;
     }
 }

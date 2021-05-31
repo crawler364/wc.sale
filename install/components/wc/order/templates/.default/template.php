@@ -329,11 +329,16 @@ use Bitrix\Main\Localization\Loc;
         <td data-basket-empty class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
     </tr>
 </table>
+<?
+//$component->si() ?>
 
 <script type="text/javascript">
     if (!window.hasOwnProperty('WCSaleOrder')) {
         window.WCSaleOrder = new WCSaleOrder(<?=Bitrix\Main\Web\Json::encode([
-            'ajaxId' => $arParams['AJAX_ID'],
+            'parameters' => [
+                'ajaxId' => $arParams['AJAX_ID'],
+            ],
+            'signedParameters' => $component->getSignedParameters(),
         ])?>);
         window.WCSaleOrder.init();
     }

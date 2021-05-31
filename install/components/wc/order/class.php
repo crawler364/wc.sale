@@ -8,15 +8,13 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\SystemException;
+use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\Order\Handler as OrderHandler;
 
 Loc::loadMessages(__FILE__);
 
 class Order extends \CBitrixComponent
 {
-    /** @var OrderHandler $cOrderHandler */
-    private $cOrderHandler;
-
     public function __construct($component = null)
     {
         parent::__construct($component);
@@ -25,12 +23,24 @@ class Order extends \CBitrixComponent
         \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
     }
 
+    protected function listKeysSignedParameters(): array
+    {
+        return [
+            'ORDER_HANDLER_CLASS',
+        ];
+    }
+
     public function executeComponent()
     {
-        $this->setCOrderHandler();
+        /**
+         * @var OrderHandler $cOrderHandler
+         * @var OrderHandler $orderHandler
+         * @var Result $result
+         */
 
-        $order = $this->cOrderHandler::createOrder();
-        $orderHandler = new $this->cOrderHandler($order, [
+        $cOrderHandler = $this->getCOrderHandler();
+        $order = $cOrderHandler::createOrder();
+        $orderHandler = new $cOrderHandler($order, [
             'USE_PROPERTIES_DEFAULT_VALUE' => $this->arParams['USE_PROPERTIES_DEFAULT_VALUE'],
         ]);
         $result = $orderHandler->processOrder();
@@ -38,7 +48,7 @@ class Order extends \CBitrixComponent
         $this->arResult['DATA'] = $result->getData();
         $this->arResult['ERRORS'] = $result->getErrorMessages();
 
-        if ($this->request['AJAX_MODE'] == 'Y') {
+        if ($this->request['AJAX'] == 'Y') {
             $this->includeComponentTemplateAjax();
         } else {
             $this->includeComponentTemplate();
@@ -54,15 +64,17 @@ class Order extends \CBitrixComponent
         }
     }
 
-    private function setCOrderHandler(): void
+    private function getCOrderHandler(): string
     {
         if (class_exists($this->arParams['ORDER_HANDLER_CLASS'])) {
-            $this->cOrderHandler = $this->arParams['ORDER_HANDLER_CLASS'];
+            $cOrderHandler = $this->arParams['ORDER_HANDLER_CLASS'];
         } elseif (class_exists(OrderHandler::class)) {
-            $this->cOrderHandler = OrderHandler::class;
+            $cOrderHandler = OrderHandler::class;
         } else {
             throw new SystemException(Loc::getMessage('WC_ORDER_HANDLER_CLASS_NOT_EXISTS'));
         }
+
+        return $cOrderHandler;
     }
 
     private function includeComponentTemplateAjax(): void

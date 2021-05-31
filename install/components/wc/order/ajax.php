@@ -4,9 +4,12 @@
 namespace WC\Sale\Components;
 
 
+use Bitrix\Main\Engine\Action;
+use Bitrix\Main\Engine\Response\AjaxJson;
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Request;
 use Bitrix\Main\SystemException;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\Order\Handler as OrderHandler;
@@ -15,11 +18,10 @@ Loc::loadMessages(__FILE__);
 
 class OrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
-    /** @var OrderHandler */
-    private $cOrderHandler;
     private $arParams;
+    private $arResult;
 
-    public function __construct(\Bitrix\Main\Request $request = null)
+    public function __construct(Request $request = null)
     {
         parent::__construct($request);
 
@@ -35,17 +37,32 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
         ];
     }
 
-    public function saveOrderAction(): \Bitrix\Main\Engine\Response\AjaxJson
+    protected function prepareParams(): bool
     {
-        /** @var OrderHandler $orderHandler */
-        /** @var Result $result */
+        $this->arParams = $this->getUnsignedParameters();
 
-        $this->setArParams($parameters);
-        $this->setCOrderHandler();
+        return parent::prepareParams();
+    }
 
-        $order = $this->cOrderHandler::createOrder();
-        $orderHandler = new $this->cOrderHandler($order, [
-            'ORDER_DATA' => $this->getOrderData(),
+    protected function processBeforeAction(Action $action): bool
+    {
+        $this->arResult = $this->getOrderData();
+
+        return parent::processBeforeAction($action);
+    }
+
+    public function saveOrderAction(): AjaxJson
+    {
+        /**
+         * @var OrderHandler $cOrderHandler
+         * @var OrderHandler $orderHandler
+         * @var Result $result
+         */
+
+        $cOrderHandler = $this->getCOrderHandler();
+        $order = $cOrderHandler::createOrder();
+        $orderHandler = new $cOrderHandler($order, [
+            'ORDER_DATA' => $this->arResult,
             'USE_PROPERTIES_DEFAULT_VALUE' => false,
         ]);
         $result = $orderHandler->saveOrder();
@@ -62,25 +79,22 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
         }
     }
 
-    private function setArParams($parameters): void
-    {
-        $this->arParams = $parameters;
-    }
-
-    private function setCOrderHandler(): void
+    private function getCOrderHandler(): string
     {
         if (class_exists($this->arParams['ORDER_HANDLER_CLASS'])) {
-            $this->cOrderHandler = $this->arParams['ORDER_HANDLER_CLASS'];
+            $cOrderHandler = $this->arParams['ORDER_HANDLER_CLASS'];
         } elseif (class_exists(OrderHandler::class)) {
-            $this->cOrderHandler = OrderHandler::class;
+            $cOrderHandler = OrderHandler::class;
         } else {
             throw new SystemException(Loc::getMessage('WC_ORDER_HANDLER_CLASS_NOT_EXISTS'));
         }
+
+        return $cOrderHandler;
     }
 
     private function getOrderData(): array
     {
-        $orderData = $this->request->toArray();
+        $orderData = $this->request->toArray(); // todo validate props
         $filesProperties = $this->request->getFileList();
 
         foreach ($filesProperties as $propertyCode => $propertyParams) {
