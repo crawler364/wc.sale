@@ -146,8 +146,7 @@ abstract class HandlerBase implements HandlerInterface
 
     protected function setBasket(): void
     {
-        $fUserId = $this->order->getFUserId();
-        $basket = $this->basketHandler::getBasket($fUserId);
+        $basket = $this->basketHandler::getBasket(Fuser::getId());
         $this->order->setBasket($basket);
     }
 
