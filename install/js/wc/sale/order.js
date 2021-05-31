@@ -16,8 +16,8 @@ class WCSaleOrder {
 
             BX.bindDelegate(
                 this.orderContainer,
-                'blur',
-                {'tag': 'input', 'attribute': {'name': 'LOCATION'}}, // todo NAME
+                'click',
+                {'class': 'bx-ui-sls-variant'},
                 this.refreshOrder.bind(this)
             );
 
