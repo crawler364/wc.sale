@@ -176,7 +176,7 @@ class WCSaleBasket {
         if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processStart === 'function') {
             basketDomHandler.processStart();
         }
-        
+
         BX.ajax.runComponentAction('wc:basket', 'process', {
             mode: 'ajax',
             data: {

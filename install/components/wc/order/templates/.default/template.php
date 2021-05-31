@@ -329,8 +329,6 @@ use Bitrix\Main\Localization\Loc;
         <td data-basket-empty class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
     </tr>
 </table>
-<?
-//$component->si() ?>
 
 <script type="text/javascript">
     if (!window.hasOwnProperty('WCSaleOrder')) {
