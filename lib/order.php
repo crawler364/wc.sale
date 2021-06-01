@@ -30,16 +30,16 @@ class Order extends \Bitrix\Sale\Order
 
     public function getRestrictedProperties(\Bitrix\Sale\PropertyValueCollection $propertyValueCollection): array
     {
-        /** @var \Bitrix\Sale\PropertyValue $orderProperty */
+        /** @var \Bitrix\Sale\PropertyValue $property */
 
         $restrictedProperties = [];
 
-        foreach ($propertyValueCollection as $orderProperty) {
-            if ($orderProperty->isUtil()) {
+        foreach ($propertyValueCollection as $property) {
+            if ($property->isUtil()) {
                 continue;
             }
 
-            $propertyRelations = $orderProperty->getRelations();
+            $propertyRelations = $property->getRelations();
 
             $paySystemCheck = null;
             $deliveryCheck = null;
@@ -57,7 +57,7 @@ class Order extends \Bitrix\Sale\Order
             }
 
             if ((is_null($paySystemCheck) || $paySystemCheck) && (is_null($deliveryCheck) || $deliveryCheck)) {
-                $restrictedProperties[] = $orderProperty;
+                $restrictedProperties[] = $property;
             }
         }
 
