@@ -6,13 +6,13 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use Bitrix\Main\Localization\Loc;
 
 ?>
-<div style="font-size: 20px; color: red">
+<div class="wc-errors">
     <? foreach ($arResult['ERRORS'] as $error) {
         echo $error;
     } ?>
 </div>
 <form id="wc-order-form" action="" method="post">
-    <h2 data-action-refresh><?= Loc::getMessage('WC_ORDER_LOCATION') ?></h2>
+    <h2><?= Loc::getMessage('WC_ORDER_LOCATION') ?></h2>
     <div data-location>
         <label for="<?= $arResult['DATA']['LOCATION']['CODE'] ?>"></label>
         <? $APPLICATION->IncludeComponent(

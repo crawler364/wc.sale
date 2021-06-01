@@ -6,3 +6,8 @@ table.person-type label {
     cursor: pointer;
 
 }
+
+.wc-errors {
+    font-size: 20px;
+    color: red;
+}

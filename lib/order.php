@@ -47,11 +47,11 @@ class Order extends \Bitrix\Sale\Order
             if (is_array($propertyRelations) && !empty($propertyRelations)) {
                 foreach ($propertyRelations as $propertyRelation) {
                     if (!$paySystemCheck && $propertyRelation['ENTITY_TYPE'] == 'P') {
-                        $paySystemCheck = in_array($propertyRelation['ENTITY_ID'], $this->getPaySystemIdList(), true);
+                        $paySystemCheck = in_array($propertyRelation['ENTITY_ID'], $this->getPaySystemIdList(), false);
                     }
 
                     if (!$deliveryCheck && $propertyRelation['ENTITY_TYPE'] == 'D') {
-                        $deliveryCheck = in_array($propertyRelation['ENTITY_ID'], $this->getDeliveryIdList(), true);
+                        $deliveryCheck = in_array($propertyRelation['ENTITY_ID'], $this->getDeliveryIdList(), false);
                     }
                 }
             }
