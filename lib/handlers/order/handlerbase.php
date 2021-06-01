@@ -164,15 +164,17 @@ abstract class HandlerBase implements HandlerInterface
     protected function setLocation(): void
     {
         /**
-         * @var array $orderPropertyCollection
-         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
+         * @var array $restrictedProperties
+         * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
-        $orderPropertyCollection = $this->order->getRestrictedProperties();
+        $propertyCollection = $this->order->getPropertyCollection();
+        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
 
-        foreach ($orderPropertyCollection as $orderProperty) {
-            if ($orderProperty->getType() === 'LOCATION') {
-                $property = $orderProperty->getProperty();
+        foreach ($restrictedProperties as $restrictedProperty) {
+            if ($restrictedProperty->getType() === 'LOCATION') {
+                $property = $restrictedProperty->getProperty();
 
                 if ($this->orderData[$property['CODE']]) {
                     $propertyValue = $this->orderData[$property['CODE']];
@@ -182,7 +184,7 @@ abstract class HandlerBase implements HandlerInterface
                     $propertyValue = '';
                 }
 
-                $orderProperty->setValue($propertyValue);
+                $restrictedProperty->setValue($propertyValue);
                 break;
             }
         }
@@ -191,18 +193,20 @@ abstract class HandlerBase implements HandlerInterface
     protected function getLocation(): array
     {
         /**
-         * @var array $orderProperties
-         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
+         * @var array $restrictedProperties
+         * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
         //todo ->getDeliveryLocation();
-        $orderProperties = $this->order->getRestrictedProperties();
+        $propertyCollection = $this->order->getPropertyCollection();
+        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
         $property = [];
 
-        foreach ($orderProperties as $orderProperty) {
-            if ($orderProperty->getType() === 'LOCATION') {
-                $property = $orderProperty->getProperty();
-                $property['VALUE'] = $orderProperty->getValue();
+        foreach ($restrictedProperties as $restrictedProperty) {
+            if ($restrictedProperty->getType() === 'LOCATION') {
+                $property = $restrictedProperty->getProperty();
+                $property['VALUE'] = $restrictedProperty->getValue();
                 break;
             }
         }
@@ -221,7 +225,7 @@ abstract class HandlerBase implements HandlerInterface
          */
 
         $shipmentCollection = $this->order->getShipmentCollection();
-        $restrictedDeliveries = $this->getRestrictedDeliveries($shipmentCollection);
+        $restrictedDeliveries = $this->order->getRestrictedDeliveries($shipmentCollection);
 
         foreach ($restrictedDeliveries as $key => $restrictedDelivery) {
             if ($key === 0) {
@@ -260,7 +264,7 @@ abstract class HandlerBase implements HandlerInterface
 
         $deliveries = [];
         $shipmentCollection = $this->order->getShipmentCollection();
-        $restrictedDeliveries = $this->getRestrictedDeliveries($shipmentCollection);
+        $restrictedDeliveries = $this->order->getRestrictedDeliveries($shipmentCollection);
         $deliveryId = $shipmentCollection->getItemByIndex(1)->getDeliveryId();
 
         foreach ($restrictedDeliveries as $restrictedDelivery) {
@@ -285,7 +289,7 @@ abstract class HandlerBase implements HandlerInterface
          */
 
         $paymentCollection = $this->order->getPaymentCollection();
-        $restrictedPaySystems = $this->getRestrictedPaySystems($paymentCollection);
+        $restrictedPaySystems = $this->order->getRestrictedPaySystems($paymentCollection);
 
         foreach ($restrictedPaySystems as $key => $restrictedPaySystem) {
             if ($key === 0) {
@@ -318,7 +322,7 @@ abstract class HandlerBase implements HandlerInterface
 
         $paySystems = [];
         $paymentCollection = $this->order->getPaymentCollection();
-        $restrictedPaySystems = $this->getRestrictedPaySystems($paymentCollection);
+        $restrictedPaySystems = $this->order->getRestrictedPaySystems($paymentCollection);
         $paySystemId = $paymentCollection->getItemByIndex(0)->getPaymentSystemId();
 
         foreach ($restrictedPaySystems as $restrictedPaySystem) {
@@ -337,18 +341,20 @@ abstract class HandlerBase implements HandlerInterface
     protected function setProperties(): void
     {
         /**
-         * @var array $orderPropertyCollection
-         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
+         * @var array $restrictedProperties
+         * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
-        $orderPropertyCollection = $this->order->getRestrictedProperties();
+        $propertyCollection = $this->order->getPropertyCollection();
+        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
 
-        foreach ($orderPropertyCollection as $orderProperty) {
-            if ($orderProperty->isUtil() || $orderProperty->getType() === 'LOCATION') {
+        foreach ($restrictedProperties as $restrictedProperty) {
+            if ($restrictedProperty->isUtil() || $restrictedProperty->getType() === 'LOCATION') {
                 continue;
             }
 
-            $property = $orderProperty->getProperty();
+            $property = $restrictedProperty->getProperty();
 
             if ($this->orderData[$property['CODE']]) {
                 $propertyValue = $this->orderData[$property['CODE']];
@@ -358,27 +364,29 @@ abstract class HandlerBase implements HandlerInterface
                 $propertyValue = $property['MULTIPLE'] === 'Y' ? [''] : '';
             }
 
-            $orderProperty->setValue($propertyValue);
+            $restrictedProperty->setValue($propertyValue);
         }
     }
 
     protected function getProperties(): array
     {
         /**
-         * @var array $orderProperties
-         * @var \Bitrix\Sale\PropertyValue $orderProperty
+         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
+         * @var array $restrictedProperties
+         * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
-        $orderProperties = $this->order->getRestrictedProperties();
+        $propertyCollection = $this->order->getPropertyCollection();
+        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
         $properties = [];
 
-        foreach ($orderProperties as $orderProperty) {
-            if ($orderProperty->isUtil() || $orderProperty->getType() === 'LOCATION') {
+        foreach ($restrictedProperties as $restrictedProperty) {
+            if ($restrictedProperty->isUtil() || $restrictedProperty->getType() === 'LOCATION') {
                 continue;
             }
 
-            $property = $orderProperty->getProperty();
-            $property['VALUE'] = $orderProperty->getValue();
+            $property = $restrictedProperty->getProperty();
+            $property['VALUE'] = $restrictedProperty->getValue();
             $properties[] = $property;
         }
 
@@ -394,26 +402,4 @@ abstract class HandlerBase implements HandlerInterface
     {
         // todo
     }
-
-    protected function getRestrictedDeliveries(\Bitrix\Sale\ShipmentCollection $shipmentCollection): array
-    {
-        $shipment = \Bitrix\Sale\Shipment::create($shipmentCollection);
-        $restrictedDeliveries = Delivery\Services\Manager::getRestrictedList(
-            $shipment,
-            Delivery\Restrictions\Manager::MODE_CLIENT
-        );
-
-        return array_values($restrictedDeliveries);
-    }
-
-    protected function getRestrictedPaySystems(\Bitrix\Sale\PaymentCollection $paymentCollection): array
-    {
-        $payment = \Bitrix\Sale\Payment::create($paymentCollection);
-        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions(
-            $payment
-        );
-
-        return array_values($restrictedPaySystems);
-    }
-
 }

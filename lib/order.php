@@ -16,13 +16,25 @@ class Order extends \Bitrix\Sale\Order
         return $info;
     }
 
-    public function getRestrictedProperties(): array
+    /**
+     * @return null|int
+     */
+    public function getFUserId(): ?int
+    {
+        if ($userId = $this->getUserId()) {
+            return Fuser::getIdByUserId($userId);
+        }
+
+        return null;
+    }
+
+    public function getRestrictedProperties(\Bitrix\Sale\PropertyValueCollection $propertyValueCollection): array
     {
         /** @var \Bitrix\Sale\PropertyValue $orderProperty */
 
         $restrictedProperties = [];
 
-        foreach ($this->getPropertyCollection() as $orderProperty) {
+        foreach ($propertyValueCollection as $orderProperty) {
             if ($orderProperty->isUtil()) {
                 continue;
             }
@@ -52,15 +64,22 @@ class Order extends \Bitrix\Sale\Order
         return $restrictedProperties;
     }
 
-    /**
-     * @return null|int
-     */
-    public function getFUserId(): ?int
+    public function getRestrictedDeliveries(\Bitrix\Sale\ShipmentCollection $shipmentCollection): array
     {
-        if ($userId = $this->getUserId()) {
-            return Fuser::getIdByUserId($userId);
-        }
+        $shipment = \Bitrix\Sale\Shipment::create($shipmentCollection);
+        $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
+            $shipment,
+            \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
+        );
 
-        return null;
+        return array_values($restrictedDeliveries);
+    }
+
+    public function getRestrictedPaySystems(\Bitrix\Sale\PaymentCollection $paymentCollection): array
+    {
+        $payment = \Bitrix\Sale\Payment::create($paymentCollection);
+        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+
+        return array_values($restrictedPaySystems);
     }
 }
