@@ -16,7 +16,10 @@ class WCSaleBasket {
             BX.bindDelegate(
                 document.body,
                 'click',
-                {attribute: 'data-action-basket-item'},
+                function(el) {
+                    let attr = el.getAttribute('data-action-basket-item');
+                    return attr === 'plus' || attr === 'minus' || attr === 'delete'
+                },
                 this.processAction.bind(this)
             );
         });
