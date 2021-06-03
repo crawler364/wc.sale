@@ -79,6 +79,8 @@ class WCSaleBasket {
             this.quantity = BX.findChild(currentBasketItemContainer, {
                 'attribute': {'data-basket-item-action': 'set'}
             }, true, false).value;
+        } else {
+            delete this.quantity;
         }
 
         basketItemContainers = BX.findChildren(document.body, {
