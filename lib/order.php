@@ -5,14 +5,18 @@ namespace WC\Sale;
 
 
 use Bitrix\Sale\Fuser;
+use WC\Core\Helpers\Catalog;
 
 class Order extends \Bitrix\Sale\Order
 {
     public function getInfo(): array
     {
-        $basket = $this->getBasket();
-        $info = $basket->getInfo();
-        // todo delivery info
+        $info = $this->getFieldValues();
+
+        $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE']);
+        $info['PRICE_DELIVERY_FORMATTED'] = Catalog::formatPrice($info['PRICE_DELIVERY']);
+        $info['SUM_PAID_FORMATTED'] = Catalog::formatPrice($info['SUM_PAID']);
+
         return $info;
     }
 

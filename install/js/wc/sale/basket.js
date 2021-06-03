@@ -9,15 +9,15 @@ class WCSaleBasket {
             BX.bindDelegate(
                 document.body,
                 'change',
-                {tag: 'input', attribute: 'data-action-basket-item'},
+                {tag: 'input', attribute: 'data-basket-item-action'},
                 this.processAction.bind(this)
             );
 
             BX.bindDelegate(
                 document.body,
                 'click',
-                function(el) {
-                    let attr = el.getAttribute('data-action-basket-item');
+                function (el) {
+                    let attr = el.getAttribute('data-basket-item-action');
                     return attr === 'plus' || attr === 'minus' || attr === 'delete'
                 },
                 this.processAction.bind(this)
@@ -29,7 +29,7 @@ class WCSaleBasket {
         let basketContainers, basketContainersDom = [];
 
         basketContainers = BX.findChildren(document.body, {
-            'attribute': {'data-wc-basket-container': ''}
+            'attribute': {'data-container': 'wc-basket'}
         }, true);
 
         basketContainers.forEach((basketContainer, key) => {
@@ -38,25 +38,25 @@ class WCSaleBasket {
             basketContainerDom.nodes = {
                 container: basketContainer,
                 weight: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-weight': ''}
+                    'attribute': {'data-container': 'basket-weight'}
                 }, true, false),
                 count: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-count': ''}
+                    'attribute': {'data-container': 'basket-count'}
                 }, true, false),
                 vatSum: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-vat-sum': ''}
+                    'attribute': {'data-container': 'basket-vat-sum'}
                 }, true, false),
                 basePrice: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-base-price': ''}
+                    'attribute': {'data-container': 'basket-base-price'}
                 }, true, false),
                 discountPrice: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-discount-price': ''}
+                    'attribute': {'data-container': 'basket-discount-price'}
                 }, true, false),
                 price: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-price': ''}
+                    'attribute': {'data-container': 'basket-price'}
                 }, true, false),
                 empty: BX.findChild(basketContainer, {
-                    'attribute': {'data-basket-empty': ''}
+                    'attribute': {'data-container': 'basket-empty'}
                 }, true, false),
             }
 
@@ -70,19 +70,19 @@ class WCSaleBasket {
         let currentBasketItemContainer, basketItemContainers, basketItemContainersDom = [];
 
         currentBasketItemContainer = BX.findParent(target, {
-            attribute: {'data-basket-item-container': ''}
+            attribute: {'data-container': 'basket-item-wrap'}
         });
 
         this.productId = currentBasketItemContainer.getAttribute('data-basket-item-id');
-        this.action = target.getAttribute('data-action-basket-item');
+        this.action = target.getAttribute('data-basket-item-action');
         if (this.action === 'set') {
             this.quantity = BX.findChild(currentBasketItemContainer, {
-                'attribute': {'data-action-basket-item': 'set'}
+                'attribute': {'data-basket-item-action': 'set'}
             }, true, false).value;
         }
 
         basketItemContainers = BX.findChildren(document.body, {
-            'attribute': {'data-basket-item-container': '', 'data-basket-item-id': this.productId}
+            'attribute': {'data-container': 'basket-item-wrap', 'data-basket-item-id': this.productId}
         }, true);
 
         basketItemContainers.forEach((basketItemContainer, key) => {
@@ -97,22 +97,22 @@ class WCSaleBasket {
             basketItemContainerDom.nodes = {
                 container: basketItemContainer,
                 basketItem: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item': ''}
+                    'attribute': {'data-container': 'basket-item'}
                 }, true, false),
                 input: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-action-basket-item': 'set'}
+                    'attribute': {'data-basket-item-action': 'set'}
                 }, true, false),
                 priceSum: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item-price-sum': ''}
+                    'attribute': {'data-container': 'basket-item-price-sum'}
                 }, true, false),
                 basePriceSum: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item-base-price-sum': ''}
+                    'attribute': {'data-container': 'basket-item-base-price-sum'}
                 }, true, false),
                 discountPriceSum: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item-discount-price-sum': ''}
+                    'attribute': {'data-container': 'basket-item-discount-price-sum'}
                 }, true, false),
                 restoreButton: BX.findChild(basketItemContainer, {
-                    'attribute': {'data-basket-item-restore-button': ''}
+                    'attribute': {'data-container': 'basket-item-restore-button'}
                 }, true, false),
             };
 

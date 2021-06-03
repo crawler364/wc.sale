@@ -74,7 +74,8 @@ abstract class HandlerBase implements HandlerInterface
             'DELIVERIES' => $deliveries,
             'PAY_SYSTEMS' => $paySystems,
             'PRODUCTS_LIST' => $productsList,
-            'INFO' => $this->order->getInfo(),
+            'ORDER_INFO' => $this->order->getInfo(),
+            'BASKET_INFO' => $this->order->getBasket()->getInfo(),
         ];
 
         $this->result->setData($data);

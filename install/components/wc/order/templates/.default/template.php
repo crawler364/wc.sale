@@ -12,7 +12,7 @@ use Bitrix\Main\Localization\Loc;
     } ?>
 </div>
 <form id="wc-order-form" action="" method="post">
-    <h2><?= Loc::getMessage('WC_ORDER_LOCATION') ?></h2>
+    <h2><?= Loc::getMessage('WC_ORDER_LOCATION_TITLE') ?></h2>
     <div data-location>
         <label for="<?= $arResult['DATA']['LOCATION']['CODE'] ?>"></label>
         <? $APPLICATION->IncludeComponent(
@@ -37,7 +37,7 @@ use Bitrix\Main\Localization\Loc;
         ); ?>
     </div>
 
-    <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE') ?></h2>
+    <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE_TITLE') ?></h2>
     <table class="person-type">
         <? foreach ($arResult['DATA']['PERSON_TYPES'] as $personType) { ?>
             <tr>
@@ -298,35 +298,43 @@ use Bitrix\Main\Localization\Loc;
     <button data-action-submit type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
 </form>
 
-<table data-wc-basket-container class="wc-basket-container">
+<table data-container="wc-basket" class="wc-basket-container">
     <tbody>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_WEIGHT') ?></td>
-        <td data-basket-weight><?= $arResult['DATA']['INFO']['WEIGHT_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_WEIGHT') ?></td>
+        <td data-container="basket-weight"><?= $arResult['DATA']['BASKET_INFO']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_COUNT') ?></td>
-        <td data-basket-count><?= $arResult['DATA']['INFO']['COUNT'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_COUNT') ?></td>
+        <td data-container="basket-count"><?= $arResult['DATA']['BASKET_INFO']['COUNT'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_VAT_SUM') ?></td>
-        <td data-basket-vat-sum><?= $arResult['DATA']['INFO']['VAT_SUM_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_VAT_SUM') ?></td>
+        <td data-container="basket-vat-sum"><?= $arResult['DATA']['BASKET_INFO']['VAT_SUM_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_PRICE_BASE') ?></td>
-        <td data-basket-price-base><?= $arResult['DATA']['INFO']['PRICE_BASE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_BASE_PRICE') ?></td>
+        <td data-container="basket-base-price"><?= $arResult['DATA']['BASKET_INFO']['BASE_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_DISCOUNT') ?></td>
-        <td data-basket-discount><?= $arResult['DATA']['INFO']['DISCOUNT_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_DISCOUNT') ?></td>
+        <td data-container="basket-discount-price"><?= $arResult['DATA']['BASKET_INFO']['DISCOUNT_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_PRICE') ?></td>
-        <td data-basket-price><?= $arResult['DATA']['INFO']['PRICE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_PRICE') ?></td>
+        <td data-container="basket-price"><?= $arResult['DATA']['BASKET_INFO']['PRICE_FORMATTED'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE_DELIVERY') ?></td>
+        <td><?= $arResult['DATA']['ORDER_INFO']['PRICE_DELIVERY_FORMATTED'] ?></td>
+    </tr>
+    <tr>
+        <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE') ?></td>
+        <td><?= $arResult['DATA']['ORDER_INFO']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
     <tr>
-        <td data-basket-empty class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
+        <td data-container="basket-empty" class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
     </tr>
 </table>
 
