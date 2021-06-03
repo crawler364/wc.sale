@@ -1,7 +1,5 @@
 <?php
 $MESS['WC_BASKET_RESTORE_BUTTON'] = 'Вернуть в корзину';
-$MESS['WC_BASKET_DETAIL_PICTURE'] = 'Картинка';
-$MESS['WC_BASKET_ARTICLE'] = 'Артикул';
 $MESS['WC_BASKET_NAME'] = 'Наименование';
 $MESS['WC_BASKET_PRICE'] = 'Цена';
 $MESS['WC_BASKET_PRICE_SUM'] = 'Сумма';

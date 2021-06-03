@@ -9,8 +9,6 @@ use \Bitrix\Main\Localization\Loc;
 <table class="wc-basket-items-container">
     <thead>
     <tr>
-        <td><?= Loc::getMessage('WC_BASKET_DETAIL_PICTURE') ?></td>
-        <td><?= Loc::getMessage('WC_BASKET_ARTICLE') ?></td>
         <td><?= Loc::getMessage('WC_BASKET_NAME') ?></td>
         <td><?= Loc::getMessage('WC_BASKET_PRICE') ?></td>
         <td></td>
@@ -26,11 +24,6 @@ use \Bitrix\Main\Localization\Loc;
             </td>
         </tr>
         <tr data-container="basket-item">
-            <td>
-                <img class="detail-picture" src="<?= $item['ELEMENT']['DETAIL_PICTURE'] ?>"
-                     alt="<?= Loc::getMessage('WC_BASKET_NAME') ?>">
-            </td>
-            <td><?= $item['ELEMENT']['PROPERTY_ARTICLE_VALUE'] ?></td>
             <td><?= $item['NAME'] ?></td>
             <td>
                 <? if ($item['DISCOUNT_PRICE']) { ?>
