@@ -67,13 +67,4 @@ class Order extends \Bitrix\Sale\Order
 
         return $restrictedProperties;
     }
-
-    public function getRestrictedPaySystems(\Bitrix\Sale\PaymentCollection $paymentCollection): array
-    {
-        $payment = \Bitrix\Sale\Payment::create($paymentCollection);
-        $payment->setField('SUM', $this->getPrice());
-        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
-
-        return array_values($restrictedPaySystems);
-    }
 }

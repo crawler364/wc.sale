@@ -230,12 +230,10 @@ abstract class HandlerBase implements HandlerInterface
         if ($basket = $this->order->getBasket()) {
             $shipment->fill($basket);
         }
-
         $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
             $shipment,
             \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
         );
-
         $deliveryId = array_keys($restrictedDeliveries)[0];
 
         foreach ($restrictedDeliveries as $restrictedDelivery) {
@@ -266,14 +264,11 @@ abstract class HandlerBase implements HandlerInterface
         $shipmentCollection = $this->order->getShipmentCollection();
         if ($shipment = $shipmentCollection->getItemByIndex(1)) {
             $deliveryId = $shipment->getDeliveryId();
+            $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
+                $shipment,
+                \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
+            );
         }
-
-        $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
-            $shipment,
-            \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
-        );
-        $restrictedDeliveries = (array_values($restrictedDeliveries));
-
 
         foreach ($restrictedDeliveries as $restrictedDelivery) {
             $delivery = Delivery\Services\Manager::getById($restrictedDelivery['ID']);
@@ -297,24 +292,23 @@ abstract class HandlerBase implements HandlerInterface
          */
 
         $paymentCollection = $this->order->getPaymentCollection();
-        $restrictedPaySystems = $this->order->getRestrictedPaySystems($paymentCollection);
+        $payment = $paymentCollection->createItem();
+        $payment->setFields([
+            'SUM' => $this->order->getPrice(),
+            'CURRENCY' => $this->order->getCurrency(),
+        ]);
+        $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+        $paySystemId = array_keys($restrictedPaySystems)[0];
 
-        foreach ($restrictedPaySystems as $key => $restrictedPaySystem) {
-            if ($key === 0) {
-                $paySystemId = $restrictedPaySystem['ID'];
-            }
-
+        foreach ($restrictedPaySystems as $restrictedPaySystem) {
             if ($this->orderData['PAY_SYSTEM_ID'] && $this->orderData['PAY_SYSTEM_ID'] == $restrictedPaySystem['ID']) {
                 $paySystemId = $restrictedPaySystem['ID'];
                 break;
             }
         }
 
-        if ($paySystemId > 0) {
-            $paySystem = \Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId);
-            $payment = $paymentCollection->createItem($paySystem);
-            $payment->setField('SUM', $this->order->getPrice());
-            $payment->setField('CURRENCY', $this->order->getCurrency());
+        if ($paySystemId > 0 && $paySystem = \Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId)) {
+            $payment->setPaySystemService($paySystem);
         } else {
             $this->result->addError('WC_SALE_PAYMENT_ERROR');
         }
@@ -330,8 +324,10 @@ abstract class HandlerBase implements HandlerInterface
 
         $paySystems = [];
         $paymentCollection = $this->order->getPaymentCollection();
-        $restrictedPaySystems = $this->order->getRestrictedPaySystems($paymentCollection);
-        $paySystemId = $paymentCollection->getItemByIndex(0)->getPaymentSystemId();
+        if ($payment = $paymentCollection->getItemByIndex(0)) {
+            $paySystemId = $payment->getPaymentSystemId();
+            $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
+        }
 
         foreach ($restrictedPaySystems as $restrictedPaySystem) {
             $paySystem = \Bitrix\Sale\PaySystem\Manager::getById($restrictedPaySystem['ID']);
