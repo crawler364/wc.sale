@@ -165,13 +165,11 @@ abstract class HandlerBase implements HandlerInterface
     protected function setLocation(): void
     {
         /**
-         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
          * @var array $restrictedProperties
          * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
-        $propertyCollection = $this->order->getPropertyCollection();
-        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
+        $restrictedProperties = $this->order->getRestrictedProperties();
 
         foreach ($restrictedProperties as $restrictedProperty) {
             if ($restrictedProperty->getType() === 'LOCATION') {
@@ -194,15 +192,13 @@ abstract class HandlerBase implements HandlerInterface
     protected function getLocation(): array
     {
         /**
-         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
          * @var array $restrictedProperties
          * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
         //todo ->getDeliveryLocation();
-        $propertyCollection = $this->order->getPropertyCollection();
-        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
         $property = [];
+        $restrictedProperties = $this->order->getRestrictedProperties();
 
         foreach ($restrictedProperties as $restrictedProperty) {
             if ($restrictedProperty->getType() === 'LOCATION') {
@@ -345,13 +341,11 @@ abstract class HandlerBase implements HandlerInterface
     protected function setProperties(): void
     {
         /**
-         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
          * @var array $restrictedProperties
          * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
-        $propertyCollection = $this->order->getPropertyCollection();
-        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
+        $restrictedProperties = $this->order->getRestrictedProperties();
 
         foreach ($restrictedProperties as $restrictedProperty) {
             if ($restrictedProperty->isUtil() || $restrictedProperty->getType() === 'LOCATION') {
@@ -375,14 +369,12 @@ abstract class HandlerBase implements HandlerInterface
     protected function getProperties(): array
     {
         /**
-         * @var \Bitrix\Sale\PropertyValueCollection $propertyCollection
          * @var array $restrictedProperties
          * @var \Bitrix\Sale\PropertyValue $restrictedProperty
          */
 
-        $propertyCollection = $this->order->getPropertyCollection();
-        $restrictedProperties = $this->order->getRestrictedProperties($propertyCollection);
         $properties = [];
+        $restrictedProperties = $this->order->getRestrictedProperties();
 
         foreach ($restrictedProperties as $restrictedProperty) {
             if ($restrictedProperty->isUtil() || $restrictedProperty->getType() === 'LOCATION') {
@@ -395,15 +387,5 @@ abstract class HandlerBase implements HandlerInterface
         }
 
         return $properties;
-    }
-
-    protected function addOrder()
-    {
-        // todo
-    }
-
-    protected function updateOrder()
-    {
-        // todo
     }
 }

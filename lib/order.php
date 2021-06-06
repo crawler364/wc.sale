@@ -32,13 +32,14 @@ class Order extends \Bitrix\Sale\Order
         return null;
     }
 
-    public function getRestrictedProperties(\Bitrix\Sale\PropertyValueCollection $propertyValueCollection): array
+    public function getRestrictedProperties(): array
     {
         /** @var \Bitrix\Sale\PropertyValue $property */
 
         $restrictedProperties = [];
+        $propertyCollection = $this->getPropertyCollection();
 
-        foreach ($propertyValueCollection as $property) {
+        foreach ($propertyCollection as $property) {
             if ($property->isUtil()) {
                 continue;
             }
