@@ -219,37 +219,35 @@ abstract class HandlerBase implements HandlerInterface
     {
         /**
          * @var \Bitrix\Sale\ShipmentCollection $shipmentCollection
-         * @var \Bitrix\Sale\Shipment $shipment
-         * @var \Bitrix\Sale\ShipmentItem $shipmentItem
+         * @var \WC\Sale\Shipment $shipment
+         * @var \WC\Sale\Basket $basket
          * @var array $restrictedDeliveries
          * @var array $restrictedDelivery
          */
 
         $shipmentCollection = $this->order->getShipmentCollection();
-        $restrictedDeliveries = $this->order->getRestrictedDeliveries($shipmentCollection);
+        $shipment = $shipmentCollection->createItem();
+        if ($basket = $this->order->getBasket()) {
+            $shipment->fill($basket);
+        }
 
-        foreach ($restrictedDeliveries as $key => $restrictedDelivery) {
-            if ($key === 0) {
-                $deliveryId = $restrictedDelivery['ID'];
-            }
+        $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
+            $shipment,
+            \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
+        );
 
+        $deliveryId = array_keys($restrictedDeliveries)[0];
+
+        foreach ($restrictedDeliveries as $restrictedDelivery) {
             if ($this->orderData['DELIVERY_ID'] && $this->orderData['DELIVERY_ID'] == $restrictedDelivery['ID']) {
                 $deliveryId = $restrictedDelivery['ID'];
                 break;
             }
         }
 
-        if ($deliveryId > 0) {
-            $delivery = Delivery\Services\Manager::getObjectById($deliveryId);
-            $shipment = $shipmentCollection->createItem($delivery);
-            $shipmentItemCollection = $shipment->getShipmentItemCollection();
-            $basket = $this->order->getBasket();
-
-            foreach ($basket as $basketItem) {
-                if ($shipmentItem = $shipmentItemCollection->createItem($basketItem)) {
-                    $shipmentItem->setQuantity($basketItem->getQuantity());
-                }
-            }
+        if ($deliveryId > 0 && $delivery = Delivery\Services\Manager::getObjectById($deliveryId)) {
+            $shipment->setDeliveryService($delivery);
+            $shipmentCollection->calculateDelivery();
         } else {
             $this->result->addError('WC_SALE_SHIPMENT_ERROR');
         }
@@ -259,14 +257,23 @@ abstract class HandlerBase implements HandlerInterface
     {
         /**
          * @var \Bitrix\Sale\ShipmentCollection $shipmentCollection
+         * @var \WC\Sale\Shipment $shipment
          * @var array $restrictedDeliveries
          * @var array $restrictedDelivery
          */
 
         $deliveries = [];
         $shipmentCollection = $this->order->getShipmentCollection();
-        $restrictedDeliveries = $this->order->getRestrictedDeliveries($shipmentCollection);
-        $deliveryId = $shipmentCollection->getItemByIndex(1)->getDeliveryId();
+        if ($shipment = $shipmentCollection->getItemByIndex(1)) {
+            $deliveryId = $shipment->getDeliveryId();
+        }
+
+        $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
+            $shipment,
+            \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
+        );
+        $restrictedDeliveries = (array_values($restrictedDeliveries));
+
 
         foreach ($restrictedDeliveries as $restrictedDelivery) {
             $delivery = Delivery\Services\Manager::getById($restrictedDelivery['ID']);

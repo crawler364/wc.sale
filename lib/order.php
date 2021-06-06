@@ -68,28 +68,6 @@ class Order extends \Bitrix\Sale\Order
         return $restrictedProperties;
     }
 
-    public function getRestrictedDeliveries(\Bitrix\Sale\ShipmentCollection $shipmentCollection): array
-    {
-        /** @var \Bitrix\Sale\Shipment $shipment */
-
-        $shipment = \Bitrix\Sale\Shipment::create($shipmentCollection);
-        $shipmentItemCollection = $shipment->getShipmentItemCollection();
-        $basket = $this->getBasket();
-
-        foreach ($basket as $basketItem) {
-            if ($shipmentItem = $shipmentItemCollection->createItem($basketItem)) {
-                $shipmentItem->setQuantity($basketItem->getQuantity());
-            }
-        }
-
-        $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
-            $shipment,
-            \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
-        );
-
-        return array_values($restrictedDeliveries);
-    }
-
     public function getRestrictedPaySystems(\Bitrix\Sale\PaymentCollection $paymentCollection): array
     {
         $payment = \Bitrix\Sale\Payment::create($paymentCollection);

@@ -7,6 +7,7 @@ use WC\Sale\BasketPropertiesCollection;
 use WC\Sale\Basket;
 use WC\Sale\BasketItem;
 use WC\Sale\Order;
+use WC\Sale\Shipment;
 
 Loader::registerAutoLoadClasses('wc.sale', [
     BasketPropertiesCollection::class => '/lib/basketproperties.php',
@@ -18,6 +19,7 @@ if (Loader::includeModule('wc.core')) {
     Sale::setRegistry(BasketItem::class, 'ENTITY_BASKET_ITEM');
     Sale::setRegistry(Order::class, 'ENTITY_ORDER');
     Sale::setRegistry(BasketPropertiesCollection::class, 'ENTITY_BASKET_PROPERTIES_COLLECTION');
+    Sale::setRegistry(Shipment::class, 'ENTITY_SHIPMENT');
 }
 
 $kernelDir = Directory::isDirectoryExists($_SERVER['DOCUMENT_ROOT'] . '/local') ? '/local' : '/bitrix';
