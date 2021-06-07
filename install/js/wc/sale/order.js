@@ -10,7 +10,7 @@ class WCSaleOrder {
             BX.bindDelegate(
                 this.orderComponentContainer,
                 'click',
-                {attribute: {'data-action-refresh': ''}},
+                {attribute: {'data-action': 'refresh'}},
                 this.refreshOrder.bind(this)
             );
 

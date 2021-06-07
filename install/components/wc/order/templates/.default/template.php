@@ -13,7 +13,7 @@ use Bitrix\Main\Localization\Loc;
 </div>
 <form data-container="order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_LOCATION_TITLE') ?></h2>
-    <div data-location>
+    <div>
         <label for="<?= $arResult['DATA']['LOCATION']['CODE'] ?>"></label>
         <? $APPLICATION->IncludeComponent(
             "bitrix:sale.location.selector.search",
@@ -44,7 +44,7 @@ use Bitrix\Main\Localization\Loc;
                 <td>
                     <label>
                         <input type="radio" value="<?= $personType['ID'] ?>" name="PERSON_TYPE_ID"
-                            <?= $personType['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
+                            <?= $personType['CHECKED'] ? 'checked' : '' ?> data-action="refresh">
                         <?= $personType['NAME'] ?>
                     </label>
                 </td>
@@ -59,7 +59,7 @@ use Bitrix\Main\Localization\Loc;
                 <td>
                     <label>
                         <input type="radio" name="DELIVERY_ID" value="<?= $delivery['ID'] ?>"
-                            <?= $delivery['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
+                            <?= $delivery['CHECKED'] ? 'checked' : '' ?> data-action="refresh">
                         <?= $delivery['NAME'] ?>
                     </label>
                 </td>
@@ -74,7 +74,7 @@ use Bitrix\Main\Localization\Loc;
                 <td>
                     <label>
                         <input type="radio" name="PAY_SYSTEM_ID" value="<?= $paySystem['ID'] ?>"
-                            <?= $paySystem['CHECKED'] ? 'checked' : '' ?> data-action-refresh>
+                            <?= $paySystem['CHECKED'] ? 'checked' : '' ?> data-action="refresh">
                         <?= $paySystem['NAME'] ?>
                     </label>
                 </td>
@@ -296,7 +296,7 @@ use Bitrix\Main\Localization\Loc;
         <? } ?>
     </table>
 
-    <button data-action-submit type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
+    <button type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
 </form>
 
 <table data-container="wc-basket" class="wc-basket-container">
