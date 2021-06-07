@@ -6,12 +6,12 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use Bitrix\Main\Localization\Loc;
 
 ?>
-<div class="wc-errors">
+<div data-container="errors" class="errors">
     <? foreach ($arResult['ERRORS'] as $error) {
         echo $error;
     } ?>
 </div>
-<form id="wc-order-form" action="" method="post">
+<form data-container="order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_LOCATION_TITLE') ?></h2>
     <div data-location>
         <label for="<?= $arResult['DATA']['LOCATION']['CODE'] ?>"></label>
@@ -88,7 +88,8 @@ use Bitrix\Main\Localization\Loc;
             <tr>
                 <td>
                     <label for="<?= $property['CODE'] ?>">
-                        <?= $property['NAME'] ?><br>
+                        <?= $property['NAME'] ?>
+                        <?= $property['REQUIRED'] == 'Y' ? '*' : '' ?>
                     </label>
                 </td>
                 <td>

@@ -2,29 +2,29 @@ class WCSaleOrder {
     constructor(params) {
         this.parameters = params.parameters;
         this.signedParameters = params.signedParameters;
-        this.orderContainer = BX(`comp_${this.parameters.ajaxId}`);
+        this.orderComponentContainer = BX(`comp_${this.parameters.ajaxId}`);
     }
 
     init() {
         BX.ready(() => {
             BX.bindDelegate(
-                this.orderContainer,
+                this.orderComponentContainer,
                 'click',
                 {attribute: {'data-action-refresh': ''}},
                 this.refreshOrder.bind(this)
             );
 
             BX.bindDelegate(
-                this.orderContainer,
+                this.orderComponentContainer,
                 'click',
                 {'class': 'bx-ui-sls-variant'},
                 this.refreshOrder.bind(this)
             );
 
             BX.bindDelegate(
-                this.orderContainer,
+                this.orderComponentContainer,
                 'submit',
-                BX('wc-order-form'),
+                BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'order'}}, true, false),
                 this.saveOrder.bind(this)
             );
         });
@@ -34,6 +34,7 @@ class WCSaleOrder {
         BX.PreventDefault(e);
         OrderLoader.showWait();
 
+        let errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
         let formData = new FormData(e.target);
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
@@ -46,10 +47,11 @@ class WCSaleOrder {
             if (response.status === 'success') {
                 window.location.replace(window.location);
             }
-        }, function (response) {
-            console.log(response);
+        }, (response) => {
             OrderLoader.closeWait();
-            // todo обработка ошибок
+            response.errors.forEach((error) => {
+                BX.append(BX.create('div', {'text': error.message}), errorsContainer);
+            });
         });
     }
 
@@ -71,7 +73,7 @@ class WCSaleOrder {
             cache: false,
             preparePost: false,
             onsuccess: (data) => {
-                BX.adjust(this.orderContainer, {html: data});
+                BX.adjust(this.orderComponentContainer, {html: data});
                 OrderLoader.closeWait();
             },
             onfailure: (data) => {

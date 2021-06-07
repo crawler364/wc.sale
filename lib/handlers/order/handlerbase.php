@@ -32,6 +32,12 @@ abstract class HandlerBase implements HandlerInterface
         $this->parseParameters($parameters);
     }
 
+    protected function parseParameters($parameters): void
+    {
+        $this->orderData = $parameters['ORDER_DATA'] ?? Context::getCurrent()->getRequest()->toArray();
+        $this->usePropertiesDefaultValue = $parameters['USE_PROPERTIES_DEFAULT_VALUE'] !== false;
+    }
+
     /**
      * @param int|null $userId
      * @return Order|\Bitrix\Sale\Order
@@ -85,8 +91,6 @@ abstract class HandlerBase implements HandlerInterface
 
     public function saveOrder(): Result
     {
-        // todo $this->checkOrderData();
-
         $this->setPersonType();
         $this->setBasket();
         $this->setLocation();
@@ -94,16 +98,17 @@ abstract class HandlerBase implements HandlerInterface
         $this->setPayment();
         $this->setProperties();
 
-        $result = $this->order->save();
-        $this->result->mergeResult($result);
+        $this->validatePersonType();
+        $this->validateShipment();
+        $this->validatePayment();
+        $this->validateProperties();
+
+        if ($this->result->isSuccess()) {
+            $result = $this->order->save();
+            $this->result->mergeResult($result);
+        }
 
         return $this->result;
-    }
-
-    protected function parseParameters($parameters): void
-    {
-        $this->orderData = $parameters['ORDER_DATA'] ?? Context::getCurrent()->getRequest()->toArray();
-        $this->usePropertiesDefaultValue = $parameters['USE_PROPERTIES_DEFAULT_VALUE'] !== false;
     }
 
     protected function setPersonType(): void
@@ -120,8 +125,6 @@ abstract class HandlerBase implements HandlerInterface
 
         if ($personTypeId > 0) {
             $this->order->setPersonTypeId($personTypeId);
-        } else {
-            $this->result->addError('WC_SALE_PERSON_TYPE_ERROR');
         }
     }
 
@@ -242,8 +245,6 @@ abstract class HandlerBase implements HandlerInterface
         if ($deliveryId > 0 && $delivery = Delivery\Services\Manager::getObjectById($deliveryId)) {
             $shipment->setDeliveryService($delivery);
             $shipmentCollection->calculateDelivery();
-        } else {
-            $this->result->addError('WC_SALE_SHIPMENT_ERROR');
         }
     }
 
@@ -305,8 +306,6 @@ abstract class HandlerBase implements HandlerInterface
 
         if ($paySystemId > 0 && $paySystem = \Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId)) {
             $payment->setPaySystemService($paySystem);
-        } else {
-            $this->result->addError('WC_SALE_PAYMENT_ERROR');
         }
     }
 
@@ -387,5 +386,72 @@ abstract class HandlerBase implements HandlerInterface
         }
 
         return $properties;
+    }
+
+    protected function validatePersonType(): void
+    {
+        if (!$this->order->getPersonTypeId()) {
+            $this->result->addError('WC_SALE_PERSON_TYPE_ERROR');
+        }
+    }
+
+    protected function validateShipment(): void
+    {
+        /**
+         * @var \Bitrix\Sale\ShipmentCollection $shipmentCollection
+         * @var \WC\Sale\Shipment $shipment
+         */
+
+        $shipmentCollection = $this->order->getShipmentCollection();
+
+        if ($shipment = $shipmentCollection->getItemByIndex(1)) {
+            $serviceParams = $shipment->getServiceParams();
+        }
+
+        if (!$serviceParams) {
+            $this->result->addError('WC_SALE_SHIPMENT_ERROR');
+        }
+    }
+
+    protected function validatePayment(): void
+    {
+        /**
+         * @var \Bitrix\Sale\PaymentCollection $paymentCollection
+         * @var \Bitrix\Sale\Payment $payment
+         */
+
+        $paymentCollection = $this->order->getPaymentCollection();
+
+        if ($payment = $paymentCollection->getItemByIndex(0)) {
+            $paymentSystemId = $payment->getPaymentSystemId();
+        }
+
+        if (!$paymentSystemId) {
+            $this->result->addError('WC_SALE_PAYMENT_ERROR');
+        }
+    }
+
+    protected function validateProperties(): void
+    {
+        /**
+         * @var \Bitrix\Main\Result $result
+         * @var \Bitrix\Sale\PropertyValue $property
+         */
+
+        foreach ($this->order->getPropertyCollection() as $property) {
+            if ($property->isUtil()) {
+                continue;
+            }
+
+            $result = $property->checkRequiredValue($property->getPropertyId(), $property->getValue());
+
+            if ($result->isSuccess()) {
+                $result = $property->verify();
+            }
+
+            if (!$result->isSuccess()) {
+                $this->result->addErrors($result->getErrors());
+            }
+        }
     }
 }

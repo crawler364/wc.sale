@@ -2,12 +2,12 @@ table.product-list td {
     border: 1px solid #000000;
 }
 
-table.person-type label {
+table label {
     cursor: pointer;
 
 }
 
-.wc-errors {
+.errors {
     font-size: 20px;
     color: red;
 }
