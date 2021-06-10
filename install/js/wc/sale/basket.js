@@ -127,22 +127,22 @@ class WCSaleBasket {
     setBasketContainersDom(basketContainersDom, basket) {
         basketContainersDom.forEach((basketContainerDom) => {
             if (basketContainerDom.nodes.weight) {
-                BX.adjust(basketContainerDom.nodes.weight, {html: basket.info.weightFormatted});
+                BX.adjust(basketContainerDom.nodes.weight, {html: basket.fields.weightFormatted});
             }
             if (basketContainerDom.nodes.count) {
-                BX.adjust(basketContainerDom.nodes.count, {html: basket.info.count});
+                BX.adjust(basketContainerDom.nodes.count, {html: basket.fields.count});
             }
             if (basketContainerDom.nodes.vatSum) {
-                BX.adjust(basketContainerDom.nodes.vatSum, {html: basket.info.vatSumFormatted});
+                BX.adjust(basketContainerDom.nodes.vatSum, {html: basket.fields.vatSumFormatted});
             }
             if (basketContainerDom.nodes.basePrice) {
-                BX.adjust(basketContainerDom.nodes.basePrice, {html: basket.info.basePriceFormatted});
+                BX.adjust(basketContainerDom.nodes.basePrice, {html: basket.fields.basePriceFormatted});
             }
             if (basketContainerDom.nodes.discountPrice) {
-                BX.adjust(basketContainerDom.nodes.discountPrice, {html: basket.info.discountPriceFormatted});
+                BX.adjust(basketContainerDom.nodes.discountPrice, {html: basket.fields.discountPriceFormatted});
             }
             if (basketContainerDom.nodes.price) {
-                BX.adjust(basketContainerDom.nodes.price, {html: basket.info.priceFormatted});
+                BX.adjust(basketContainerDom.nodes.price, {html: basket.fields.priceFormatted});
             }
         });
     }
