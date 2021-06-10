@@ -303,35 +303,35 @@ use Bitrix\Main\Localization\Loc;
     <tbody>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_WEIGHT') ?></td>
-        <td data-container="basket-weight"><?= $arResult['DATA']['BASKET_INFO']['WEIGHT_FORMATTED'] ?></td>
+        <td data-container="basket-weight"><?= $arResult['DATA']['ORDER']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_COUNT') ?></td>
-        <td data-container="basket-count"><?= $arResult['DATA']['BASKET_INFO']['COUNT'] ?></td>
+        <td data-container="basket-count"><?= $arResult['DATA']['ORDER']['COUNT'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_VAT_SUM') ?></td>
-        <td data-container="basket-vat-sum"><?= $arResult['DATA']['BASKET_INFO']['VAT_SUM_FORMATTED'] ?></td>
+        <td data-container="basket-vat-sum"><?= $arResult['DATA']['ORDER']['VAT_SUM_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_BASE_PRICE') ?></td>
-        <td data-container="basket-base-price"><?= $arResult['DATA']['BASKET_INFO']['BASE_PRICE_FORMATTED'] ?></td>
+        <td data-container="basket-base-price"><?= $arResult['DATA']['ORDER']['BASE_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_DISCOUNT') ?></td>
-        <td data-container="basket-discount-price"><?= $arResult['DATA']['BASKET_INFO']['DISCOUNT_PRICE_FORMATTED'] ?></td>
+        <td data-container="basket-discount-price"><?= $arResult['DATA']['ORDER']['DISCOUNT_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_PRICE') ?></td>
-        <td data-container="basket-price"><?= $arResult['DATA']['BASKET_INFO']['PRICE_FORMATTED'] ?></td>
+        <td data-container="basket-price"><?= $arResult['DATA']['ORDER']['PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE_DELIVERY') ?></td>
-        <td><?= $arResult['DATA']['ORDER_INFO']['PRICE_DELIVERY_FORMATTED'] ?></td>
+        <td><?= $arResult['DATA']['ORDER']['PRICE_DELIVERY_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE') ?></td>
-        <td><?= $arResult['DATA']['ORDER_INFO']['PRICE_FORMATTED'] ?></td>
+        <td><?= $arResult['DATA']['ORDER']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
     <tr>

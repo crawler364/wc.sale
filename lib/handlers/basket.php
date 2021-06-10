@@ -1,14 +1,14 @@
 <?php
 
 
-namespace WC\Sale\Handlers\Basket;
+namespace WC\Sale\Handlers;
 
 
 use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 
-class Handler extends HandlerBase
+class Basket extends Internals\BasketBase
 {
     protected function setBasketItemQuantity(array $product): void
     {

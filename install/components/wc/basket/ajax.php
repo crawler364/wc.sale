@@ -13,7 +13,7 @@ use Bitrix\Main\Request;
 use Bitrix\Main\Loader;
 use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
-use WC\Sale\Handlers\Basket\Handler as BasketHandler;
+use WC\Sale\Handlers\Basket as BasketHandler;
 
 Loc::loadMessages(__FILE__);
 
@@ -42,14 +42,14 @@ class BasketAjaxController extends Controller
     {
         $this->arParams = $this->getUnsignedParameters();
 
-        return parent::prepareParams();
+        return true;
     }
 
     protected function processBeforeAction(Action $action): bool
     {
         $this->arResult = $this->request->toArray();
 
-        return parent::processBeforeAction($action);
+        return true;
     }
 
     public function processAction(): AjaxJson

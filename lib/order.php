@@ -9,15 +9,15 @@ use WC\Core\Helpers\Catalog;
 
 class Order extends \Bitrix\Sale\Order
 {
-    public function getInfo(): array
+    public function getFieldValuesFormatted(): array
     {
-        $info = $this->getFieldValues();
+        $fields = $this->getFieldValues();
 
-        $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE']);
-        $info['PRICE_DELIVERY_FORMATTED'] = Catalog::formatPrice($info['PRICE_DELIVERY']);
-        $info['SUM_PAID_FORMATTED'] = Catalog::formatPrice($info['SUM_PAID']);
+        $fields['PRICE_FORMATTED'] = Catalog::formatPrice($fields['PRICE']);
+        $fields['PRICE_DELIVERY_FORMATTED'] = Catalog::formatPrice($fields['PRICE_DELIVERY']);
+        $fields['SUM_PAID_FORMATTED'] = Catalog::formatPrice($fields['SUM_PAID']);
 
-        return $info;
+        return $fields;
     }
 
     /**

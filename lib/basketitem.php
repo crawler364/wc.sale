@@ -11,26 +11,32 @@ use WC\Core\Helpers\Catalog;
 
 class BasketItem extends \Bitrix\Sale\BasketItem
 {
-    public function getInfo(): array
+    public function getFieldValuesFormatted(): array
     {
-        $info = $this->getFieldValues();
+        $fields = $this->getFieldValues();
 
-        $info['QUANTITY'] = $this->getQuantity();
-        $info['BASE_PRICE_SUM'] = $info['BASE_PRICE'] * $info['QUANTITY'];
-        $info['PRICE_SUM'] = $info['PRICE'] * $info['QUANTITY'];
-        $info['DISCOUNT_PRICE_SUM'] = $info['DISCOUNT_PRICE'] * $info['QUANTITY'];  // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
+        $fields['QUANTITY'] = $this->getQuantity();
+        $fields['BASE_PRICE_SUM'] = $fields['BASE_PRICE'] * $fields['QUANTITY'];
+        $fields['PRICE_SUM'] = $fields['PRICE'] * $fields['QUANTITY'];
+        $fields['DISCOUNT_PRICE_SUM'] = $fields['DISCOUNT_PRICE'] * $fields['QUANTITY'];  // DISCOUNT_PRICE - величина скидки, а не цена со скидкой
 
-        $info['WEIGHT_FORMATTED'] = Catalog::formatWeight($info['WEIGHT']);
-        $info['PRICE_FORMATTED'] = Catalog::formatPrice($info['PRICE'], $info['CURRENCY']);
-        $info['PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['PRICE_SUM'], $info['CURRENCY']);
-        $info['BASE_PRICE_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE'], $info['CURRENCY']);
-        $info['BASE_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['BASE_PRICE_SUM'], $info['CURRENCY']);
-        $info['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE'], $info['CURRENCY']);
-        $info['DISCOUNT_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($info['DISCOUNT_PRICE_SUM'], $info['CURRENCY']);
+        $fields['WEIGHT_FORMATTED'] = Catalog::formatWeight($fields['WEIGHT']);
+        $fields['PRICE_FORMATTED'] = Catalog::formatPrice($fields['PRICE'], $fields['CURRENCY']);
+        $fields['PRICE_SUM_FORMATTED'] = Catalog::formatPrice($fields['PRICE_SUM'], $fields['CURRENCY']);
+        $fields['BASE_PRICE_FORMATTED'] = Catalog::formatPrice($fields['BASE_PRICE'], $fields['CURRENCY']);
+        $fields['BASE_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($fields['BASE_PRICE_SUM'], $fields['CURRENCY']);
+        $fields['DISCOUNT_PRICE_FORMATTED'] = Catalog::formatPrice($fields['DISCOUNT_PRICE'], $fields['CURRENCY']);
+        $fields['DISCOUNT_PRICE_SUM_FORMATTED'] = Catalog::formatPrice($fields['DISCOUNT_PRICE_SUM'], $fields['CURRENCY']);
 
-        $info['IBLOCK_ELEMENT'] = $this->getIblockElementInfo();
+        $fields['IBLOCK_ELEMENT'] = $this->getIblockElementInfo();
 
-        return $info;
+        return $fields;
+    }
+
+    public function getIblockElementInfo(): array
+    {
+        // todo
+        return [];
     }
 
     public function setProperty($name, $code, $value): void
@@ -63,12 +69,6 @@ class BasketItem extends \Bitrix\Sale\BasketItem
         }
 
         $this->setField('NOTES', serialize($notes));
-    }
-
-    public function getIblockElementInfo(): array
-    {
-        // todo
-        return [];
     }
 
     /**

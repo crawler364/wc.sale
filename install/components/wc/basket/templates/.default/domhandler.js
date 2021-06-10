@@ -19,7 +19,7 @@ class WCSaleBasketDomHandler {
 
             // basket DOM
             this.basketContainersDom.forEach((basketContainerDom) => {
-                if (this.basket.info.count > 0) {
+                if (this.basket.fields.count > 0) {
                     if (basketContainerDom.nodes.empty) {
                         BX.addClass(basketContainerDom.nodes.empty, 'hide');
                     }

@@ -1,14 +1,14 @@
 <?php
 
 
-namespace WC\Sale\Handlers\Basket;
+namespace WC\Sale\Handlers\Internals;
 
 
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\BasketItem;
 use WC\Sale\Basket;
 
-interface HandlerInterface
+interface BasketInterface
 {
     /**
      * @param int $fUserId

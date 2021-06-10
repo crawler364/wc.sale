@@ -1,19 +1,19 @@
 <?php
 
 
-namespace WC\Sale\Handlers\Order;
+namespace WC\Sale\Handlers\Internals;
 
 
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Order;
 
-interface HandlerInterface
+interface OrderInterface
 {
     /**
      * @param int|null $userId
      * @return Order|\Bitrix\Sale\Order
      */
-    public static function createOrder(int $userId = null);
+    public static function createOrder($userId = null);
 
     /**
      * @return Result

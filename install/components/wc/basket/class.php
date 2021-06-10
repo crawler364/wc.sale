@@ -8,7 +8,7 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Fuser;
-use WC\Sale\Handlers\Basket\Handler as BasketHandler;
+use WC\Sale\Handlers\Basket as BasketHandler;
 
 Loc::loadMessages(__FILE__);
 

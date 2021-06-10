@@ -68,27 +68,27 @@ use \Bitrix\Main\Localization\Loc;
     <tbody>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_INFO_WEIGHT') ?></td>
-        <td data-container="basket-weight"><?= $arResult['INFO']['WEIGHT_FORMATTED'] ?></td>
+        <td data-container="basket-weight"><?= $arResult['FIELDS']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_INFO_COUNT') ?></td>
-        <td data-container="basket-count"><?= $arResult['INFO']['COUNT'] ?></td>
+        <td data-container="basket-count"><?= $arResult['FIELDS']['COUNT'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_INFO_VAT_SUM') ?></td>
-        <td data-container="basket-vat-sum"><?= $arResult['INFO']['VAT_SUM_FORMATTED'] ?></td>
+        <td data-container="basket-vat-sum"><?= $arResult['FIELDS']['VAT_SUM_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_INFO_PRICE') ?></td>
-        <td data-container="basket-base-price"><?= $arResult['INFO']['BASE_PRICE_FORMATTED'] ?></td>
+        <td data-container="basket-base-price"><?= $arResult['FIELDS']['BASE_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_INFO_DISCOUNT') ?></td>
-        <td data-container="basket-discount-price"><?= $arResult['INFO']['DISCOUNT_PRICE_FORMATTED'] ?></td>
+        <td data-container="basket-discount-price"><?= $arResult['FIELDS']['DISCOUNT_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_INFO_PRICE_SUM') ?></td>
-        <td data-container="basket-price"><?= $arResult['INFO']['PRICE_FORMATTED'] ?></td>
+        <td data-container="basket-price"><?= $arResult['FIELDS']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
     <tr>

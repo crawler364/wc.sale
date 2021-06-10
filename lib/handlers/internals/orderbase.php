@@ -1,20 +1,20 @@
 <?php
 
 
-namespace WC\Sale\Handlers\Order;
+namespace WC\Sale\Handlers\Internals;
 
 
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery;
-use Bitrix\Main\Context;
 use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
-use WC\Sale\Handlers\Basket\Handler as BasketHandler;
+use WC\Sale\Basket;
+use WC\Sale\Handlers\Basket as BasketHandler;
 use WC\Sale\Order;
 
 Loc::loadMessages(__FILE__);
 
-abstract class HandlerBase implements HandlerInterface
+abstract class OrderBase implements OrderInterface
 {
     /** @var Result */
     protected $result;
@@ -22,33 +22,23 @@ abstract class HandlerBase implements HandlerInterface
     protected $order;
     /** @var BasketHandler */
     protected $basketHandler = BasketHandler::class;
-    protected $usePropertiesDefaultValue = true;
-    protected $orderData;
+    protected $data;
+    protected $params;
 
-    public function __construct(Order $order, array $parameters = [])
+    public function __construct(Order $order, array $data = [], array $params = [])
     {
         $this->result = new Result();
         $this->order = $order;
-        $this->parseParameters($parameters);
-    }
-
-    protected function parseParameters($parameters): void
-    {
-        $this->orderData = $parameters['ORDER_DATA'] ?? Context::getCurrent()->getRequest()->toArray();
-        $this->usePropertiesDefaultValue = $parameters['USE_PROPERTIES_DEFAULT_VALUE'] !== false;
+        $this->data = $data;
+        $this->params = $params;
     }
 
     /**
      * @param int|null $userId
      * @return Order|\Bitrix\Sale\Order
      */
-    public static function createOrder(int $userId = null)
+    public static function createOrder($userId = null)
     {
-        if ($userId == null) {
-            $fUserId = Fuser::getId();
-            $userId = Fuser::getUserIdById($fUserId);
-        }
-
         $siteId = \WC\Core\Helpers\Main::getSiteId();
 
         return Order::create($siteId, $userId);
@@ -56,22 +46,19 @@ abstract class HandlerBase implements HandlerInterface
 
     public function processOrder(): Result
     {
-        // todo $this->checkOrderData();
-
         $this->setPersonType();
         $personTypes = $this->getPersonTypes();
         $this->setBasket();
         $productsList = $this->getProductsList();
-
         $this->setLocation();
         $location = $this->getLocation();
         $this->setShipment();
         $deliveries = $this->getDeliveries();
         $this->setPayment();
         $paySystems = $this->getPaySystems();
-
         $this->setProperties();
         $properties = $this->getProperties();
+        $orderFields = $this->getFields();
 
         $data = [
             'LOCATION' => $location,
@@ -80,8 +67,7 @@ abstract class HandlerBase implements HandlerInterface
             'DELIVERIES' => $deliveries,
             'PAY_SYSTEMS' => $paySystems,
             'PRODUCTS_LIST' => $productsList,
-            'ORDER_INFO' => $this->order->getInfo(),
-            'BASKET_INFO' => $this->order->getBasket()->getInfo(),
+            'ORDER' => $orderFields,
         ];
 
         $this->result->setData($data);
@@ -93,10 +79,10 @@ abstract class HandlerBase implements HandlerInterface
     {
         $this->setPersonType();
         $this->setBasket();
-        $this->setLocation();
+        $this->setLocation(false);
         $this->setShipment();
         $this->setPayment();
-        $this->setProperties();
+        $this->setProperties(false);
 
         $this->validatePersonType();
         $this->validateShipment();
@@ -104,6 +90,10 @@ abstract class HandlerBase implements HandlerInterface
         $this->validateProperties();
 
         if ($this->result->isSuccess()) {
+            if (!$this->order->getUserId()) {
+                $this->setUserId();
+            }
+
             $result = $this->order->save();
             $this->result->mergeResult($result);
         }
@@ -113,8 +103,8 @@ abstract class HandlerBase implements HandlerInterface
 
     protected function setPersonType(): void
     {
-        if ($this->orderData['PERSON_TYPE_ID']) {
-            $personTypeId = $this->orderData['PERSON_TYPE_ID'];
+        if ($this->data['PERSON_TYPE_ID']) {
+            $personTypeId = $this->data['PERSON_TYPE_ID'];
         } else {
             $personType = \Bitrix\Sale\PersonType::getList([
                 'order' => ['SORT' => 'ASC'],
@@ -156,6 +146,8 @@ abstract class HandlerBase implements HandlerInterface
 
     protected function getProductsList(): array
     {
+        /** @var Basket $basket */
+
         $productsList = [];
 
         if ($basket = $this->order->getBasket()) {
@@ -165,7 +157,7 @@ abstract class HandlerBase implements HandlerInterface
         return $productsList;
     }
 
-    protected function setLocation(): void
+    protected function setLocation($useDefaults = true): void
     {
         /**
          * @var array $restrictedProperties
@@ -178,9 +170,9 @@ abstract class HandlerBase implements HandlerInterface
             if ($restrictedProperty->getType() === 'LOCATION') {
                 $property = $restrictedProperty->getProperty();
 
-                if ($this->orderData[$property['CODE']]) {
-                    $propertyValue = $this->orderData[$property['CODE']];
-                } elseif ($property['DEFAULT_VALUE'] && $this->usePropertiesDefaultValue) {
+                if ($this->data[$property['CODE']]) {
+                    $propertyValue = $this->data[$property['CODE']];
+                } elseif ($property['DEFAULT_VALUE'] && $useDefaults) {
                     $propertyValue = $property['DEFAULT_VALUE'];
                 } else {
                     $propertyValue = '';
@@ -236,7 +228,7 @@ abstract class HandlerBase implements HandlerInterface
         $deliveryId = array_keys($restrictedDeliveries)[0];
 
         foreach ($restrictedDeliveries as $restrictedDelivery) {
-            if ($this->orderData['DELIVERY_ID'] && $this->orderData['DELIVERY_ID'] == $restrictedDelivery['ID']) {
+            if ($this->data['DELIVERY_ID'] && $this->data['DELIVERY_ID'] == $restrictedDelivery['ID']) {
                 $deliveryId = $restrictedDelivery['ID'];
                 break;
             }
@@ -298,7 +290,7 @@ abstract class HandlerBase implements HandlerInterface
         $paySystemId = array_keys($restrictedPaySystems)[0];
 
         foreach ($restrictedPaySystems as $restrictedPaySystem) {
-            if ($this->orderData['PAY_SYSTEM_ID'] && $this->orderData['PAY_SYSTEM_ID'] == $restrictedPaySystem['ID']) {
+            if ($this->data['PAY_SYSTEM_ID'] && $this->data['PAY_SYSTEM_ID'] == $restrictedPaySystem['ID']) {
                 $paySystemId = $restrictedPaySystem['ID'];
                 break;
             }
@@ -337,7 +329,7 @@ abstract class HandlerBase implements HandlerInterface
         return $paySystems;
     }
 
-    protected function setProperties(): void
+    protected function setProperties($useDefaults = true): void
     {
         /**
          * @var array $restrictedProperties
@@ -353,9 +345,9 @@ abstract class HandlerBase implements HandlerInterface
 
             $property = $restrictedProperty->getProperty();
 
-            if ($this->orderData[$property['CODE']]) {
-                $propertyValue = $this->orderData[$property['CODE']];
-            } elseif ($property['DEFAULT_VALUE'] && $this->usePropertiesDefaultValue) {
+            if ($this->data[$property['CODE']]) {
+                $propertyValue = $this->data[$property['CODE']];
+            } elseif ($property['DEFAULT_VALUE'] && $useDefaults) {
                 $propertyValue = $property['DEFAULT_VALUE'];
             } else {
                 $propertyValue = $property['MULTIPLE'] === 'Y' ? [''] : '';
@@ -388,6 +380,20 @@ abstract class HandlerBase implements HandlerInterface
         return $properties;
     }
 
+    protected function getFields(): array
+    {
+        /** @var Basket $basket */
+
+        $orderFields = $this->order->getFieldValuesFormatted();
+        $basketFields = [];
+
+        if ($basket = $this->order->getBasket()) {
+            $basketFields = $basket->getFieldValuesFormatted();
+        }
+
+        return array_merge($orderFields, $basketFields);
+    }
+
     protected function validatePersonType(): void
     {
         if (!$this->order->getPersonTypeId()) {
@@ -405,10 +411,10 @@ abstract class HandlerBase implements HandlerInterface
         $shipmentCollection = $this->order->getShipmentCollection();
 
         if ($shipment = $shipmentCollection->getItemByIndex(1)) {
-            $serviceParams = $shipment->getServiceParams();
+            $deliveryId = $shipment->getDeliveryId();
         }
 
-        if (!$serviceParams) {
+        if (!$deliveryId) {
             $this->result->addError('WC_SALE_SHIPMENT_ERROR');
         }
     }
@@ -453,5 +459,28 @@ abstract class HandlerBase implements HandlerInterface
                 $this->result->addErrors($result->getErrors());
             }
         }
+    }
+
+    protected function setUserId(): void
+    {
+        global $USER;
+
+        if ($USER->IsAuthorized()) {
+            $userId = $USER->GetID();
+        } else {
+            $user = \WC\Sale\Handlers\OrderUser::autoRegister([$this->order->getPropertyCollection()]);
+            if (!$userId = $user->GetId()) {
+                $this->result->addError($user->LAST_ERROR);
+            }
+        }
+
+        if ($userId > 0) {
+            $this->order->setFieldNoDemand('USER_ID', $userId);
+        }
+    }
+
+    protected function setFields(): void
+    {
+
     }
 }

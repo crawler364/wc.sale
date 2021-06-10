@@ -1,7 +1,7 @@
 <?php
 
 
-namespace WC\Sale\Handlers\Basket;
+namespace WC\Sale\Handlers\Internals;
 
 
 use Bitrix\Catalog\Product\CatalogProvider;
@@ -12,11 +12,11 @@ use WC\Core\Bitrix\Main\Result;
 use WC\Core\Helpers\Main;
 use WC\Sale\BasketItem;
 use WC\Sale\Basket;
-use WC\Sale\Handlers\Order\Handler as OrderHandler;
+use WC\Sale\Handlers\Order as OrderHandler;
 
 Loc::loadMessages(__FILE__);
 
-abstract class HandlerBase implements HandlerInterface
+abstract class BasketBase implements BasketInterface
 {
     /** @var Basket $basketItem */
     protected $basket;
@@ -93,7 +93,7 @@ abstract class HandlerBase implements HandlerInterface
 
         if ($r->isSuccess()) {
             $this->result->setData([
-                'BASKET_ITEM' => $this->basketItem->getInfo(),
+                'BASKET_ITEM' => $this->basketItem->getFieldValuesFormatted(),
                 'BASKET' => $this->basket->getData(),
             ]);
         } else {

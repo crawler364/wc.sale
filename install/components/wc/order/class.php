@@ -8,19 +8,31 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\SystemException;
+use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
-use WC\Sale\Handlers\Order\Handler as OrderHandler;
+use WC\Sale\Handlers\Order as OrderHandler;
 
 Loc::loadMessages(__FILE__);
 
 class Order extends \CBitrixComponent
 {
+    private $orderData;
+
     public function __construct($component = null)
     {
         parent::__construct($component);
 
-        $this->checkModules(['wc.core', 'wc.sale']);
+        static::checkModules(['wc.core', 'wc.sale']);
         \CUtil::InitJSCore(['ajax', 'wc.sale.order']);
+    }
+
+    public static function checkModules(array $modules): void
+    {
+        foreach ($modules as $module) {
+            if (!Loader::includeModule($module)) {
+                throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => $module]));
+            }
+        }
     }
 
     protected function listKeysSignedParameters(): array
@@ -32,42 +44,83 @@ class Order extends \CBitrixComponent
 
     public function executeComponent()
     {
+        global $USER;
+
+        $basket = \WC\Sale\Handlers\Basket::getBasket(Fuser::getId());
+
+        if ($basket->count() > 0) {
+            if ($this->arParams['ALLOW_AUTO_REGISTER'] === 'Y' || $USER->IsAuthorized()) {
+                $templatePage = 'template';
+                $this->setResult();
+            } else {
+                $templatePage = 'template_auth';
+            }
+        } else {
+            $templatePage = 'template_empty';
+        }
+
+        if ($this->request['AJAX'] === 'Y') {
+            $this->includeComponentTemplateAjax($templatePage);
+        } else {
+            $this->includeComponentTemplate($templatePage);
+        }
+    }
+
+    private function setResult(): void
+    {
         /**
          * @var OrderHandler $cOrderHandler
          * @var OrderHandler $orderHandler
          * @var Result $result
          */
 
-        $cOrderHandler = $this->getCOrderHandler();
+        $this->orderData = static::getOrderData();
+        $cOrderHandler = $this::getCOrderHandler($this->arParams);
         $order = $cOrderHandler::createOrder();
-        $orderHandler = new $cOrderHandler($order, [
-            'USE_PROPERTIES_DEFAULT_VALUE' => $this->arParams['USE_PROPERTIES_DEFAULT_VALUE'],
-        ]);
+        $orderHandler = new $cOrderHandler($order, $this->orderData, $this->arParams);
         $result = $orderHandler->processOrder();
 
-        $this->arResult['DATA'] = $result->getData();
-        $this->arResult['ERRORS'] = $result->getErrorMessages();
-
-        if ($this->request['AJAX'] == 'Y') {
-            $this->includeComponentTemplateAjax();
-        } else {
-            $this->includeComponentTemplate();
-        }
+        $this->arResult = [
+            'DATA' => $result->getData(),
+            'ERRORS' => $result->getErrorMessages(),
+        ];
     }
 
-    private function checkModules(array $modules): void
+    private function includeComponentTemplateAjax($templatePage): void
     {
-        foreach ($modules as $module) {
-            if (!Loader::includeModule($module)) {
-                throw new LoaderException(Loc::getMessage('WC_ORDER_MODULE_NOT_INCLUDED', ['#REPLACE#' => $module]));
+        global $APPLICATION;
+        $APPLICATION->RestartBuffer();
+        $this->includeComponentTemplate($templatePage);
+        die;
+    }
+
+    public static function getOrderData(): array
+    {
+        $request = \Bitrix\Main\Context::getCurrent()->getRequest();
+        $orderData = $request->toArray(); // todo validate props
+        $filesProperties = $request->getFileList();
+
+        foreach ($filesProperties as $propertyCode => $propertyParams) {
+            foreach ($propertyParams as $paramName => $propertyValues) {
+                if (is_array($propertyValues)) {
+                    foreach ($propertyValues as $index => $propertyValue) {
+                        $orderData[$propertyCode][$index]['ID'] = '';
+                        $orderData[$propertyCode][$index][$paramName] = $propertyValue;
+                    }
+                } else {
+                    $orderData[$propertyCode][$index]['ID'] = '';
+                    $orderData[$propertyCode][$index][$paramName] = $propertyValues;
+                }
             }
         }
+
+        return $orderData;
     }
 
-    private function getCOrderHandler(): string
+    public static function getCOrderHandler($arParams): string
     {
-        if (class_exists($this->arParams['ORDER_HANDLER_CLASS'])) {
-            $cOrderHandler = $this->arParams['ORDER_HANDLER_CLASS'];
+        if (class_exists($arParams['ORDER_HANDLER_CLASS'])) {
+            $cOrderHandler = $arParams['ORDER_HANDLER_CLASS'];
         } elseif (class_exists(OrderHandler::class)) {
             $cOrderHandler = OrderHandler::class;
         } else {
@@ -75,13 +128,5 @@ class Order extends \CBitrixComponent
         }
 
         return $cOrderHandler;
-    }
-
-    private function includeComponentTemplateAjax(): void
-    {
-        global $APPLICATION;
-        $APPLICATION->RestartBuffer();
-        $this->includeComponentTemplate();
-        die;
     }
 }
