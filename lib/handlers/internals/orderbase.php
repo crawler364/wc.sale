@@ -10,6 +10,7 @@ use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Basket;
 use WC\Sale\Handlers\Basket as BasketHandler;
+use WC\Sale\Handlers\OrderUser;
 use WC\Sale\Order;
 
 Loc::loadMessages(__FILE__);
@@ -22,6 +23,8 @@ abstract class OrderBase implements OrderInterface
     protected $order;
     /** @var BasketHandler */
     protected $basketHandler = BasketHandler::class;
+    /** @var OrderUser */
+    protected $orderUser = OrderUser::class;
     protected $data;
     protected $params;
 
@@ -468,13 +471,15 @@ abstract class OrderBase implements OrderInterface
         if ($USER->IsAuthorized()) {
             $userId = $USER->GetID();
         } else {
-            $user = \WC\Sale\Handlers\OrderUser::autoRegister([$this->order->getPropertyCollection()]);
-            if (!$userId = $user->GetId()) {
-                $this->result->addError($user->LAST_ERROR);
+            $r = $this->orderUser::autoRegister([$this->order->getPropertyCollection()]);
+            if ((int)$r > 0) {
+                $userId = $r;
+            } else {
+                $this->result->addError($r->LAST_ERROR);
             }
         }
 
-        if ($userId > 0) {
+        if ((int)$userId > 0) {
             $this->order->setFieldNoDemand('USER_ID', $userId);
         }
     }
