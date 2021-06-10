@@ -89,11 +89,11 @@ abstract class OrderBase implements OrderInterface
         $this->validatePayment();
         $this->validateProperties();
 
-        if ($this->result->isSuccess()) {
-            if (!$this->order->getUserId()) {
-                $this->setUserId();
-            }
+        if ($this->result->isSuccess() && !$this->order->getUserId()) {
+            $this->setUserId();
+        }
 
+        if ($this->result->isSuccess()) {
             $result = $this->order->save();
             $this->result->mergeResult($result);
         }

@@ -10,6 +10,8 @@ class OrderUser extends \WC\Core\Handlers\Internals\UserBase
 {
     public static function autoRegister(array $fields): \CUser
     {
+        $pc = $fields[0];
+
         if ($fields[0] instanceof PropertyValueCollection && $emailProperty = $pc->getItemByOrderPropertyCode('EMAIL')) {
             $email = $emailProperty->getValue();
         }
