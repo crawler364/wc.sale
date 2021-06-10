@@ -32,7 +32,6 @@ class WCSaleOrder {
 
     saveOrder(e) {
         BX.PreventDefault(e);
-        OrderLoader.showWait();
 
         let errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
         let formData = new FormData(e.target);
@@ -42,13 +41,13 @@ class WCSaleOrder {
             data: formData,
             signedParameters: this.signedParameters,
         }).then((response) => {
-            console.log(response);
             OrderLoader.closeWait();
             if (response.status === 'success') {
                 window.location.replace(window.location);
             }
         }, (response) => {
             OrderLoader.closeWait();
+            BX.cleanNode(errorsContainer);
             response.errors.forEach((error) => {
                 BX.append(BX.create('div', {'text': error.message}), errorsContainer);
             });
