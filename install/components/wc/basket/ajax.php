@@ -7,10 +7,8 @@ namespace WC\Sale\Components;
 use Bitrix\Main\Engine\Action;
 use Bitrix\Main\Engine\Controller;
 use Bitrix\Main\Engine\Response\AjaxJson;
-use Bitrix\Main\LoaderException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Request;
-use Bitrix\Main\Loader;
 use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\Basket as BasketHandler;
@@ -21,12 +19,15 @@ class BasketAjaxController extends Controller
 {
     private $arParams;
     private $arResult;
+    /** @var Basket */
+    private $class;
 
     public function __construct(Request $request = null)
     {
         parent::__construct($request);
 
-        $this->checkModules(['wc.core', 'wc.sale']);
+        $this->class = '\\' . \CBitrixComponent::includeComponentClass('wc:basket');
+        $this->class::checkModules(['wc.core', 'wc.sale']);
     }
 
     public function configureActions(): array
@@ -60,7 +61,7 @@ class BasketAjaxController extends Controller
          * @var BasketHandler $basketHandler
          */
 
-        $cBasketHandler = $this->getCBasketHandler();
+        $cBasketHandler = $this->class::getCBasketHandler($this->arParams);
 
         $basket = $cBasketHandler::getBasket(Fuser::getId());
         $basketItem = $basket->getItemBy(['PRODUCT_ID' => $this->arResult['product']['id']]) ??
@@ -79,27 +80,5 @@ class BasketAjaxController extends Controller
         }
 
         return $result->prepareAjaxJson();
-    }
-
-    private function checkModules(array $modules): void
-    {
-        foreach ($modules as $module) {
-            if (!Loader::includeModule($module)) {
-                throw new LoaderException(Loc::getMessage('WC_BASKET_MODULE_NOT_INCLUDED', ['#REPLACE#' => $module]));
-            }
-        }
-    }
-
-    private function getCBasketHandler(): string
-    {
-        if (class_exists($this->arParams['BASKET_HANDLER_CLASS'])) {
-            $cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
-        } elseif (class_exists(BasketHandler::class)) {
-            $cBasketHandler = BasketHandler::class;
-        } else {
-            throw new SystemException(Loc::getMessage('WC_BASKET_HANDLER_CLASS_NOT_EXISTS'));
-        }
-
-        return $cBasketHandler;
     }
 }

@@ -18,7 +18,7 @@ class Basket extends \CBitrixComponent
     {
         parent::__construct($component);
 
-        $this->checkModules(['wc.core', 'wc.sale']);
+        static::checkModules(['wc.core', 'wc.sale']);
         \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
     }
 
@@ -34,7 +34,7 @@ class Basket extends \CBitrixComponent
     {
         /** @var BasketHandler $cBasketHandler */
 
-        $cBasketHandler = $this->getCBasketHandler();
+        $cBasketHandler = static::getCBasketHandler($this->arParams);
 
         $basket = $cBasketHandler::getBasket(Fuser::getId());
         $this->arResult = $basket->getData();
@@ -42,7 +42,7 @@ class Basket extends \CBitrixComponent
         $this->includeComponentTemplate();
     }
 
-    private function checkModules(array $modules): void
+    public static function checkModules(array $modules): void
     {
         foreach ($modules as $module) {
             if (!Loader::includeModule($module)) {
@@ -51,10 +51,10 @@ class Basket extends \CBitrixComponent
         }
     }
 
-    private function getCBasketHandler(): string
+    public static function getCBasketHandler($arParams): string
     {
-        if (class_exists($this->arParams['BASKET_HANDLER_CLASS'])) {
-            $cBasketHandler = $this->arParams['BASKET_HANDLER_CLASS'];
+        if (class_exists($arParams['BASKET_HANDLER_CLASS'])) {
+            $cBasketHandler = $arParams['BASKET_HANDLER_CLASS'];
         } elseif (class_exists(BasketHandler::class)) {
             $cBasketHandler = BasketHandler::class;
         } else {
