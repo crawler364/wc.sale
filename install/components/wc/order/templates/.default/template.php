@@ -5,6 +5,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 
 use Bitrix\Main\Localization\Loc;
 
+$this->setFrameMode(false);
 ?>
 <div data-container="errors" class="errors">
     <? foreach ($arResult['ERRORS'] as $error) {
@@ -296,7 +297,7 @@ use Bitrix\Main\Localization\Loc;
         <? } ?>
     </table>
 
-    <button type="submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></button>
+    <div data-action="submit" class="button-submit"><?= Loc::getMessage('WC_ORDER_SUBMIT_BUTTON') ?></div>
 </form>
 
 <table data-container="wc-basket" class="wc-basket-container">

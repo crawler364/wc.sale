@@ -11,3 +11,18 @@ table label {
     font-size: 20px;
     color: red;
 }
+
+form .button-submit {
+    background: #EFEFEF;
+    border: 1px solid #767676;
+    border-radius: 3px;
+    padding: 4px;
+    width: 140px;
+    margin: 20px 0;
+    text-align: center;
+    cursor: pointer;
+}
+
+form .button-submit:hover {
+    background: #E5E5E5;
+}

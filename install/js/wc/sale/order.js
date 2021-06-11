@@ -20,11 +20,10 @@ class WCSaleOrder {
                 {'class': 'bx-ui-sls-variant'},
                 this.refreshOrder.bind(this)
             );
-
             BX.bindDelegate(
                 this.orderComponentContainer,
-                'submit',
-                BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'order'}}, true, false),
+                'click',
+                {attribute: {'data-action': 'submit'}},
                 this.saveOrder.bind(this)
             );
         });
@@ -33,35 +32,47 @@ class WCSaleOrder {
     saveOrder(e) {
         BX.PreventDefault(e);
 
-        let errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
-        let formData = new FormData(e.target);
+        this.errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
+        this.orderContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'order'}}, true, false);
+        let formData = new FormData(this.orderContainer);
+        let orderDomHandler = this.getOrderDomHandler();
+
+        if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            orderDomHandler.processStart();
+        }
 
         BX.ajax.runComponentAction('wc:order', 'saveOrder', {
             mode: 'ajax',
             data: formData,
             signedParameters: this.signedParameters,
         }).then((response) => {
-            OrderLoader.closeWait();
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                orderDomHandler.processEnd();
+            }
             if (response.status === 'success') {
                 window.location.replace(window.location);
             }
         }, (response) => {
-            OrderLoader.closeWait();
-            BX.cleanNode(errorsContainer);
-            response.errors.forEach((error) => {
-                BX.append(BX.create('div', {'text': error.message}), errorsContainer);
-            });
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                orderDomHandler.processEnd();
+            }
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                orderDomHandler.processResponseError(response);
+            }
         });
     }
 
     refreshOrder(e) {
         BX.PreventDefault(e);
-        OrderLoader.showWait();
 
-        let form = BX.findChild(e.currentTarget, {
-            'tag': 'form'
-        }, true, false);
-        let formData = new FormData(form);
+        this.errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
+        this.orderContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'order'}}, true, false);
+        let formData = new FormData(this.orderContainer);
+        let orderDomHandler = this.getOrderDomHandler();
+
+        if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            orderDomHandler.processStart();
+        }
 
         BX.ajax({
             url: '?AJAX=Y',
@@ -71,13 +82,34 @@ class WCSaleOrder {
             timeout: 30,
             cache: false,
             preparePost: false,
-            onsuccess: (data) => {
-                BX.adjust(this.orderComponentContainer, {html: data});
-                OrderLoader.closeWait();
+            onsuccess: (response) => {
+                BX.adjust(this.orderComponentContainer, {html: response});
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                    orderDomHandler.processEnd();
+                }
             },
-            onfailure: (data) => {
-                OrderLoader.closeWait();
+            onfailure: (response) => {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                    orderDomHandler.processEnd();
+                }
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                    orderDomHandler.processResponseError(response);
+                }
             }
         });
+    }
+
+    getOrderDomHandler() {
+        let orderDomHandler;
+
+        if (typeof WCSaleOrderDomHandler === 'function') {
+            orderDomHandler = new WCSaleOrderDomHandler({
+                orderComponentContainer: this.orderComponentContainer,
+                orderContainer: this.orderContainer,
+                errorsContainer: this.errorsContainer
+            });
+        }
+
+        return orderDomHandler;
     }
 }

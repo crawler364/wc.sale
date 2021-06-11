@@ -209,11 +209,6 @@ class WCSaleBasket {
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
-
-            response.errors.forEach((error) => {
-                console.error(error);
-            });
-
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
                 basketDomHandler.processResponse(response);
             }

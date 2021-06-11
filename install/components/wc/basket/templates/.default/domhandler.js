@@ -61,7 +61,9 @@ class WCSaleBasketDomHandler {
                 }
             });
         } else if (response.status === 'error') {
-
+            response.errors.forEach((error) => {
+                console.error(error);
+            });
         }
     }
 }
