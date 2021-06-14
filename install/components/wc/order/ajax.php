@@ -16,7 +16,6 @@ Loc::loadMessages(__FILE__);
 class OrderAjaxController extends \Bitrix\Main\Engine\Controller
 {
     private $arParams;
-    private $orderData;
     /** @var Order */
     private $class;
 
@@ -44,25 +43,26 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
         return true;
     }
 
-    protected function processBeforeAction(Action $action): bool
-    {
-        $this->orderData = $this->class::getOrderData();
-
-        return true;
-    }
-
     public function saveOrderAction(): AjaxJson
     {
         /**
          * @var OrderHandler $cOrderHandler
          * @var OrderHandler $orderHandler
-         * @var Result $result
+         * @var  \Bitrix\Main\Result | \Bitrix\Sale\Result $result
          */
 
+        $orderData = $this->class::getOrderData();
         $cOrderHandler = $this->class::getCOrderHandler($this->arParams);
         $order = $cOrderHandler::createOrder();
-        $orderHandler = new $cOrderHandler($order, $this->orderData, $this->arParams);
+        $orderHandler = new $cOrderHandler($order, $orderData, $this->arParams);
         $result = $orderHandler->saveOrder();
+
+        if ($result->isSuccess()) {
+            $uri = new \Bitrix\Main\Web\Uri('');
+            $uri->addParams(['order_id' => $result->getDataField('ORDER_ID')]);
+            $redirect = $uri->getUri();
+            $result->setData(['redirect' => $redirect]);
+        }
 
         return $result->prepareAjaxJson();
     }

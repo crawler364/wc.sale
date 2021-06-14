@@ -202,15 +202,15 @@ class WCSaleBasket {
             this.setBasketContainersDom(basketContainersDom, basket);
             this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
 
-            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
-                basketDomHandler.processResponse(response);
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponseSuccess === 'function') {
+                basketDomHandler.processResponseSuccess(response);
             }
         }, (response) => {
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
-            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
-                basketDomHandler.processResponse(response);
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponseError === 'function') {
+                basketDomHandler.processResponseError(response);
             }
         });
     }

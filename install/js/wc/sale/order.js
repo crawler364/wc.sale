@@ -46,17 +46,17 @@ class WCSaleOrder {
             data: formData,
             signedParameters: this.signedParameters,
         }).then((response) => {
-            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                 orderDomHandler.processEnd();
             }
             if (response.status === 'success') {
-                window.location.replace(window.location);
+               window.location.replace(response.data.redirect);
             }
         }, (response) => {
-            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                 orderDomHandler.processEnd();
             }
-            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processResponseError === 'function') {
                 orderDomHandler.processResponseError(response);
             }
         });
@@ -84,15 +84,15 @@ class WCSaleOrder {
             preparePost: false,
             onsuccess: (response) => {
                 BX.adjust(this.orderComponentContainer, {html: response});
-                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                     orderDomHandler.processEnd();
                 }
             },
             onfailure: (response) => {
-                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                     orderDomHandler.processEnd();
                 }
-                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processResponseError === 'function') {
                     orderDomHandler.processResponseError(response);
                 }
             }

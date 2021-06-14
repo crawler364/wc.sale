@@ -7,6 +7,8 @@ namespace WC\Sale\Handlers\Internals;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery;
 use Bitrix\Sale\Fuser;
+use Bitrix\Sale\Payment;
+use Bitrix\Sale\Shipment;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Basket;
 use WC\Sale\Handlers\Basket as BasketHandler;
@@ -47,12 +49,13 @@ abstract class OrderBase implements OrderInterface
         return Order::create($siteId, $userId);
     }
 
-    public function processOrder(): Result
+    public function refreshOrder(): Result
     {
         $this->setPersonType();
         $personTypes = $this->getPersonTypes();
         $this->setBasket();
-        $productsList = $this->getProductsList();
+        $basketList = $this->getBasketList();
+        $basketFields = $this->getBasketFields();
         $this->setLocation();
         $location = $this->getLocation();
         $this->setShipment();
@@ -61,16 +64,40 @@ abstract class OrderBase implements OrderInterface
         $paySystems = $this->getPaySystems();
         $this->setProperties();
         $properties = $this->getProperties();
-        $orderFields = $this->getFields();
+        $fields = $this->getFields();
 
         $data = [
-            'LOCATION' => $location,
             'PERSON_TYPES' => $personTypes,
-            'PROPERTIES' => $properties,
+            'LOCATION' => $location,
+            'BASKET_LIST' => $basketList,
+            'BASKET_FIELDS' => $basketFields,
             'DELIVERIES' => $deliveries,
             'PAY_SYSTEMS' => $paySystems,
-            'PRODUCTS_LIST' => $productsList,
-            'ORDER' => $orderFields,
+            'PROPERTIES' => $properties,
+            'FIELDS' => $fields,
+        ];
+
+        $this->result->setData($data);
+
+        return $this->result;
+    }
+
+    public function getOrder(): Result
+    {
+        $basketList = $this->getBasketList();
+        $basketFields = $this->getBasketFields();
+        $shipment = $this->getShipment();
+        $payment = $this->getPayment();
+        $properties = $this->getProperties();
+        $fields = $this->getFields();
+
+        $data = [
+            'BASKET_LIST' => $basketList,
+            'BASKET_FIELDS' => $basketFields,
+            'SHIPMENT' => $shipment,
+            'PAYMENT' => $payment,
+            'PROPERTIES' => $properties,
+            'FIELDS' => $fields,
         ];
 
         $this->result->setData($data);
@@ -98,10 +125,31 @@ abstract class OrderBase implements OrderInterface
 
         if ($this->result->isSuccess()) {
             $result = $this->order->save();
-            $this->result->mergeResult($result);
+
+            if ($result->isSuccess() && $orderId = $result->getId()) {
+                $this->result->setData(['ORDER_ID' => $orderId]);
+            }
         }
 
         return $this->result;
+    }
+
+    public static function loadOrder(array $filter): Result
+    {
+        $result = new Result();
+
+        $parameters = [
+            'filter' => $filter,
+            'select' => '*',
+        ];
+
+        if ($order = Order::loadByFilter($parameters)[0]) {
+            $result->setData(['ORDER' => $order]);
+        } else {
+            $result->addError('WC_SALE_ORDER_NOT_FOUND');
+        }
+
+        return $result;
     }
 
     protected function setPersonType(): void
@@ -123,8 +171,8 @@ abstract class OrderBase implements OrderInterface
 
     protected function getPersonTypes(): array
     {
-        $orderPersonTypeId = $this->order->getPersonTypeId();
         $personTypes = [];
+        $orderPersonTypeId = $this->order->getPersonTypeId();
 
         $obPersonTypes = \Bitrix\Sale\PersonType::getList([
             'order' => ['SORT' => 'ASC'],
@@ -147,17 +195,31 @@ abstract class OrderBase implements OrderInterface
         $this->order->setBasket($basket);
     }
 
-    protected function getProductsList(): array
+    protected function getBasketList(): array
     {
         /** @var Basket $basket */
 
-        $productsList = [];
+        $basketList = [];
 
         if ($basket = $this->order->getBasket()) {
-            $productsList = $basket->getItemsList();
+            $basketList = $basket->getItemsList();
         }
 
-        return $productsList;
+        return $basketList;
+    }
+
+    protected function getBasketFields(): array
+    {
+        /** @var Basket $basket */
+
+        $basketFields = [];
+
+        if ($basket = $this->order->getBasket()) {
+            $basketFields = $basket->getFieldValuesFormatted();
+        }
+
+        return $basketFields;
+
     }
 
     protected function setLocation($useDefaults = true): void
@@ -189,24 +251,19 @@ abstract class OrderBase implements OrderInterface
 
     protected function getLocation(): array
     {
-        /**
-         * @var array $restrictedProperties
-         * @var \Bitrix\Sale\PropertyValue $restrictedProperty
-         */
+        $location = [];
+        $propertyCollection = $this->order->getPropertyCollection();
+        $arPropertyCollection = $propertyCollection->getArray();
 
-        //todo ->getDeliveryLocation();
-        $property = [];
-        $restrictedProperties = $this->order->getRestrictedProperties();
-
-        foreach ($restrictedProperties as $restrictedProperty) {
-            if ($restrictedProperty->getType() === 'LOCATION') {
-                $property = $restrictedProperty->getProperty();
-                $property['VALUE'] = $restrictedProperty->getValue();
+        foreach ($arPropertyCollection['properties'] as $property) {
+            if ($property['TYPE'] === 'LOCATION') {
+                $property['VALUE'] = $property['VALUE'][0];
+                $location = $property;
                 break;
             }
         }
 
-        return $property;
+        return $location;
     }
 
     protected function setShipment(): void
@@ -214,7 +271,7 @@ abstract class OrderBase implements OrderInterface
         /**
          * @var \Bitrix\Sale\ShipmentCollection $shipmentCollection
          * @var \WC\Sale\Shipment $shipment
-         * @var \WC\Sale\Basket $basket
+         * @var Basket $basket
          * @var array $restrictedDeliveries
          * @var array $restrictedDelivery
          */
@@ -254,22 +311,24 @@ abstract class OrderBase implements OrderInterface
 
         $deliveries = [];
         $shipmentCollection = $this->order->getShipmentCollection();
-        if ($shipment = $shipmentCollection->getItemByIndex(1)) {
+        $shipment = $shipmentCollection->getItemByIndex(1);
+
+        if ($shipment instanceof Shipment) {
             $deliveryId = $shipment->getDeliveryId();
             $restrictedDeliveries = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedList(
                 $shipment,
                 \Bitrix\Sale\Delivery\Restrictions\Manager::MODE_CLIENT
             );
-        }
 
-        foreach ($restrictedDeliveries as $restrictedDelivery) {
-            $delivery = Delivery\Services\Manager::getById($restrictedDelivery['ID']);
+            foreach ($restrictedDeliveries as $restrictedDelivery) {
+                $delivery = Delivery\Services\Manager::getById($restrictedDelivery['ID']);
 
-            if ($deliveryId == $delivery['ID']) {
-                $delivery['CHECKED'] = true;
+                if ($deliveryId == $delivery['ID']) {
+                    $delivery['CHECKED'] = true;
+                }
+
+                $deliveries[] = $delivery;
             }
-
-            $deliveries[] = $delivery;
         }
 
         return $deliveries;
@@ -279,7 +338,7 @@ abstract class OrderBase implements OrderInterface
     {
         /**
          * @var \Bitrix\Sale\PaymentCollection $paymentCollection
-         * @var \Bitrix\Sale\Payment $payment
+         * @var Payment $payment
          * @var array $restrictedPaySystems
          */
 
@@ -308,25 +367,27 @@ abstract class OrderBase implements OrderInterface
     {
         /**
          * @var \Bitrix\Sale\PaymentCollection $paymentCollection
-         * @var \Bitrix\Sale\Payment $payment
+         * @var Payment $payment
          * @var array $restrictedPaySystems
          */
 
         $paySystems = [];
         $paymentCollection = $this->order->getPaymentCollection();
-        if ($payment = $paymentCollection->getItemByIndex(0)) {
+        $payment = $paymentCollection->getItemByIndex(0);
+
+        if ($payment instanceof Payment) {
             $paySystemId = $payment->getPaymentSystemId();
             $restrictedPaySystems = \Bitrix\Sale\PaySystem\Manager::getListWithRestrictions($payment);
-        }
 
-        foreach ($restrictedPaySystems as $restrictedPaySystem) {
-            $paySystem = \Bitrix\Sale\PaySystem\Manager::getById($restrictedPaySystem['ID']);
+            foreach ($restrictedPaySystems as $restrictedPaySystem) {
+                $paySystem = \Bitrix\Sale\PaySystem\Manager::getById($restrictedPaySystem['ID']);
 
-            if ($paySystemId == $paySystem['ID']) {
-                $paySystem['CHECKED'] = true;
+                if ($paySystemId == $paySystem['ID']) {
+                    $paySystem['CHECKED'] = true;
+                }
+
+                $paySystems[] = $paySystem;
             }
-
-            $paySystems[] = $paySystem;
         }
 
         return $paySystems;
@@ -362,21 +423,19 @@ abstract class OrderBase implements OrderInterface
 
     protected function getProperties(): array
     {
-        /**
-         * @var array $restrictedProperties
-         * @var \Bitrix\Sale\PropertyValue $restrictedProperty
-         */
-
         $properties = [];
-        $restrictedProperties = $this->order->getRestrictedProperties();
+        $propertyCollection = $this->order->getPropertyCollection();
+        $arPropertyCollection = $propertyCollection->getArray();
 
-        foreach ($restrictedProperties as $restrictedProperty) {
-            if ($restrictedProperty->isUtil() || $restrictedProperty->getType() === 'LOCATION') {
+        foreach ($arPropertyCollection['properties'] as $property) {
+            if ($property['UTIL'] === 'Y' || $property['TYPE'] === 'LOCATION') {
                 continue;
             }
 
-            $property = $restrictedProperty->getProperty();
-            $property['VALUE'] = $restrictedProperty->getValue();
+            if ($property['MULTIPLE'] === 'N') {
+                $property['VALUE'] = $property['VALUE'][0];
+            }
+
             $properties[] = $property;
         }
 
@@ -385,16 +444,45 @@ abstract class OrderBase implements OrderInterface
 
     protected function getFields(): array
     {
-        /** @var Basket $basket */
+        return $this->order->getFieldValuesFormatted();
+    }
 
-        $orderFields = $this->order->getFieldValuesFormatted();
-        $basketFields = [];
+    protected function getShipment(): array
+    {
+        $arShipment = [];
+        $shipmentCollection = $this->order->getShipmentCollection();
+        $shipment = $shipmentCollection->getItemByIndex(1);
 
-        if ($basket = $this->order->getBasket()) {
-            $basketFields = $basket->getFieldValuesFormatted();
+        if ($shipment instanceof Shipment && $delivery = $shipment->getDelivery()) {
+            $arShipment = $shipment->getFieldValues();
+            $arShipment['LOGO'] = $delivery->getLogotipPath();
         }
 
-        return array_merge($orderFields, $basketFields);
+        return $arShipment;
+    }
+
+    protected function getPayment(): array
+    {
+        /** @var \Bitrix\Sale\PaySystem\ServiceResult $serviceResult */
+
+        $arPayment = [];
+        $paymentCollection = $this->order->getPaymentCollection();
+        $payment = $paymentCollection->getItemByIndex(0);
+
+        if ($payment instanceof Payment && $paySystem = $payment->getPaySystem()) {
+            $serviceResult = $paySystem->initiatePay($payment, null, \Bitrix\Sale\PaySystem\BaseServiceHandler::STRING);
+
+            if ($serviceResult->isSuccess()) {
+                $arPayment = $payment->getFieldValues();
+                $arPaySystem = $paySystem->getFieldsValues();
+                $arPayment['BUFFERED_OUTPUT'] = $serviceResult->getTemplate();
+                $arPayment = array_merge($arPayment, $arPaySystem);
+            } else {
+                $arPayment["ERROR"] = $serviceResult->getErrorMessages();
+            }
+        }
+
+        return $arPayment;
     }
 
     protected function validatePersonType(): void
@@ -426,7 +514,7 @@ abstract class OrderBase implements OrderInterface
     {
         /**
          * @var \Bitrix\Sale\PaymentCollection $paymentCollection
-         * @var \Bitrix\Sale\Payment $payment
+         * @var Payment $payment
          */
 
         $paymentCollection = $this->order->getPaymentCollection();
@@ -472,6 +560,7 @@ abstract class OrderBase implements OrderInterface
             $userId = $USER->GetID();
         } else {
             $r = $this->orderUser::autoRegister([$this->order->getPropertyCollection()]);
+
             if ((int)$r > 0) {
                 $userId = $r;
             } else {
