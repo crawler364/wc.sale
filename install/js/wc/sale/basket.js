@@ -29,7 +29,7 @@ class WCSaleBasket {
         let basketContainers, basketContainersDom = [];
 
         basketContainers = BX.findChildren(document.body, {
-            'attribute': {'data-container': 'wc-basket'}
+            'attribute': {'data-container': 'basket-fields'}
         }, true);
 
         basketContainers.forEach((basketContainer, key) => {

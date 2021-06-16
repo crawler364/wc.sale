@@ -17,5 +17,11 @@ $arComponentParameters = [
             'PARENT' => 'BASE',
             'MULTIPLE' => 'Y',
         ],
+        'SHOW_FIELDS' => [
+            'PARENT' => 'BASE',
+            'NAME' => GetMessage('WC_BASKET_SHOW_FIELDS'),
+            'TYPE' => 'CHECKBOX',
+            "DEFAULT" => "Y",
+        ],
     ],
 ];

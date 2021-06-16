@@ -12,6 +12,20 @@ $errors = $arResult['ERRORS'];
 
 ?>
 <h1><?= Loc::getMessage("WC_ORDER_TITLE") ?></h1>
+<? if ($arParams['SHOW_BASKET'] === 'Y') {
+    $APPLICATION->IncludeComponent(
+        "wc:basket",
+        ".default",
+        [
+            "COMPONENT_TEMPLATE" => ".default",
+            "CLASS_BASKET_HANDLER" => "",
+            "PROPERTIES" => [
+            ],
+            "SHOW_FIELDS" => "N",
+        ],
+        false
+    );
+} ?>
 <div data-container="errors" class="errors">
     <? foreach ($errors as $error) {
         echo $error;

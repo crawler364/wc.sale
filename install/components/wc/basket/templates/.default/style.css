@@ -1,36 +1,36 @@
-table.wc-basket-items-container td {
+table.basket-list td {
     border: 1px solid
 }
 
-table.wc-basket-items-container td img.detail-picture {
+table.basket-list td img.detail-picture {
     width: 100px;
     height: 100px;
 }
 
-table.wc-basket-items-container table td {
+table.basket-list table td {
     border: none
 }
 
-table.wc-basket-items-container td[data-basket-item-action] {
+table.basket-list td[data-basket-item-action] {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
 }
 
-table.wc-basket-items-container div.line-through {
+table.basket-list div.line-through {
     text-decoration: line-through;
 }
 
-table.wc-basket-items-container .disabled {
+table.basket-list .disabled {
     pointer-events: none;
     opacity: .5;
 }
 
-table.wc-basket-items-container .hide, table.wc-basket-container .hide {
+table.basket-list .hide, table.basket-fields .hide {
     display: none;
 }
 
-table.wc-basket-items-container tr td.restore-button {
+table.basket-list tr td.restore-button {
     text-align: center;
     cursor: pointer;
 }
