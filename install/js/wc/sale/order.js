@@ -76,9 +76,9 @@ class WCSaleOrder {
         if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
             orderDomHandler.processStart();
         }
-        
+
         BX.ajax({
-            url: '?' + BX.ajax.prepareData({parameters: this.parameters}),
+            url: '?' + BX.ajax.prepareData({'AJAX_CALL': 'Y'}),
             data: formData,
             method: 'POST',
             dataType: 'html',

@@ -34,15 +34,6 @@ class Order extends \CBitrixComponent
         }
     }
 
-    public function onPrepareComponentParams($arParams): array
-    {
-        $arRequest = $this->request->toArray();
-
-        $arParams['AJAX_MODE'] = $arRequest['parameters']['AJAX_MODE'];
-
-        return $arParams;
-    }
-
     public function executeComponent()
     {
         /**
@@ -86,7 +77,7 @@ class Order extends \CBitrixComponent
             ];
         }
 
-        if ($this->arParams['AJAX_MODE'] === 'Y') {
+        if ($this->request['AJAX_CALL'] === 'Y') {
             $this->includeComponentTemplateAjax($templatePage);
         } else {
             $this->includeComponentTemplate($templatePage);

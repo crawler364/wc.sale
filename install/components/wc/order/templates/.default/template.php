@@ -364,7 +364,6 @@ $errors = $arResult['ERRORS'];
         window.WCSaleOrder = new WCSaleOrder(<?=Bitrix\Main\Web\Json::encode([
             'parameters' => [
                 'ajaxId' => $arParams['AJAX_ID'],
-                'AJAX_MODE' => $arParams['AJAX_MODE'],
                 'ORDER_HANDLER_CLASS' => $arParams['ORDER_HANDLER_CLASS'],
             ],
             'signedParameters' => $component->getSignedParameters(),
