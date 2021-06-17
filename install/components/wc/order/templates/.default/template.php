@@ -18,7 +18,7 @@ $errors = $arResult['ERRORS'];
         ".default",
         [
             "COMPONENT_TEMPLATE" => ".default",
-            "CLASS_BASKET_HANDLER" => "",
+            "BASKET_HANDLER_CLASS" => "",
             "PROPERTIES" => [
             ],
             "SHOW_FIELDS" => "N",
@@ -322,35 +322,35 @@ $errors = $arResult['ERRORS'];
 <table data-container="wc-basket" class="wc-basket-container">
     <tbody>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_WEIGHT') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_WEIGHT') ?></td>
         <td data-container="basket-weight"><?= $data['BASKET_FIELDS']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_COUNT') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_COUNT') ?></td>
         <td data-container="basket-count"><?= $data['BASKET_FIELDS']['COUNT'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_VAT_SUM') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_VAT_SUM') ?></td>
         <td data-container="basket-vat-sum"><?= $data['BASKET_FIELDS']['VAT_SUM_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_BASE_PRICE') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_BASKET_BASE_PRICE') ?></td>
         <td data-container="basket-base-price"><?= $data['BASKET_FIELDS']['BASE_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_DISCOUNT') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_DISCOUNT') ?></td>
         <td data-container="basket-discount-price"><?= $data['BASKET_FIELDS']['DISCOUNT_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_PRICE') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_BASKET_PRICE') ?></td>
         <td data-container="basket-price"><?= $data['BASKET_FIELDS']['PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE_DELIVERY') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_PRICE_DELIVERY') ?></td>
         <td><?= $data['FIELDS']['PRICE_DELIVERY_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE') ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_PRICE') ?></td>
         <td><?= $data['FIELDS']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
@@ -364,6 +364,8 @@ $errors = $arResult['ERRORS'];
         window.WCSaleOrder = new WCSaleOrder(<?=Bitrix\Main\Web\Json::encode([
             'parameters' => [
                 'ajaxId' => $arParams['AJAX_ID'],
+                'AJAX_MODE' => $arParams['AJAX_MODE'],
+                'ORDER_HANDLER_CLASS' => $arParams['ORDER_HANDLER_CLASS'],
             ],
             'signedParameters' => $component->getSignedParameters(),
         ])?>);

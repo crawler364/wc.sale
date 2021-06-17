@@ -38,7 +38,9 @@ class OrderAjaxController extends \Bitrix\Main\Engine\Controller
 
     protected function prepareParams(): bool
     {
-        $this->arParams = $this->getUnsignedParameters();
+        $arRequest = $this->request->toArray();
+
+        $this->arParams = $arRequest['parameters'];
 
         return true;
     }

@@ -22,14 +22,6 @@ class Basket extends \CBitrixComponent
         \CUtil::InitJSCore(['ajax', 'wc.sale.basket']);
     }
 
-    protected function listKeysSignedParameters(): array
-    {
-        return [
-            'ORDER_HANDLER_CLASS',
-            'PROPERTIES',
-        ];
-    }
-
     public function executeComponent()
     {
         /** @var BasketHandler $cBasketHandler */

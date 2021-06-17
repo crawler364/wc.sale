@@ -45,12 +45,15 @@ class WCSaleOrder {
             mode: 'ajax',
             data: formData,
             signedParameters: this.signedParameters,
+            getParameters: {
+                parameters: this.parameters
+            }
         }).then((response) => {
             if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                 orderDomHandler.processEnd();
             }
             if (response.status === 'success') {
-               window.location.replace(response.data.redirect);
+                window.location.replace(response.data.redirect);
             }
         }, (response) => {
             if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
@@ -73,9 +76,9 @@ class WCSaleOrder {
         if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
             orderDomHandler.processStart();
         }
-
+        
         BX.ajax({
-            url: '?AJAX=Y',
+            url: '?' + BX.ajax.prepareData({parameters: this.parameters}),
             data: formData,
             method: 'POST',
             dataType: 'html',

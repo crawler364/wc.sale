@@ -34,11 +34,13 @@ class Order extends \CBitrixComponent
         }
     }
 
-    protected function listKeysSignedParameters(): array
+    public function onPrepareComponentParams($arParams): array
     {
-        return [
-            'ORDER_HANDLER_CLASS',
-        ];
+        $arRequest = $this->request->toArray();
+
+        $arParams['AJAX_MODE'] = $arRequest['parameters']['AJAX_MODE'];
+
+        return $arParams;
     }
 
     public function executeComponent()
@@ -84,7 +86,7 @@ class Order extends \CBitrixComponent
             ];
         }
 
-        if ($this->request['AJAX'] === 'Y') {
+        if ($this->arParams['AJAX_MODE'] === 'Y') {
             $this->includeComponentTemplateAjax($templatePage);
         } else {
             $this->includeComponentTemplate($templatePage);

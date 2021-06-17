@@ -188,10 +188,13 @@ class WCSaleBasket {
                 product: {
                     id: this.productId,
                     quantity: this.quantity,
-                    action: this.action
-                }
+                    action: this.action,
+                },
             },
-            signedParameters: this.signedParameters
+            signedParameters: this.signedParameters,
+            getParameters: {
+                parameters: this.parameters
+            },
         }).then((response) => {
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();

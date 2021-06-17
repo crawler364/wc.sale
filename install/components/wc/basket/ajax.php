@@ -41,14 +41,18 @@ class BasketAjaxController extends Controller
 
     protected function prepareParams(): bool
     {
-        $this->arParams = $this->getUnsignedParameters();
+        $arRequest = $this->request->toArray();
+
+        $this->arParams = $arRequest['parameters'];
 
         return true;
     }
 
     protected function processBeforeAction(Action $action): bool
     {
-        $this->arResult = $this->request->toArray();
+        $arRequest = $this->request->toArray();
+
+        $this->arResult = $arRequest;
 
         return true;
     }
