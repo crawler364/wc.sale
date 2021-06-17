@@ -20,12 +20,15 @@ class WCSaleOrder {
                 {'class': 'bx-ui-sls-variant'},
                 this.refreshOrder.bind(this)
             );
+
             BX.bindDelegate(
                 this.orderComponentContainer,
                 'click',
                 {attribute: {'data-action': 'submit'}},
                 this.saveOrder.bind(this)
             );
+
+            BX.addCustomEvent('OnBasketChange', this.refreshOrder.bind(this));
         });
     }
 
@@ -70,7 +73,7 @@ class WCSaleOrder {
 
         this.errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
         this.orderContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'order'}}, true, false);
-        let formData = new FormData(this.orderContainer);
+        let formData = this.orderContainer ? new FormData(this.orderContainer) : {};
         let orderDomHandler = this.getOrderDomHandler();
 
         if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {

@@ -24,12 +24,6 @@ $arComponentParameters = [
             'TYPE' => 'CHECKBOX',
             "DEFAULT" => "Y",
         ],
-        'SHOW_BASKET' => [
-            'PARENT' => 'BASE',
-            'NAME' => GetMessage('WC_ORDER_SHOW_BASKET'),
-            'TYPE' => 'CHECKBOX',
-            "DEFAULT" => "Y",
-        ],
         'AJAX_MODE' => [
             'PARENT' => 'AJAX_SETTINGS',
             'NAME' => GetMessage('WC_ORDER_AJAX_MODE'),

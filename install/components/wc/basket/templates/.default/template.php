@@ -6,6 +6,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use \Bitrix\Main\Localization\Loc;
 
 ?>
+<h1><?= Loc::getMessage("WC_BASKET_TITLE") ?></h1>
 <table class="basket-list">
     <thead>
     <tr>
@@ -64,7 +65,7 @@ use \Bitrix\Main\Localization\Loc;
     <? } ?>
 </table>
 
-<? if ($arParams['SHOW_FIELDS'] === 'Y') { ?>
+<? if ($arParams['ORDER_MODE'] !== 'Y') { ?>
     <table data-container="basket-fields" class="basket-fields">
         <tbody>
         <tr>
@@ -103,6 +104,7 @@ use \Bitrix\Main\Localization\Loc;
             'parameters' => [
                 'BASKET_HANDLER_CLASS' => $arParams['BASKET_HANDLER_CLASS'],
                 'PROPERTIES' => count($arParams['PROPERTIES']) > 0 ? $arParams['PROPERTIES'] : '',
+                'ORDER_MODE' => $arParams['ORDER_MODE'],
             ],
             'signedParameters' => $this->getComponent()->getSignedParameters(),
         ])?>);

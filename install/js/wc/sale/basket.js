@@ -6,6 +6,7 @@ class WCSaleBasket {
 
     init() {
         BX.ready(() => {
+            console.log();
             BX.bindDelegate(
                 document.body,
                 'change',
@@ -200,10 +201,12 @@ class WCSaleBasket {
                 basketDomHandler.processEnd();
             }
 
-            let basket = response.data.basket;
-            let basketItem = response.data.basketItem;
-            this.setBasketContainersDom(basketContainersDom, basket);
-            this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
+            if (this.parameters.ORDER_MODE === 'Y') {
+                BX.onCustomEvent('OnBasketChange');
+            }
+
+            this.setBasketItemContainersDom(basketItemContainersDom, response.data.basketItem);
+            this.setBasketContainersDom(basketContainersDom, response.data.basket);
 
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponseSuccess === 'function') {
                 basketDomHandler.processResponseSuccess(response);

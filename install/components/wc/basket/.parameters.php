@@ -17,11 +17,11 @@ $arComponentParameters = [
             'PARENT' => 'BASE',
             'MULTIPLE' => 'Y',
         ],
-        'SHOW_FIELDS' => [
+        'ORDER_MODE' => [
             'PARENT' => 'BASE',
-            'NAME' => GetMessage('WC_BASKET_SHOW_FIELDS'),
+            'NAME' => GetMessage('WC_BASKET_ORDER_MODE'),
             'TYPE' => 'CHECKBOX',
-            "DEFAULT" => "Y",
+            "DEFAULT" => "N",
         ],
     ],
 ];

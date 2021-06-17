@@ -1,4 +1,5 @@
 <?php
+$MESS['WC_BASKET_TITLE'] = 'Корзина';
 $MESS['WC_BASKET_RESTORE_BUTTON'] = 'Вернуть в корзину';
 $MESS['WC_BASKET_NAME'] = 'Наименование';
 $MESS['WC_BASKET_PRICE'] = 'Цена';
