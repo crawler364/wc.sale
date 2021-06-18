@@ -28,23 +28,8 @@ $arComponentParameters = [
             'PARENT' => 'AJAX_SETTINGS',
             'NAME' => GetMessage('WC_ORDER_AJAX_MODE'),
             'TYPE' => 'CHECKBOX',
-            'VALUE' => 'Y',
             "DEFAULT" => "Y",
             "HIDDEN" => 'Y',
-        ],
-        'AJAX_OPTION_JUMP' => [
-            'PARENT' => 'AJAX_SETTINGS',
-            'NAME' => GetMessage('WC_ORDER_AJAX_OPTION_JUMP'),
-            'TYPE' => 'CHECKBOX',
-            'VALUE' => 'Y',
-            "DEFAULT" => "Y",
-        ],
-        'AJAX_OPTION_STYLE' => [
-            'PARENT' => 'AJAX_SETTINGS',
-            'NAME' => GetMessage('WC_ORDER_AJAX_OPTION_STYLE'),
-            'TYPE' => 'CHECKBOX',
-            'VALUE' => 'Y',
-            "DEFAULT" => "Y",
         ],
     ],
 ];

@@ -11,13 +11,12 @@ use Bitrix\Main\SystemException;
 use Bitrix\Sale\Fuser;
 use WC\Core\Bitrix\Main\Result;
 use WC\Sale\Handlers\Order as OrderHandler;
+use \WC\Sale\Handlers\Basket;
 
 Loc::loadMessages(__FILE__);
 
 class Order extends \CBitrixComponent
 {
-    private $orderData;
-
     public function __construct($component = null)
     {
         parent::__construct($component);
@@ -35,38 +34,7 @@ class Order extends \CBitrixComponent
         }
     }
 
-    protected function listKeysSignedParameters(): array
-    {
-        return [
-            'ORDER_HANDLER_CLASS',
-        ];
-    }
-
     public function executeComponent()
-    {
-        global $USER;
-
-        $basket = \WC\Sale\Handlers\Basket::getBasket(Fuser::getId());
-
-        if ($basket->count() > 0) {
-            if ($this->arParams['ALLOW_AUTO_REGISTER'] === 'Y' || $USER->IsAuthorized()) {
-                $templatePage = 'template';
-                $this->setResult();
-            } else {
-                $templatePage = 'template_auth';
-            }
-        } else {
-            $templatePage = 'template_empty';
-        }
-
-        if ($this->request['AJAX'] === 'Y') {
-            $this->includeComponentTemplateAjax($templatePage);
-        } else {
-            $this->includeComponentTemplate($templatePage);
-        }
-    }
-
-    private function setResult(): void
     {
         /**
          * @var OrderHandler $cOrderHandler
@@ -74,16 +42,46 @@ class Order extends \CBitrixComponent
          * @var Result $result
          */
 
-        $this->orderData = static::getOrderData();
+        global $USER;
+        $isAuthorized = $USER->IsAuthorized();
+        $basket = Basket::getBasket(Fuser::getId());
         $cOrderHandler = $this::getCOrderHandler($this->arParams);
-        $order = $cOrderHandler::createOrder();
-        $orderHandler = new $cOrderHandler($order, $this->orderData, $this->arParams);
-        $result = $orderHandler->processOrder();
 
-        $this->arResult = [
-            'DATA' => $result->getData(),
-            'ERRORS' => $result->getErrorMessages(),
-        ];
+        if ($this->request['order_id'] && $isAuthorized) {
+            $templatePage = 'template_accepted';
+            $result = $cOrderHandler::loadOrder(['ID' => $this->request['order_id'], 'USER_ID' => $USER->GetID()]);
+
+            if ($result->isSuccess()) {
+                $orderHandler = new $cOrderHandler($result->getDataField('ORDER'));
+                $result = $orderHandler->getOrder();
+            }
+        } elseif ($basket->count() > 0) {
+            if ($this->arParams['ALLOW_AUTO_REGISTER'] === 'Y' || $isAuthorized) {
+                $templatePage = 'template';
+                $orderData = static::getOrderData();
+                $order = $cOrderHandler::createOrder();
+
+                $orderHandler = new $cOrderHandler($order, $orderData, $this->arParams);
+                $result = $orderHandler->refreshOrder();
+            } else {
+                $templatePage = 'template_auth';
+            }
+        } else {
+            $templatePage = 'template_empty';
+        }
+
+        if ($result instanceof Result) {
+            $this->arResult = [
+                'DATA' => $result->getData(),
+                'ERRORS' => $result->getErrorMessages(),
+            ];
+        }
+
+        if ($this->request['AJAX_CALL'] === 'Y') {
+            $this->includeComponentTemplateAjax($templatePage);
+        } else {
+            $this->includeComponentTemplate($templatePage);
+        }
     }
 
     private function includeComponentTemplateAjax($templatePage): void
@@ -92,6 +90,19 @@ class Order extends \CBitrixComponent
         $APPLICATION->RestartBuffer();
         $this->includeComponentTemplate($templatePage);
         die;
+    }
+
+    public static function getCOrderHandler($arParams): string
+    {
+        if (class_exists($arParams['ORDER_HANDLER_CLASS'])) {
+            $cOrderHandler = $arParams['ORDER_HANDLER_CLASS'];
+        } elseif (class_exists(OrderHandler::class)) {
+            $cOrderHandler = OrderHandler::class;
+        } else {
+            throw new SystemException(Loc::getMessage('WC_ORDER_HANDLER_CLASS_NOT_EXISTS'));
+        }
+
+        return $cOrderHandler;
     }
 
     public static function getOrderData(): array
@@ -115,18 +126,5 @@ class Order extends \CBitrixComponent
         }
 
         return $orderData;
-    }
-
-    public static function getCOrderHandler($arParams): string
-    {
-        if (class_exists($arParams['ORDER_HANDLER_CLASS'])) {
-            $cOrderHandler = $arParams['ORDER_HANDLER_CLASS'];
-        } elseif (class_exists(OrderHandler::class)) {
-            $cOrderHandler = OrderHandler::class;
-        } else {
-            throw new SystemException(Loc::getMessage('WC_ORDER_HANDLER_CLASS_NOT_EXISTS'));
-        }
-
-        return $cOrderHandler;
     }
 }

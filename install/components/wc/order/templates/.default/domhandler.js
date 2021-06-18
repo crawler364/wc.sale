@@ -15,9 +15,11 @@ class WCSaleOrderDomHandler {
 
     processResponseError(response) {
         BX.cleanNode(this.errorsContainer);
+
         response.errors.forEach((error) => {
             BX.append(BX.create('div', {'text': error.message}), this.errorsContainer);
         });
+
         BX.scrollToNode(this.errorsContainer);
     }
 }

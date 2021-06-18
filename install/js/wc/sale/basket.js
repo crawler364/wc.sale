@@ -6,6 +6,7 @@ class WCSaleBasket {
 
     init() {
         BX.ready(() => {
+            console.log();
             BX.bindDelegate(
                 document.body,
                 'change',
@@ -29,7 +30,7 @@ class WCSaleBasket {
         let basketContainers, basketContainersDom = [];
 
         basketContainers = BX.findChildren(document.body, {
-            'attribute': {'data-container': 'wc-basket'}
+            'attribute': {'data-container': 'basket-fields'}
         }, true);
 
         basketContainers.forEach((basketContainer, key) => {
@@ -188,29 +189,34 @@ class WCSaleBasket {
                 product: {
                     id: this.productId,
                     quantity: this.quantity,
-                    action: this.action
-                }
+                    action: this.action,
+                },
             },
-            signedParameters: this.signedParameters
+            signedParameters: this.signedParameters,
+            getParameters: {
+                parameters: this.parameters
+            },
         }).then((response) => {
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
 
-            let basket = response.data.basket;
-            let basketItem = response.data.basketItem;
-            this.setBasketContainersDom(basketContainersDom, basket);
-            this.setBasketItemContainersDom(basketItemContainersDom, basketItem);
+            if (this.parameters.ORDER_MODE === 'Y') {
+                BX.onCustomEvent('OnBasketChange');
+            }
 
-            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
-                basketDomHandler.processResponse(response);
+            this.setBasketItemContainersDom(basketItemContainersDom, response.data.basketItem);
+            this.setBasketContainersDom(basketContainersDom, response.data.basket);
+
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponseSuccess === 'function') {
+                basketDomHandler.processResponseSuccess(response);
             }
         }, (response) => {
             if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processEnd === 'function') {
                 basketDomHandler.processEnd();
             }
-            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponse === 'function') {
-                basketDomHandler.processResponse(response);
+            if (typeof basketDomHandler === 'object' && typeof basketDomHandler.processResponseError === 'function') {
+                basketDomHandler.processResponseError(response);
             }
         });
     }

@@ -6,24 +6,29 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use Bitrix\Main\Localization\Loc;
 
 $this->setFrameMode(false);
+
+$data = $arResult['DATA'];
+$errors = $arResult['ERRORS'];
+
 ?>
+<h1><?= Loc::getMessage("WC_ORDER_TITLE") ?></h1>
 <div data-container="errors" class="errors">
-    <? foreach ($arResult['ERRORS'] as $error) {
+    <? foreach ($errors as $error) {
         echo $error;
     } ?>
 </div>
 <form data-container="order" action="" method="post">
     <h2><?= Loc::getMessage('WC_ORDER_LOCATION_TITLE') ?></h2>
     <div>
-        <label for="<?= $arResult['DATA']['LOCATION']['CODE'] ?>"></label>
+        <label for="<?= $data['LOCATION']['CODE'] ?>"></label>
         <? $APPLICATION->IncludeComponent(
             "bitrix:sale.location.selector.search",
             "",
             [
                 "COMPONENT_TEMPLATE" => ".default",
                 "ID" => "",
-                "CODE" => $arResult['DATA']['LOCATION']['VALUE'],
-                "INPUT_NAME" => $arResult['DATA']['LOCATION']['CODE'],
+                "CODE" => $data['LOCATION']['VALUE'],
+                "INPUT_NAME" => $data['LOCATION']['CODE'],
                 "PROVIDE_LINK_BY" => "code",
                 "JSCONTROL_GLOBAL_ID" => "",
                 "JS_CALLBACK" => "",
@@ -40,7 +45,7 @@ $this->setFrameMode(false);
 
     <h2><?= Loc::getMessage('WC_ORDER_PERSON_TYPE_TITLE') ?></h2>
     <table class="person-type">
-        <? foreach ($arResult['DATA']['PERSON_TYPES'] as $personType) { ?>
+        <? foreach ($data['PERSON_TYPES'] as $personType) { ?>
             <tr>
                 <td>
                     <label>
@@ -55,7 +60,7 @@ $this->setFrameMode(false);
 
     <h2><?= Loc::getMessage('WC_ORDER_DELIVERIES_TITLE') ?></h2>
     <table>
-        <? foreach ($arResult['DATA']['DELIVERIES'] as $delivery) { ?>
+        <? foreach ($data['DELIVERIES'] as $delivery) { ?>
             <tr>
                 <td>
                     <label>
@@ -70,7 +75,7 @@ $this->setFrameMode(false);
 
     <h2><?= Loc::getMessage('WC_ORDER_PAY_SYSTEMS_TITLE') ?>:</h2>
     <table>
-        <? foreach ($arResult['DATA']['PAY_SYSTEMS'] as $paySystem) { ?>
+        <? foreach ($data['PAY_SYSTEMS'] as $paySystem) { ?>
             <tr>
                 <td>
                     <label>
@@ -85,7 +90,7 @@ $this->setFrameMode(false);
 
     <h2><?= Loc::getMessage('WC_ORDER_PROPERTIES_TITLE') ?></h2>
     <table>
-        <? foreach ($arResult['DATA']['PROPERTIES'] as $property) { ?>
+        <? foreach ($data['PROPERTIES'] as $property) { ?>
             <tr>
                 <td>
                     <label for="<?= $property['CODE'] ?>">
@@ -287,7 +292,7 @@ $this->setFrameMode(false);
             <td><?= Loc::getMessage('WC_ORDER_PRODUCT_LIST_COUNT') ?></td>
             <td><?= Loc::getMessage('WC_ORDER_PRODUCT_LIST_PRICE_SUM') ?></td>
         </tr>
-        <? foreach ($arResult['DATA']['PRODUCTS_LIST'] as $product) { ?>
+        <? foreach ($data['BASKET_LIST'] as $product) { ?>
             <tr>
                 <td><?= $product['NAME'] ?></td>
                 <td><?= $product['PRICE_FORMATTED'] ?></td>
@@ -303,36 +308,36 @@ $this->setFrameMode(false);
 <table data-container="wc-basket" class="wc-basket-container">
     <tbody>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_WEIGHT') ?></td>
-        <td data-container="basket-weight"><?= $arResult['DATA']['ORDER']['WEIGHT_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_WEIGHT') ?></td>
+        <td data-container="basket-weight"><?= $data['BASKET_FIELDS']['WEIGHT_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_COUNT') ?></td>
-        <td data-container="basket-count"><?= $arResult['DATA']['ORDER']['COUNT'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_COUNT') ?></td>
+        <td data-container="basket-count"><?= $data['BASKET_FIELDS']['COUNT'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_VAT_SUM') ?></td>
-        <td data-container="basket-vat-sum"><?= $arResult['DATA']['ORDER']['VAT_SUM_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_VAT_SUM') ?></td>
+        <td data-container="basket-vat-sum"><?= $data['BASKET_FIELDS']['VAT_SUM_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_BASE_PRICE') ?></td>
-        <td data-container="basket-base-price"><?= $arResult['DATA']['ORDER']['BASE_PRICE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_BASKET_BASE_PRICE') ?></td>
+        <td data-container="basket-base-price"><?= $data['BASKET_FIELDS']['BASE_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_DISCOUNT') ?></td>
-        <td data-container="basket-discount-price"><?= $arResult['DATA']['ORDER']['DISCOUNT_PRICE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_DISCOUNT') ?></td>
+        <td data-container="basket-discount-price"><?= $data['BASKET_FIELDS']['DISCOUNT_PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_BASKET_PRICE') ?></td>
-        <td data-container="basket-price"><?= $arResult['DATA']['ORDER']['PRICE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_BASKET_PRICE') ?></td>
+        <td data-container="basket-price"><?= $data['BASKET_FIELDS']['PRICE_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE_DELIVERY') ?></td>
-        <td><?= $arResult['DATA']['ORDER']['PRICE_DELIVERY_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_PRICE_DELIVERY') ?></td>
+        <td><?= $data['FIELDS']['PRICE_DELIVERY_FORMATTED'] ?></td>
     </tr>
     <tr>
-        <td><?= Loc::getMessage('WC_ORDER_INFO_PRICE') ?></td>
-        <td><?= $arResult['DATA']['ORDER']['PRICE_FORMATTED'] ?></td>
+        <td><?= Loc::getMessage('WC_ORDER_FIELDS_PRICE') ?></td>
+        <td><?= $data['FIELDS']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
     <tr>
@@ -345,6 +350,7 @@ $this->setFrameMode(false);
         window.WCSaleOrder = new WCSaleOrder(<?=Bitrix\Main\Web\Json::encode([
             'parameters' => [
                 'ajaxId' => $arParams['AJAX_ID'],
+                'ORDER_HANDLER_CLASS' => $arParams['ORDER_HANDLER_CLASS'],
             ],
             'signedParameters' => $component->getSignedParameters(),
         ])?>);

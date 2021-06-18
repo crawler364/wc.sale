@@ -20,12 +20,15 @@ class WCSaleOrder {
                 {'class': 'bx-ui-sls-variant'},
                 this.refreshOrder.bind(this)
             );
+
             BX.bindDelegate(
                 this.orderComponentContainer,
                 'click',
                 {attribute: {'data-action': 'submit'}},
                 this.saveOrder.bind(this)
             );
+
+            BX.addCustomEvent('OnBasketChange', this.refreshOrder.bind(this));
         });
     }
 
@@ -45,18 +48,21 @@ class WCSaleOrder {
             mode: 'ajax',
             data: formData,
             signedParameters: this.signedParameters,
+            getParameters: {
+                parameters: this.parameters
+            }
         }).then((response) => {
-            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                 orderDomHandler.processEnd();
             }
             if (response.status === 'success') {
-                window.location.replace(window.location);
+                window.location.replace(response.data.redirect);
             }
         }, (response) => {
-            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                 orderDomHandler.processEnd();
             }
-            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+            if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processResponseError === 'function') {
                 orderDomHandler.processResponseError(response);
             }
         });
@@ -67,7 +73,7 @@ class WCSaleOrder {
 
         this.errorsContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'errors'}}, true, false);
         this.orderContainer = BX.findChild(this.orderComponentContainer, {attribute: {'data-container': 'order'}}, true, false);
-        let formData = new FormData(this.orderContainer);
+        let formData = this.orderContainer ? new FormData(this.orderContainer) : {};
         let orderDomHandler = this.getOrderDomHandler();
 
         if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
@@ -75,7 +81,7 @@ class WCSaleOrder {
         }
 
         BX.ajax({
-            url: '?AJAX=Y',
+            url: '?' + BX.ajax.prepareData({'AJAX_CALL': 'Y'}),
             data: formData,
             method: 'POST',
             dataType: 'html',
@@ -84,15 +90,15 @@ class WCSaleOrder {
             preparePost: false,
             onsuccess: (response) => {
                 BX.adjust(this.orderComponentContainer, {html: response});
-                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                     orderDomHandler.processEnd();
                 }
             },
             onfailure: (response) => {
-                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processEnd === 'function') {
                     orderDomHandler.processEnd();
                 }
-                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processStart === 'function') {
+                if (typeof orderDomHandler === 'object' && typeof orderDomHandler.processResponseError === 'function') {
                     orderDomHandler.processResponseError(response);
                 }
             }

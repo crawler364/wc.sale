@@ -6,7 +6,8 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 use \Bitrix\Main\Localization\Loc;
 
 ?>
-<table class="wc-basket-items-container">
+<h1><?= Loc::getMessage("WC_BASKET_TITLE") ?></h1>
+<table class="basket-list">
     <thead>
     <tr>
         <td><?= Loc::getMessage('WC_BASKET_NAME') ?></td>
@@ -64,44 +65,46 @@ use \Bitrix\Main\Localization\Loc;
     <? } ?>
 </table>
 
-<table data-container="wc-basket" class="wc-basket-container">
-    <tbody>
-    <tr>
-        <td><?= Loc::getMessage('WC_BASKET_INFO_WEIGHT') ?></td>
-        <td data-container="basket-weight"><?= $arResult['FIELDS']['WEIGHT_FORMATTED'] ?></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('WC_BASKET_INFO_COUNT') ?></td>
-        <td data-container="basket-count"><?= $arResult['FIELDS']['COUNT'] ?></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('WC_BASKET_INFO_VAT_SUM') ?></td>
-        <td data-container="basket-vat-sum"><?= $arResult['FIELDS']['VAT_SUM_FORMATTED'] ?></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('WC_BASKET_INFO_PRICE') ?></td>
-        <td data-container="basket-base-price"><?= $arResult['FIELDS']['BASE_PRICE_FORMATTED'] ?></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('WC_BASKET_INFO_DISCOUNT') ?></td>
-        <td data-container="basket-discount-price"><?= $arResult['FIELDS']['DISCOUNT_PRICE_FORMATTED'] ?></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('WC_BASKET_INFO_PRICE_SUM') ?></td>
-        <td data-container="basket-price"><?= $arResult['FIELDS']['PRICE_FORMATTED'] ?></td>
-    </tr>
-    </tbody>
-    <tr>
-        <td data-container="basket-empty" class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
-    </tr>
-</table>
-
+<? if ($arParams['ORDER_MODE'] !== 'Y') { ?>
+    <table data-container="basket-fields" class="basket-fields">
+        <tbody>
+        <tr>
+            <td><?= Loc::getMessage('WC_BASKET_FIELDS_WEIGHT') ?></td>
+            <td data-container="basket-weight"><?= $arResult['FIELDS']['WEIGHT_FORMATTED'] ?></td>
+        </tr>
+        <tr>
+            <td><?= Loc::getMessage('WC_BASKET_FIELDS_COUNT') ?></td>
+            <td data-container="basket-count"><?= $arResult['FIELDS']['COUNT'] ?></td>
+        </tr>
+        <tr>
+            <td><?= Loc::getMessage('WC_BASKET_FIELDS_VAT_SUM') ?></td>
+            <td data-container="basket-vat-sum"><?= $arResult['FIELDS']['VAT_SUM_FORMATTED'] ?></td>
+        </tr>
+        <tr>
+            <td><?= Loc::getMessage('WC_BASKET_FIELDS_PRICE') ?></td>
+            <td data-container="basket-base-price"><?= $arResult['FIELDS']['BASE_PRICE_FORMATTED'] ?></td>
+        </tr>
+        <tr>
+            <td><?= Loc::getMessage('WC_BASKET_FIELDS_DISCOUNT') ?></td>
+            <td data-container="basket-discount-price"><?= $arResult['FIELDS']['DISCOUNT_PRICE_FORMATTED'] ?></td>
+        </tr>
+        <tr>
+            <td><?= Loc::getMessage('WC_BASKET_FIELDS_PRICE_SUM') ?></td>
+            <td data-container="basket-price"><?= $arResult['FIELDS']['PRICE_FORMATTED'] ?></td>
+        </tr>
+        </tbody>
+        <tr>
+            <td data-container="basket-empty" class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
+        </tr>
+    </table>
+<? } ?>
 <script type="text/javascript">
     if (!window.hasOwnProperty('WCSaleBasket')) {
         window.WCSaleBasket = new WCSaleBasket(<?=Bitrix\Main\Web\Json::encode([
             'parameters' => [
                 'BASKET_HANDLER_CLASS' => $arParams['BASKET_HANDLER_CLASS'],
-                'PROPERTIES' => $arParams['PROPERTIES'],
+                'PROPERTIES' => count($arParams['PROPERTIES']) > 0 ? $arParams['PROPERTIES'] : '',
+                'ORDER_MODE' => $arParams['ORDER_MODE'],
             ],
             'signedParameters' => $this->getComponent()->getSignedParameters(),
         ])?>);

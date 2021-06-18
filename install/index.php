@@ -94,7 +94,7 @@ class wc_sale extends CModule
         $requirePhp = '7.4';
         $requireModules = [
             'main' => '20.200.300',
-            'wc.core' => '0.3.4',
+            'wc.core' => '0.3.9',
         ];
 
         if (CheckVersion(PHP_VERSION, $requirePhp) === false) {
