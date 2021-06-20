@@ -16,15 +16,15 @@ use \Bitrix\Main\Localization\Loc;
         <td><?= Loc::getMessage('WC_BASKET_PRICE_SUM') ?></td>
     </tr>
     </thead>
-    <? foreach ($arResult['ITEMS'] as $item) { ?>
-        <tbody data-container="basket-item-wrap" data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
+    <? foreach ($arResult['LIST'] as $item) { ?>
+        <tbody data-container="basket-item" data-basket-item-id="<?= $item['PRODUCT_ID'] ?>">
         <tr>
             <td data-container="basket-item-restore-button" data-basket-item-action="plus" class="restore-button hide"
                 colspan="6">
                 <?= Loc::getMessage('WC_BASKET_RESTORE_BUTTON') ?>
             </td>
         </tr>
-        <tr data-container="basket-item">
+        <tr data-container="basket-item-body">
             <td><?= $item['NAME'] ?></td>
             <td>
                 <? if ($item['DISCOUNT_PRICE']) { ?>
@@ -38,7 +38,7 @@ use \Bitrix\Main\Localization\Loc;
                         <td data-basket-item-action="minus">-</td>
                         <td>
                             <label>
-                                <input type="text" data-basket-item-action="set"
+                                <input type="text" data-basket-item-action="set" data-container="basket-item-input"
                                        value="<?= $item['QUANTITY'] ?>">
                             </label>
                         </td>
