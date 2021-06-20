@@ -28,7 +28,7 @@ class WCSaleOrder {
                 this.saveOrder.bind(this)
             );
 
-            BX.addCustomEvent('OnBasketChange', this.refreshOrder.bind(this));
+            BX.addCustomEvent('onBasketUpdate', this.refreshOrder.bind(this));
         });
     }
 

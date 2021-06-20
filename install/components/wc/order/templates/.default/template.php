@@ -340,9 +340,6 @@ $errors = $arResult['ERRORS'];
         <td><?= $data['FIELDS']['PRICE_FORMATTED'] ?></td>
     </tr>
     </tbody>
-    <tr>
-        <td data-container="basket-empty" class="hide"><?= Loc::getMessage('WC_BASKET_EMPTY') ?></td>
-    </tr>
 </table>
 
 <script type="text/javascript">

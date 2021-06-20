@@ -8,15 +8,6 @@ use WC\Core\Helpers\Catalog;
 
 class Basket extends \Bitrix\Sale\Basket
 {
-    public function getData(): array
-    {
-        return [
-            'FIELDS' => $this->getFieldValuesFormatted(),
-            'ITEMS' => $this->getItemsList(),
-            'REMOVED_ITEMS' => $this->getRemovedItemsList(),
-        ];
-    }
-
     public function getFieldValuesFormatted(): array
     {
         $fields = $this->getFieldValues();
@@ -41,12 +32,6 @@ class Basket extends \Bitrix\Sale\Basket
         }
 
         return $itemsList;
-    }
-
-    public function getRemovedItemsList(): array
-    {
-        // todo
-        return [];
     }
 
     public function getFieldValues(): array

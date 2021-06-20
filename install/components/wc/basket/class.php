@@ -29,7 +29,10 @@ class Basket extends \CBitrixComponent
         $cBasketHandler = static::getCBasketHandler($this->arParams);
 
         $basket = $cBasketHandler::getBasket(Fuser::getId());
-        $this->arResult = $basket->getData();
+        $this->arResult = [
+            'FIELDS' => $basket->getFieldValuesFormatted(),
+            'LIST' => $basket->getItemsList(),
+        ];
 
         $this->includeComponentTemplate();
     }

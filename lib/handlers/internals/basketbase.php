@@ -93,8 +93,9 @@ abstract class BasketBase implements BasketInterface
 
         if ($r->isSuccess()) {
             $this->result->setData([
-                'BASKET_ITEM' => $this->basketItem->getFieldValuesFormatted(),
-                'BASKET' => $this->basket->getData(),
+                'ITEM' => $this->basketItem->getFieldValuesFormatted(),
+                'FIELDS' => $this->basket->getFieldValuesFormatted(),
+                'LIST' => $this->basket->getItemsList(),
             ]);
         } else {
             $this->result->mergeResult($r);
