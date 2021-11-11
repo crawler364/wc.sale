@@ -72,10 +72,10 @@ class Order extends \Bitrix\Sale\Order
         return $restrictedProperties;
     }
 
-    public function getPropertyByCode($code)
+    public function getPropertyByCode($code, $personTypeId = null)
     {
         $pc = $this->getPropertyCollection();
-        $personTypeId = $this->getPersonTypeId();
+        $personTypeId = $personTypeId ?: $this->getPersonTypeId();
 
         foreach ($pc as $property) {
             if ($property->getPersonTypeId() == $personTypeId && $property->getField('CODE') === $code) {
