@@ -4,7 +4,9 @@
 namespace WC\Sale;
 
 
+use Bitrix\Main\ArgumentException;
 use Bitrix\Sale\Fuser;
+use Bitrix\Sale\PropertyValue;
 use WC\Core\Helpers\Catalog;
 
 class Order extends \Bitrix\Sale\Order
@@ -22,6 +24,7 @@ class Order extends \Bitrix\Sale\Order
 
     /**
      * @return null|int
+     * @throws ArgumentException
      */
     public function getFUserId(): ?int
     {
@@ -34,7 +37,7 @@ class Order extends \Bitrix\Sale\Order
 
     public function getRestrictedProperties(): array
     {
-        /** @var \Bitrix\Sale\PropertyValue $property */
+        /** @var PropertyValue $property */
 
         $restrictedProperties = [];
         $propertyCollection = $this->getPropertyCollection();
@@ -67,5 +70,19 @@ class Order extends \Bitrix\Sale\Order
         }
 
         return $restrictedProperties;
+    }
+
+    public function getPropertyByCode($code)
+    {
+        $pc = $this->getPropertyCollection();
+        $personTypeId = $this->getPersonTypeId();
+
+        foreach ($pc as $property) {
+            if ($property->getPersonTypeId() == $personTypeId && $property->getField('CODE') === $code) {
+                return $property;
+            }
+        }
+
+        return null;
     }
 }
