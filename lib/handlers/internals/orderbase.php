@@ -559,12 +559,12 @@ abstract class OrderBase implements OrderInterface
         if ($USER->IsAuthorized()) {
             $userId = $USER->GetID();
         } else {
-            $r = $this->orderUser::autoRegister([$this->order->getPropertyCollection()]);
+            $result = $this->orderUser::autoRegister($this->order->getPropertyCollection());
 
-            if ((int)$r > 0) {
-                $userId = $r;
+            if ($result->isSuccess()) {
+                $userId = $result->getDataField('ID');
             } else {
-                $this->result->addError($r->LAST_ERROR);
+                $this->result->addErrors($result->getErrors());
             }
         }
 

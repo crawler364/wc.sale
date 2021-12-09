@@ -5,28 +5,33 @@ namespace WC\Sale\Handlers;
 
 
 use Bitrix\Sale\PropertyValueCollection;
+use WC\Core\Bitrix\Main\Result;
 
 class OrderUser
 {
-    public static function autoRegister(array $fields)
+    public static function autoRegister($pc): Result
     {
-        $pc = $fields[0];
-        if ($fields[0] instanceof PropertyValueCollection && $emailProperty = $pc->getItemByOrderPropertyCode('EMAIL')) {
+        $result = new Result;
+
+        if ($pc instanceof PropertyValueCollection && $emailProperty = $pc->getItemByOrderPropertyCode('EMAIL')) {
             $email = $emailProperty->getValue();
         }
         $password = uniqid();
         $user = new \CUser;
 
-        $result = $user->Add([
+        $id = $user->Add([
             'LOGIN' => $email,
             'EMAIL' => $email,
             'PASSWORD' => $password,
             'CONFIRM_PASSWORD' => $password,
         ]);
 
-        if ((int)$result > 0) {
+        if ((int)$id > 0) {
             global $USER;
-            $USER->Authorize($result);
+            $USER->Authorize($id);
+            $result->setData(['ID' => $id]);
+        } else {
+            $result->addError($user->LAST_ERROR);
         }
 
         return $result;

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace WC\Sale\Components;
-
 
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
@@ -27,14 +25,20 @@ class Basket extends \CBitrixComponent
         /** @var BasketHandler $cBasketHandler */
 
         $cBasketHandler = static::getCBasketHandler($this->arParams);
-
         $basket = $cBasketHandler::getBasket(Fuser::getId());
-        $this->arResult = [
-            'FIELDS' => $basket->getFieldValuesFormatted(),
-            'LIST' => $basket->getItemsList(),
-        ];
 
-        $this->includeComponentTemplate();
+        if ($basket->isEmpty()) {
+            $template = 'empty';
+        } else {
+            $this->arResult = [
+                'FIELDS' => $basket->getFieldValuesFormatted(),
+                'LIST' => $basket->getItemsList(),
+            ];
+
+            $template = '';
+        }
+
+        $this->includeComponentTemplate($template);
     }
 
     public static function checkModules(array $modules): void
